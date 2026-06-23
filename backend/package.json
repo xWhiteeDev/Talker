@@ -1,0 +1,35 @@
+{
+  "name": "talker-backend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Social media project",
+  "homepage": "https://github.com/xWhiteeDev/Talker#readme",
+  "bugs": {
+    "url": "https://github.com/xWhiteeDev/Talker/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xWhiteeDev/Talker.git"
+  },
+  "license": "ISC",
+  "author": "WhiteeDev",
+  "type": "module",
+  "main": "dist/app/server.js",
+  "scripts": {
+    "test": "test",
+    "dev": "tsx watch app/server.ts"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/mysql": "^2.15.27",
+    "@types/node": "^26.0.0",
+    "tsx": "^4.22.4",
+    "typescript": "^6.0.3"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "mysql": "^2.18.1",
+    "mysql2": "^3.22.5"
+  }
+}
