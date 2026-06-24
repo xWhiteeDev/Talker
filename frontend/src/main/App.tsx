@@ -1,5 +1,8 @@
+import appstyle from '../styles/components/app.module.css'
+
 export default function App() {
   return (
-    <div></div>
+    <div className={appstyle.appContainer}>
+    </div>
   )
 }

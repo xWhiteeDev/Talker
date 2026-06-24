@@ -1,0 +1,54 @@
+.container {
+    position: fixed;
+    display: flex;
+    background-image: url(../../assets/auth/bg.png);
+    width: 100%;
+    height: 100%;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    margin: 0;
+    top: 0;
+    left: 0;
+    right: 0;
+}
+
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(322deg, rgba(187, 245, 254, 1) 0%, rgba(219, 219, 219, 0.562) 100%);
+    height: 100%;
+    width: 20%;
+    border: 2px solid rgba(0, 0, 0, 0.658);
+    backdrop-filter: blur(6px);
+}
+
+
+.mediaInfo {
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    /* background-color: rgba(255, 0, 0, 0.418); */
+    height: 35%;
+    gap: 4%;
+    width: 100%;
+    text-align: center;
+    font-size: 2.2rem;
+    border-bottom: 2px solid rgb(51, 51, 51);
+}
+
+.mediaLogo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+
+.section {
+    background-color: red;
+    width: 100%;
+    height: 55%;
+}
