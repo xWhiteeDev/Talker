@@ -1,4 +1,4 @@
-import type { IQuote } from "../interfaces/IQuote";
+import type { IQuote } from "../interfaces/components/IQuote";
 
 export default function Quote({ size, weight, text }: IQuote) {
   return (

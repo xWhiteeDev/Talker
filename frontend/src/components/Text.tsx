@@ -1,4 +1,4 @@
-import type { IText } from "../interfaces/IText";
+import type { IText } from "../interfaces/components/IText";
 
 export default function CustomText({
   text,

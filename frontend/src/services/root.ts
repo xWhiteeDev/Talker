@@ -1,5 +1,7 @@
+import type { ViteModule } from "../interfaces/services/IRoot";
+
 export async function fetchImage(imageName: string): Promise<string | undefined> {
-    const images = import.meta.glob('../assets/**/*.png');
+    const images = import.meta.glob<ViteModule>(['../assets/**/*.png', '../assets/**/*.jpeg', '../assets/**/*.jpg', '../assets/**/*.svg']);
     const img = Object.keys(images).find(image => {
         const lastIndex: number = image.lastIndexOf('/');
         const fileName = image.slice(lastIndex + 1);

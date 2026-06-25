@@ -20,7 +20,8 @@ export default function Auth() {
           <Quote text="Say Hello to your friends!" size="1.9rem" weight="600" />
         </div>
         <div className={style.section}>
-          <Input width="222px" height="10%"/>
+          <Input width="85%" height="20%" image="login_ico.png" />
+          <Input width="85%" height="20%" image="pass_ico.png" />
         </div>
       </Sidebar>
     </div>
