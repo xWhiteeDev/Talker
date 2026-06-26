@@ -8,7 +8,14 @@ export default function CustomText({
   className,
 }: IText) {
   return (
-    <span className={className} style={{ fontWeight: weight, fontSize: size }}>
+    <span
+      className={className}
+      style={{
+        fontWeight: weight,
+        fontSize: size,
+        fontFamily: "Trebuchet MS, Lucida Sans Unicode, Lucida Grande, Lucida Sans, Arial, sans-serif",
+      }}
+    >
       {text}{" "}
       {bottomText ? (
         <>

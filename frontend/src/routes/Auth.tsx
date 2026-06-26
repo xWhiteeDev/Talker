@@ -1,4 +1,4 @@
-import style from "../styles/components/auth.module.css";
+import style from "../styles/routes/auth.module.css";
 import Sidebar from "../components/Sidebar";
 import Quote from "../components/Quote";
 import Logo from "../components/Logo";
@@ -20,8 +20,9 @@ export default function Auth() {
           <Quote text="Say Hello to your friends!" size="1.9rem" weight="600" />
         </div>
         <div className={style.section}>
-          <Input width="85%" height="20%" image="login_ico.png" />
-          <Input width="85%" height="20%" image="pass_ico.png" />
+          <CustomText text="Fill authorization fields" weight="600" size="1.1rem"/>
+          <Input width="85%" type="text" height="20%" placeholder="Type your email or phone number" image="login_ico.png" />
+          <Input width="85%" type="password" height="20%" placeholder="Type your password" image="pass_ico.png" />
         </div>
       </Sidebar>
     </div>

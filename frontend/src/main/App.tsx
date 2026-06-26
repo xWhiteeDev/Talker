@@ -1,4 +1,4 @@
-import appstyle from '../styles/components/app.module.css'
+import appstyle from '../styles/routes/app.module.css'
 
 export default function App() {
   return (

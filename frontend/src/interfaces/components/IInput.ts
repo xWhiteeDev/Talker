@@ -3,4 +3,8 @@ export interface IInput {
     height:string;
     image?:string
     placeholder?:string;
+    type:string
+    onChange?:() => void;
+    onInput?:() => void;
+    onSubmit?:()=> void
 }
