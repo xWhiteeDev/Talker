@@ -10,7 +10,11 @@ const routes = createBrowserRouter([
   },
   {
     path:'/auth',
-    element:<Auth/>
+    element:<Auth/>,
+    children:[{
+      path:'register',
+      element:<>todo</>
+    }]
   }
 ]);
 

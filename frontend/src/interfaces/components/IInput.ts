@@ -4,7 +4,9 @@ export interface IInput {
     image?:string
     placeholder?:string;
     type:string
-    onChange?:() => void;
-    onInput?:() => void;
-    onSubmit?:()=> void
+    onChange?:(e: React.FormEvent<HTMLInputElement>) => void;
+    onInput?:(e: React.FormEvent<HTMLInputElement>) => void;
+    onSubmit?:(e: React.FormEvent<HTMLInputElement>)=> void;
+    min?:number;
+    max?:number
 }
