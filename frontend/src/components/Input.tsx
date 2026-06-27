@@ -13,6 +13,7 @@ export default function Input({
   type,
   max,
   min,
+  ref,
 }: IInput) {
   const [img, setImg] = useState<string>();
   useEffect(() => {
@@ -40,6 +41,7 @@ export default function Input({
         />
       )}
       <input
+        ref={ref}
         className={style.global}
         type={type}
         maxLength={max}

@@ -10,6 +10,7 @@ export default function Button({
   textAlignment,
   fontSize,
   onClick,
+  isDisabled
 }: IButton) {
   return (
     <button
@@ -25,6 +26,7 @@ export default function Button({
         outline: "none",
         fontSize,
       }}
+      disabled={isDisabled}
       onClick={(e) => onClick?.(e)}
     >
       {text}

@@ -1,3 +1,5 @@
+import type React from "react";
+
 export interface IInput {
     width:string;
     height:string;
@@ -8,5 +10,6 @@ export interface IInput {
     onInput?:(e: React.FormEvent<HTMLInputElement>) => void;
     onSubmit?:(e: React.FormEvent<HTMLInputElement>)=> void;
     min?:number;
-    max?:number
+    max?:number;
+    ref?: React.Ref<HTMLInputElement>
 }

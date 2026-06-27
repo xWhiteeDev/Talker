@@ -6,6 +6,7 @@ export default function CustomText({
   weight,
   size,
   className,
+  align,
 }: IText) {
   return (
     <span
@@ -13,7 +14,9 @@ export default function CustomText({
       style={{
         fontWeight: weight,
         fontSize: size,
-        fontFamily: "Trebuchet MS, Lucida Sans Unicode, Lucida Grande, Lucida Sans, Arial, sans-serif",
+        textAlign: align,
+        fontFamily:
+          "Trebuchet MS, Lucida Sans Unicode, Lucida Grande, Lucida Sans, Arial, sans-serif",
       }}
     >
       {text}{" "}
