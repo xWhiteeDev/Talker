@@ -1,14 +1,39 @@
-  .container {
-      position: absolute;
-      display: flex;
-      flex-direction: column;
-      gap: 6%;
-      align-items: center;
-      backdrop-filter: blur(2px);
-      border: 2px solid black;
-      background: linear-gradient(322deg, rgba(187, 245, 254, 1) 0%, rgba(219, 219, 219, 0.61) 100%);
-      width: 100%;
-      height: 30%;
-      grid-column: 2/3;
-      margin-bottom: 21%
-  }
+.container {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    gap: 2%;
+    align-items: center;
+    backdrop-filter: blur(4px);
+    border: 2px solid black;
+    background: linear-gradient(322deg, rgba(187, 245, 254, 1) 0%, rgba(219, 219, 219, 0.61) 100%);
+    width: 100%;
+    height: 40%;
+    grid-column: 2/3;
+}
+
+.section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 70%;
+    height: 85%;
+}
+
+.section form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3%;
+
+}
+
+.personalData {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    width: 75%;
+    height: 20%;
+    gap:4%;
+}

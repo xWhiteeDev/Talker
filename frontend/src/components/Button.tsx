@@ -10,11 +10,13 @@ export default function Button({
   textAlignment,
   fontSize,
   onClick,
-  isDisabled
+  isDisabled,
+  type
 }: IButton) {
   return (
     <button
       className={style.global}
+      type={type}
       style={{
         width,
         height,

@@ -8,6 +8,7 @@ export interface IButton {
     textAlignment?: TextAlign;
     fontSize?: string;
     isDisabled?:boolean
+    type?:'submit' | 'reset' | 'button'
     onClick?: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
 }
 type TextAlign = 'center' | 'start' | 'left' | 'end' | 'right' | '-webkit-center' | '-webkit-left' | '-webkit-match-parent'

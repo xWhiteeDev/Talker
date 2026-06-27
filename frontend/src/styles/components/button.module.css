@@ -2,3 +2,7 @@
     cursor: pointer;
     filter: brightness(0.9);
 }
+.global:disabled {
+    opacity: 0.4;
+    cursor:not-allowed;
+}
