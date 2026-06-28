@@ -1,17 +1,17 @@
 export interface IRegisterInfo {
     email: string;
-    firstName:string;
-    lastName:string;
+    firstName: string;
+    lastName: string;
     password: string;
-    date: string;
-    sex?:string
+    birthdayDate: string;
+
 }
 
 export interface IRegisterFormData {
-    email:string;
-    firstName:string;
-    lastName:string;
-    password:string;
-    birthdayDate:string;
-    
+    email: string;
+    firstName: string;
+    lastName: string;
+    password: string;
+    birthdayDate: string;
+
 }
