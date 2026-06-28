@@ -8,15 +8,17 @@ const cfg = {
     password: process.env['TALKER_SERVER_DB_PASSWORD'],
     database: process.env['TALKER_SERVER_DB_DATABASE'],
     waitForConnections: true,
-    connectionLimit: 15
+    connectionLimit: 15,
+    namedPlaceholders: true
+
 }
 
 export function createPool(): Pool {
     if (!cfg.password || !cfg.database) {
-        console.error('NIE USTAWIONO KRYTYCZNEGO PUNKTU KONFIGURACJI: PASSWORD LUB DATABASE');
+        console.error('CRITICAL CONFIG POINT ISNT SET! PASSWORD OR DATABASE');
         process.exit(1)
     }
-    const pool = mysql.createPool({ user: cfg.user, port: +cfg.port, password: cfg.password, database: cfg.database, waitForConnections: cfg.waitForConnections, connectionLimit: cfg.connectionLimit })
+    const pool = mysql.createPool({ user: cfg.user, port: +cfg.port, password: cfg.password, database: cfg.database, waitForConnections: cfg.waitForConnections, connectionLimit: cfg.connectionLimit, namedPlaceholders: cfg.namedPlaceholders });
     return pool
 }
 
