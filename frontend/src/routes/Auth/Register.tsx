@@ -1,13 +1,11 @@
-import { useRef, useState } from "react";
 import Button from "../../components/Button";
 import Input from "../../components/Input";
 import CustomText from "../../components/Text";
 import style from "../../styles/routes/Auth/register.module.css";
 import { extractFormData } from "../../services/routes/Auth/registerService";
+import { registerConfig } from "../../configs/registerConfig";
 
 export default function Register() {
-  const today = new Date();
-  const currentDate = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate}`;
   return (
     <div className={style.container}>
       <CustomText
@@ -34,8 +32,8 @@ export default function Register() {
             width="75%"
             height="15%"
             image="email_ico.png"
-            min={3}
-            max={30}
+            min={registerConfig.email.min}
+            max={registerConfig.email.max}
             isRequired={true}
           />
           <Input
@@ -54,8 +52,8 @@ export default function Register() {
             width="75%"
             height="15%"
             image="pass_ico.png"
-            min={5}
-            max={200}
+            min={registerConfig.password.min}
+            max={registerConfig.password.max}
             isRequired={true}
           />
           <div className={style.personalData}>
@@ -65,8 +63,8 @@ export default function Register() {
               placeholder="First name"
               width="45%"
               height="75%"
-              min={2}
-              max={15}
+              min={registerConfig.personalData.min}
+              max={registerConfig.personalData.max}
               isRequired={true}
             />
             <Input
@@ -75,8 +73,8 @@ export default function Register() {
               placeholder="Last name"
               width="45%"
               height="75%"
-              min={2}
-              max={15}
+              min={registerConfig.personalData.min}
+              max={registerConfig.personalData.max}
               isRequired={true}
             />
           </div>
