@@ -1,4 +1,4 @@
-import type { IRegisterFormData } from "../../../interfaces/services/routes/Auth/IRegister";
+import type { IRegisterConfig, IRegisterFormData } from "../../../interfaces/services/routes/Auth/IRegister";
 
 export function getPersonAge(birthdayDate: string, today: string): number {
     const [birthYear, birthMonth, birthDay] = birthdayDate.split('-').map(Number);
@@ -31,8 +31,30 @@ function isKeyValid<T>(key: string, allowed: (keyof T & string)[]): key is keyof
 }
 
 
-export function checkDataRequirements({ email, password, firstName, lastName, birthdayDate }: IRegisterFormData) {
-    if (password.length <= 5) return {
-        password: false
-    } //todo
+export function checkDataRequirements({ email, password, firstName, lastName, birthdayDate }: IRegisterFormData, requirementConfig: IRegisterConfig): Record<keyof IRegisterFormData, boolean> | {} {
+    const nonCompilantProperties = {} as Record<keyof IRegisterFormData, boolean>
+    const today = new Date()
+    const currentDate = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
+
+    if (password.length < requirementConfig.password.min || password.length > requirementConfig.password.max) {
+        nonCompilantProperties['password'] = false
+    }
+    if (email.length < requirementConfig.email.min || email.length > requirementConfig.email.max) {
+        nonCompilantProperties['email'] = false
+    }
+    if (checkPersonalDataRequirement(firstName, requirementConfig)) {
+        nonCompilantProperties['firstName'] = false
+    }
+    if (checkPersonalDataRequirement(lastName, requirementConfig)) {
+        nonCompilantProperties['lastName'] = false
+    }
+    if (getPersonAge(birthdayDate, currentDate) < requirementConfig.minimalUsageAge) {
+        nonCompilantProperties['birthdayDate'] = false
+    }
+    return nonCompilantProperties
+}
+
+function checkPersonalDataRequirement(personInfo: string, { personalData, personalDataRegex }: IRegisterConfig) {
+    const correctPersonalData: string = personInfo.trim();
+    return (correctPersonalData.length < personalData.min || correctPersonalData.length > personalData.max) || personalDataRegex.test(personInfo)
 }
