@@ -3,6 +3,7 @@ import dotEnv from 'dotenv'
 import cors from 'cors'
 import cookieparser from 'cookie-parser'
 import { createPool } from '../database/database.js';
+import { authRouter } from '../routes/authRoute.js';
 
 dotEnv.config();
 export const pool = createPool();
@@ -26,3 +27,5 @@ app.listen(cfg.serverPort, (err) => {
     }
     console.log(cfg.connectionMessage)
 })
+
+app.use('/api/auth',authRouter)
