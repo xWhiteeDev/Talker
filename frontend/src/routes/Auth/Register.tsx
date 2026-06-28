@@ -2,7 +2,10 @@ import Button from "../../components/Button";
 import Input from "../../components/Input";
 import CustomText from "../../components/Text";
 import style from "../../styles/routes/Auth/register.module.css";
-import { extractFormData } from "../../services/routes/Auth/registerService";
+import {
+  checkDataRequirements,
+  extractFormData,
+} from "../../services/routes/Auth/registerService";
 import { registerConfig } from "../../configs/registerConfig";
 
 export default function Register() {
@@ -17,12 +20,30 @@ export default function Register() {
       <div className={style.section}>
         <form
           style={{ height: "100%", width: "100%" }}
-          onSubmit={(e) => {
+          onSubmit={async (e) => {
             e.preventDefault();
 
             const formData = new FormData(e.currentTarget);
             const data = extractFormData(formData);
-            if (data) console.log(data);
+            if (!data) return; //todo Error handler / notify user
+            const requirementsCheck = checkDataRequirements(
+              data,
+              registerConfig,
+            );
+            if (!requirementsCheck) return; //todo Error handler / notify user
+            const res = await fetch("http://localhost:3000/api/auth/register", {
+              method: "POST",
+              headers: {
+                "Content-type": "application/json",
+              },
+              body: JSON.stringify({data}),
+            });
+            if (!res.ok) {
+              console.error(res.status, res.statusText);
+              //todo Error handler / notify user
+              return;
+            }
+            const result = await res.json();
           }}
         >
           <Input
