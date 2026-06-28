@@ -1,4 +1,6 @@
-export const registerConfig = {
+import type { IRegisterConfig } from "../interfaces/services/routes/Auth/IRegister";
+
+export const registerConfig: IRegisterConfig = {
     password: {
         min: 5,
         max: 200
