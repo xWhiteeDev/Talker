@@ -12,7 +12,7 @@ export const registerConfig: IRegisterConfig = {
     },
     email: {
         min: 5,
-        max: 15
+        max: 35
     },
     minimalUsageAge: 14
 }
