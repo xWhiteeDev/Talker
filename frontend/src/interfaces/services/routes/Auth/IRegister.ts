@@ -1,12 +1,4 @@
-export interface IRegisterInfo {
-    email: string;
-    firstName: string;
-    lastName: string;
-    password: string;
-    birthdayDate: string;
-}
-
-export interface IRegisterFormData {
+export interface IRegister {
     email: string;
     firstName: string;
     lastName: string;
