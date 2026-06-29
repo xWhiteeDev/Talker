@@ -7,8 +7,8 @@ export class AuthService implements IAuthService {
     constructor(private authRepository: IAuthRepository) {
         console.log(`[AuthService] authRepository included`);
     }
-    async insert(email: string, data: IAuthInsertDTO): Promise<boolean> {
-        const existingUser = await this.authRepository.findByEmail(email)
+    async insert(data: IAuthInsertDTO): Promise<boolean> {
+        const existingUser = await this.authRepository.findByEmail(data.email)
         if (existingUser) return false
         const payload = { ...data }
         payload.firstName = data.firstName.trim();
@@ -19,22 +19,22 @@ export class AuthService implements IAuthService {
             return false
         }
 
-        const result = await this.authRepository.insert(email, payload)
+        const result = await this.authRepository.insert(payload)
         return result
     }
-    async update(email: string, dto: IAuthUpdateDTO): Promise<boolean> {
-        const existingUser = await this.authRepository.findByEmail(email)
+    async update(data: IAuthUpdateDTO): Promise<boolean> {
+        const existingUser = await this.authRepository.findByEmail(data.email)
         if (!existingUser) return false
-        const payload = { ...dto }
-        if (dto.password) {
+        const payload = { ...data}
+        if (data.password) {
             try {
-                payload.password = await bcrypt.hash(dto.password, 12);
+                payload.password = await bcrypt.hash(data.password, 12);
 
             } catch (error) {
                 return false
             }
         }
-        return await this.authRepository.update(email, payload);
+        return await this.authRepository.update(payload);
 
     }
     async findByEmail(email: string): Promise<IAccountRow | null> {
