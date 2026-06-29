@@ -11,11 +11,11 @@ export class AuthRepository implements IAuthRepository {
         if (!result) return null
         return result
     }
-    async insert(email: string, data: IAuthInsertDTO): Promise<boolean> {
-        const [result] = await this.pool.execute<ResultSetHeader>('INSERT INTO accounts (email,password,birthdayDate,firstName,lastName) VALUES (:email,:password,:birthdayDate,:firstName,:lastName)', { email: email, ...data });
+    async insert(data: IAuthInsertDTO): Promise<boolean> {
+        const [result] = await this.pool.execute<ResultSetHeader>('INSERT INTO accounts (email,password,birthdayDate,firstName,lastName) VALUES (:email,:password,:birthdayDate,:firstName,:lastName)', {...data });
         return result.affectedRows > 0
     }
-    async update(email: string, data: IAuthUpdateDTO): Promise<boolean> {
+    async update(data: IAuthUpdateDTO): Promise<boolean> {
         const allowedKeys: (keyof IAuthUpdateDTO)[] = ['password', 'birthdayDate', 'firstName', 'lastName']
         const queries: string[] = [];
         const queryValues = {} as Record<keyof IAuthUpdateDTO | 'email', unknown>;
@@ -26,7 +26,7 @@ export class AuthRepository implements IAuthRepository {
             queries.push(`${key}=:${key}`);
             queryValues[key] = data[key]
         }
-        queryValues['email'] = email
+        queryValues['email'] = data.email
         if (queries.length == 0) return false;
         const fullQueryPart = queries.join(',');
         const [result] = await this.pool.execute<ResultSetHeader>(`UPDATE accounts SET ${fullQueryPart} WHERE email=:email`, queryValues as Record<keyof IAuthUpdateDTO | 'email', ExecuteValues>);
