@@ -1,8 +1,8 @@
 import { type ResultSetHeader, type ExecuteValues, type Pool } from 'mysql2/promise';
-import type { IAuthRepository, IUpdateDTO } from '../interface/repository/IAuthRepository.js';
+import type { IAuthInsertDTO, IAuthRepository, IAuthUpdateDTO } from '../interface/repository/IAuthRepository.js';
 import type { IAccountRow } from '../interface/database/IAccount.js';
 
-export class authRepository implements IAuthRepository {
+export class AuthRepository implements IAuthRepository {
     constructor(private pool: Pool) {
         console.log(`Pool injected: ${this.pool.threadId}`)
     }
@@ -11,16 +11,16 @@ export class authRepository implements IAuthRepository {
         if (!result) return null
         return result
     }
-    async insert(email: string, password: string, birthdayDate: string, firstName: string, lastName: string): Promise<boolean> {
-        const [result] = await this.pool.execute<ResultSetHeader>('INSERT INTO accounts (email,password,birthdayDate,firstName,lastName) VALUES (:email,:password,:birthdayDate,:firstName,:lastName)', { email, password, birthdayDate, firstName, lastName });
+    async insert(email: string, data: IAuthInsertDTO): Promise<boolean> {
+        const [result] = await this.pool.execute<ResultSetHeader>('INSERT INTO accounts (email,password,birthdayDate,firstName,lastName) VALUES (:email,:password,:birthdayDate,:firstName,:lastName)', { email: email, ...data });
         return result.affectedRows > 0
     }
-    async update(email: string, data: IUpdateDTO): Promise<boolean> {
-        const allowedKeys: (keyof IUpdateDTO)[] = ['password', 'birthdayDate', 'firstName', 'lastName']
+    async update(email: string, data: IAuthUpdateDTO): Promise<boolean> {
+        const allowedKeys: (keyof IAuthUpdateDTO)[] = ['password', 'birthdayDate', 'firstName', 'lastName']
         const queries: string[] = [];
-        const queryValues = {} as Record<keyof IUpdateDTO | 'email', unknown>;
+        const queryValues = {} as Record<keyof IAuthUpdateDTO | 'email', unknown>;
 
-        let key: keyof IUpdateDTO;
+        let key: keyof IAuthUpdateDTO;
         for (key in data) {
             if (!allowedKeys.includes(key) || data[key] == null) continue
             queries.push(`${key}=:${key}`);
@@ -29,7 +29,11 @@ export class authRepository implements IAuthRepository {
         queryValues['email'] = email
         if (queries.length == 0) return false;
         const fullQueryPart = queries.join(',');
-        const [result] = await this.pool.execute<ResultSetHeader>(`UPDATE accounts SET ${fullQueryPart} WHERE email=:email`, queryValues as Record<keyof IUpdateDTO | 'email', ExecuteValues>);
+        const [result] = await this.pool.execute<ResultSetHeader>(`UPDATE accounts SET ${fullQueryPart} WHERE email=:email`, queryValues as Record<keyof IAuthUpdateDTO | 'email', ExecuteValues>);
+        return result.affectedRows > 0
+    }
+    async delete(email: string): Promise<boolean> {
+        const [result] = await this.pool.execute<ResultSetHeader>('DELETE FROM accounts WHERE email=:email', { email: email })
         return result.affectedRows > 0
     }
 
