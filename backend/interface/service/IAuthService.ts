@@ -3,7 +3,7 @@ import type { IAuthInsertDTO, IAuthUpdateDTO } from "../repository/IAuthReposito
 
 export interface IAuthService {
     findByEmail(email: string): Promise<IAccountRow | null>;
-    insert(email: string, data: IAuthInsertDTO): Promise<boolean>;
-    update(email: string, dto: IAuthUpdateDTO): Promise<boolean>
+    insert(data: IAuthInsertDTO): Promise<boolean>;
+    update(dto: IAuthUpdateDTO): Promise<boolean>
     delete(email: string): Promise<boolean>
 }
