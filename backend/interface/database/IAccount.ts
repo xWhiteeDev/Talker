@@ -1,6 +1,6 @@
-import type { ResultSetHeader } from "mysql2";
+import type {  RowDataPacket } from "mysql2";
 
-export interface IAccountRow extends ResultSetHeader {
+export interface IAccountRow extends RowDataPacket {
     id: string;
     created_at: string;
     email: string;
