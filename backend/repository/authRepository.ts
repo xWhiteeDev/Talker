@@ -6,8 +6,9 @@ export class authRepository implements IAuthRepository {
     constructor(private pool: Pool) {
         console.log(`Pool injected: ${this.pool.threadId}`)
     }
-    async findByEmail(email: string): Promise<IAccountRow> {
-        const [result] = await this.pool.query<IAccountRow>('SELECT * FROM accounts WHERE email=:email', { email: email });
+    async findByEmail(email: string): Promise<IAccountRow | null> {
+        const [[result]] = await this.pool.query<IAccountRow[]>('SELECT * FROM accounts WHERE email=:email', { email: email });
+        if (!result) return null
         return result
     }
     async insert(email: string, password: string, birthdayDate: string, firstName: string, lastName: string): Promise<boolean> {
