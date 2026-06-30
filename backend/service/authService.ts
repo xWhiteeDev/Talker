@@ -5,16 +5,18 @@ import type { IAuthService } from "../interface/service/IAuthService.js";
 
 export class AuthService implements IAuthService {
     constructor(private authRepository: IAuthRepository) {
-        console.log(`[AuthService] authRepository included`);
+        console.log(`\x1b[32;1m🚀[AuthService] authRepository injected \x1b[0m`)
     }
     async insert(data: IAuthInsertDTO): Promise<boolean> {
         const existingUser = await this.authRepository.findByEmail(data.email)
+
         if (existingUser) return false
         const payload = { ...data }
         payload.firstName = data.firstName.trim();
         payload.lastName = data.lastName.trim();
         try {
             payload.password = await bcrypt.hash(data.password, 12);
+
         } catch (error) {
             return false
         }
@@ -25,7 +27,7 @@ export class AuthService implements IAuthService {
     async update(data: IAuthUpdateDTO): Promise<boolean> {
         const existingUser = await this.authRepository.findByEmail(data.email)
         if (!existingUser) return false
-        const payload = { ...data}
+        const payload = { ...data }
         if (data.password) {
             try {
                 payload.password = await bcrypt.hash(data.password, 12);
