@@ -4,7 +4,7 @@ import type { IAccountRow } from '../interface/database/IAccount.js';
 
 export class AuthRepository implements IAuthRepository {
     constructor(private pool: Pool) {
-        console.log(`Pool injected: ${this.pool.threadId}`)
+        console.log(`\x1b[32;1m🚀[AuthRepository] Pool injected \x1b[0m`)
     }
     async findByEmail(email: string): Promise<IAccountRow | null> {
         const [[result]] = await this.pool.query<IAccountRow[]>('SELECT * FROM accounts WHERE email=:email', { email: email });
