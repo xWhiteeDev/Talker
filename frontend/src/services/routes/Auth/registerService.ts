@@ -14,7 +14,7 @@ export function getPersonAge(birthdayDate: string, today: string): number {
 }
 
 export function extractFormData(formData: FormData): IRegister | null {
-    if (!formData || Array(formData).length == 0) return null
+    if (!formData || Array.from(formData.keys()).length === 0) return null
     const allowedKeys: (keyof IRegister)[] = ['email', 'birthdayDate', 'firstName', 'lastName', 'password']
     const collectedData: Partial<IRegister> = {}
     formData.forEach((v, k) => {
@@ -31,7 +31,7 @@ function isKeyValid<T>(key: string, allowed: (keyof T & string)[]): key is keyof
 }
 
 
-export function checkDataRequirements({ email, password, firstName, lastName, birthdayDate }: IRegister, requirementConfig: IRegisterConfig): Record<keyof IRegister, boolean> | {} {
+export function checkDataRequirements({ email, password, firstName, lastName, birthdayDate }: IRegister, requirementConfig: IRegisterConfig): Record<keyof IRegister, boolean> | null {
     const nonCompilantProperties = {} as Record<keyof IRegister, boolean>
     const today = new Date()
     const currentDate = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
@@ -50,6 +50,9 @@ export function checkDataRequirements({ email, password, firstName, lastName, bi
     }
     if (getPersonAge(birthdayDate, currentDate) < requirementConfig.minimalUsageAge) {
         nonCompilantProperties['birthdayDate'] = false
+    }
+    if (Object.keys(nonCompilantProperties).length === 0) {
+        return null
     }
     return nonCompilantProperties
 }
