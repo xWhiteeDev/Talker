@@ -43,6 +43,6 @@ const cfg: Record<string, IRequirementOptions> = {
     }
 }
 
-authRouter.post('/register', isDataValid(cfg), async(req,res)=>{
-   await authController.createUser(req,res)
+authRouter.post('/register', isDataValid(cfg), async(req,res,next)=>{
+   await authController.createUser(req,res,next)
 })
