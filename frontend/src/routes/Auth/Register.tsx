@@ -32,7 +32,7 @@ export default function Register() {
               data,
               registerConfig,
             );
-            if (!requirementsCheck) return; //todo Error handler / notify user
+            if (requirementsCheck) return; //todo Error handler / notify user
             const res = await fetch("http://localhost:3000/api/auth/register", {
               method: "POST",
               headers: {
