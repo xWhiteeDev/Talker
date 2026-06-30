@@ -7,7 +7,7 @@ export class AuthController {
 
     async createUser(req: Request, res: Response, next: NextFunction) {
         try {
-            const result = await this.authService.insert(req.body.data)
+            const result = await this.authService.insertUser(req.body.data)
             if (!result) {
                 res.status(400).json({ message: "Failed to insert result" })
                 return false
@@ -15,8 +15,6 @@ export class AuthController {
             res.status(200).json({ message: 'Record added!' });
             return true
         } catch (error) {
-            console.log(error)
-            res.status(500).json({ message: 'Internal server error' });
             next(error)
         }
     }
