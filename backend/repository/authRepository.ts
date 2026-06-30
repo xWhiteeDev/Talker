@@ -6,13 +6,13 @@ export class AuthRepository implements IAuthRepository {
     constructor(private pool: Pool) {
         console.log(`\x1b[32;1m🚀[AuthRepository] Pool injected \x1b[0m`)
     }
-    async findByEmail(email: string): Promise<IAccountRow | null> {
+    async findWithCredentials(email: string): Promise<IAccountRow | null> {
         const [[result]] = await this.pool.query<IAccountRow[]>('SELECT * FROM accounts WHERE email=:email', { email });
         if (!result) return null
         return result
     }
     async isExist(email: string): Promise<boolean> {
-        const [result] = await this.pool.query<RowDataPacket[]>('SELECT 1 FROM accounts WHERE email=:email', { email })
+        const [[result]] = await this.pool.query<RowDataPacket[]>('SELECT 1 FROM accounts WHERE email=:email', { email })
         return !!result
     }
     async insert(data: IAuthInsertDTO): Promise<boolean> {
