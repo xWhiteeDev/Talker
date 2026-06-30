@@ -7,8 +7,10 @@ import {
   extractFormData,
 } from "../../services/routes/Auth/registerService";
 import { registerConfig } from "../../configs/registerConfig";
+import { redirect, useNavigate } from "react-router-dom";
 
 export default function Register() {
+  const nav = useNavigate();
   return (
     <div className={style.container}>
       <CustomText
@@ -36,7 +38,7 @@ export default function Register() {
               headers: {
                 "Content-type": "application/json",
               },
-              body: JSON.stringify({data}),
+              body: JSON.stringify({ data }),
             });
             if (!res.ok) {
               console.error(res.status, res.statusText);
@@ -44,6 +46,7 @@ export default function Register() {
               return;
             }
             const result = await res.json();
+            nav('/auth/login')
           }}
         >
           <Input
