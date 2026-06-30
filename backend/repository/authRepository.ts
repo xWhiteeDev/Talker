@@ -1,4 +1,4 @@
-import { type ResultSetHeader, type ExecuteValues, type Pool } from 'mysql2/promise';
+import { type ResultSetHeader, type ExecuteValues, type Pool, type RowDataPacket } from 'mysql2/promise';
 import type { IAuthInsertDTO, IAuthRepository, IAuthUpdateDTO } from '../interface/repository/IAuthRepository.js';
 import type { IAccountRow } from '../interface/database/IAccount.js';
 
@@ -7,12 +7,16 @@ export class AuthRepository implements IAuthRepository {
         console.log(`\x1b[32;1m🚀[AuthRepository] Pool injected \x1b[0m`)
     }
     async findByEmail(email: string): Promise<IAccountRow | null> {
-        const [[result]] = await this.pool.query<IAccountRow[]>('SELECT * FROM accounts WHERE email=:email', { email: email });
+        const [[result]] = await this.pool.query<IAccountRow[]>('SELECT * FROM accounts WHERE email=:email', { email });
         if (!result) return null
         return result
     }
+    async isExist(email: string): Promise<boolean> {
+        const [result] = await this.pool.query<RowDataPacket[]>('SELECT 1 FROM accounts WHERE email=:email', { email })
+        return !!result
+    }
     async insert(data: IAuthInsertDTO): Promise<boolean> {
-        const [result] = await this.pool.execute<ResultSetHeader>('INSERT INTO accounts (email,password,birthdayDate,firstName,lastName) VALUES (:email,:password,:birthdayDate,:firstName,:lastName)', {...data });
+        const [result] = await this.pool.execute<ResultSetHeader>('INSERT INTO accounts (email,password,birthdayDate,firstName,lastName) VALUES (:email,:password,:birthdayDate,:firstName,:lastName)', { ...data });
         return result.affectedRows > 0
     }
     async update(data: IAuthUpdateDTO): Promise<boolean> {
