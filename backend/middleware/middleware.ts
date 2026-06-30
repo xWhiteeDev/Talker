@@ -30,7 +30,7 @@ export function isDataValid(requirements: IRequirement) {
                 if (requiredElement.type === 'object' && (Object.keys(passedElement).length > requiredElement.maxLength || Object.keys(passedElement).length < requiredElement.minLength)) {
                     throw new Error(`Property: ${requirement} do not satisfy length requirements!`)
                 }
-                if (requiredElement.type === 'array' && passedElement.length > requiredElement.maxLength || passedElement.length < requiredElement.minLength) {
+                if (requiredElement.type === 'array' && (passedElement.length > requiredElement.maxLength || passedElement.length < requiredElement.minLength)) {
                     throw new Error(`Property: ${requirement} do not satisfy length requirements!`)
                 }
                 if (requiredElement.type !== 'array' && requiredElement.type !== 'object') {
