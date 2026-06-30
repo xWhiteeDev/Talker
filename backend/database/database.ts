@@ -1,4 +1,4 @@
-import mysql, { type Pool } from 'mysql2'
+import mysql, { type Pool } from 'mysql2/promise'
 import dotEnv from 'dotenv'
 dotEnv.config()
 
