@@ -7,8 +7,8 @@ export class AuthService implements IAuthService {
     constructor(private authRepository: IAuthRepository) {
         console.log(`\x1b[32;1m🚀[AuthService] authRepository injected \x1b[0m`)
     }
-    async insert(data: IAuthInsertDTO): Promise<boolean> {
-        const existingUser = await this.authRepository.findByEmail(data.email)
+    async insertUser(data: IAuthInsertDTO): Promise<boolean> {
+        const existingUser = await this.authRepository.isExist(data.email)
 
         if (existingUser) return false
         const payload = { ...data }
@@ -24,8 +24,8 @@ export class AuthService implements IAuthService {
         const result = await this.authRepository.insert(payload)
         return result
     }
-    async update(data: IAuthUpdateDTO): Promise<boolean> {
-        const existingUser = await this.authRepository.findByEmail(data.email)
+    async updateUser(data: IAuthUpdateDTO): Promise<boolean> {
+        const existingUser = await this.authRepository.isExist(data.email)
         if (!existingUser) return false
         const payload = { ...data }
         if (data.password) {
@@ -39,12 +39,16 @@ export class AuthService implements IAuthService {
         return await this.authRepository.update(payload);
 
     }
-    async findByEmail(email: string): Promise<IAccountRow | null> {
-        const result = await this.authRepository.findByEmail(email)
+    async findUserWithCredentials(email: string): Promise<IAccountRow | null> {
+        const result = await this.authRepository.findWithCredentials(email)
         return result
     }
-    async delete(email: string): Promise<boolean> {
-        const existingUser = await this.authRepository.findByEmail(email);
+    async isUserExist(email: string): Promise<boolean> {
+        const result = await this.authRepository.isExist(email)
+        return result
+    }
+    async deleteUser(email: string): Promise<boolean> {
+        const existingUser = await this.authRepository.isExist(email);
         if (!existingUser) return false
         const result = await this.authRepository.delete(email);
         return result
