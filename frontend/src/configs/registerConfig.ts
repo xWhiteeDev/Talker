@@ -1,4 +1,4 @@
-import type { IRegisterConfig } from "../interfaces/services/routes/Auth/IRegister";
+import type { IRegisterConfig } from "../interfaces/services/routes/Auth/IAuth";
 
 export const registerConfig: IRegisterConfig = {
     password: {
