@@ -1,5 +1,5 @@
 import { type ResultSetHeader, type ExecuteValues, type Pool, type RowDataPacket } from 'mysql2/promise';
-import type { IAccountInsertDTO, IAccountRepository, IAccountUpdateDTO } from '../interface/repository/IAuthRepository.js';
+import type { IAccountInsertDTO, IAccountRepository, IAccountUpdateDTO } from '../interface/repository/IAccountRepository.js';
 import type { IAccountRow } from '../interface/database/IAccount.js';
 
 export class AccountRepository implements IAccountRepository {
@@ -33,7 +33,7 @@ export class AccountRepository implements IAccountRepository {
         queryValues['email'] = data.email
         if (queries.length == 0) return false;
         const fullQueryPart = queries.join(',');
-        const [result] = await this.pool.execute<ResultSetHeader>(`UPDATE accounts SET ${fullQueryPart} WHERE email=:email`, queryValues as Record<keyof IAuthUpdateDTO | 'email', ExecuteValues>);
+        const [result] = await this.pool.execute<ResultSetHeader>(`UPDATE accounts SET ${fullQueryPart} WHERE email=:email`, queryValues as Record<keyof IAccountUpdateDTO | 'email', ExecuteValues>);
         return result.affectedRows > 0
     }
     async delete(email: string): Promise<boolean> {
