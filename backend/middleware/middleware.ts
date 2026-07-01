@@ -2,7 +2,6 @@ import type { NextFunction, Request, Response } from "express";
 import type { IRequirement } from "../interface/middleware/IRequirement.js";
 
 export function isDataValid(requirements: IRequirement) {
-    console.log('Middleware intercepted data!')
     return (req: Request, res: Response, next: NextFunction) => {
         try {
             const data = req.body.data
