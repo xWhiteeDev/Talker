@@ -5,7 +5,7 @@ import style from "../../styles/routes/Auth/register.module.css";
 import {
   checkDataRequirements,
   extractFormData,
-} from "../../services/routes/Auth/registerService";
+} from "../../services/routes/Auth/authService";
 import { registerConfig } from "../../configs/registerConfig";
 import { redirect, useNavigate } from "react-router-dom";
 
@@ -41,12 +41,13 @@ export default function Register() {
               body: JSON.stringify({ data }),
             });
             if (!res.ok) {
-              console.error(res.status, res.statusText);
+              const {message} = await res.json();
+
+              console.error(res.status, message);
               //todo Error handler / notify user
               return;
             }
-            const result = await res.json();
-            nav('/auth/login')
+            nav("/auth/login");
           }}
         >
           <Input
