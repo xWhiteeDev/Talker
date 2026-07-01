@@ -1,4 +1,5 @@
-import type { IRegisterConfig, IRegister } from "../../../interfaces/services/routes/Auth/IRegister";
+import type { IRegisterConfig, IRegister, IGlobalConfig } from "../../../interfaces/services/routes/Auth/IAuth";
+import { ErrorHandler } from "../../customError";
 
 export function getPersonAge(birthdayDate: string, today: string): number {
     const [birthYear, birthMonth, birthDay] = birthdayDate.split('-').map(Number);
@@ -25,6 +26,62 @@ export function extractFormData(formData: FormData): IRegister | null {
     })
     return collectedData as IRegister
 }
+
+export function validateFormData<T>(formData: FormData, cfg: IGlobalConfig): T | null {
+    if (!formData) throw new ErrorHandler('Form data empty', 400);
+    const formDataProperties: Record<string, unknown> = {}
+    const validatedProperties: Record<string, unknown> = {}
+    formData.forEach((v, k) => {
+        formDataProperties[k] = v;
+    })
+    for (const property in formDataProperties) {
+        const propertyValue = formDataProperties[property]
+        if (!cfg[property]) continue
+        if (cfg[property].trim && (typeof propertyValue !== 'object' && !Array.isArray(propertyValue))) {
+            if (typeof propertyValue === 'number') {
+                formDataProperties[property] = String(propertyValue).trim()
+            }
+            if (typeof propertyValue === 'string') {
+                formDataProperties[property] = propertyValue.trim()
+
+            }
+        }
+        if (cfg[property].length) {
+            if (typeof propertyValue === 'number') {
+                const newValue = String(propertyValue).length
+                if (newValue < cfg[property].length.min || newValue > cfg[property].length.max) continue 
+
+            }
+            if (typeof propertyValue === 'string') {
+                const newValue = propertyValue.length
+                if (newValue < cfg[property].length.min || newValue > cfg[property].length.max) continue
+
+            }
+            if (typeof propertyValue === 'object' && !Array.isArray(propertyValue)) {
+                const newValue = Array.from(Object.keys(propertyValue as {})).length
+                if (newValue < cfg[property].length.min || newValue > cfg[property].length.max) continue
+
+            }
+            if (Array.isArray(propertyValue)) {
+                const newValue = propertyValue.length
+                if (newValue < cfg[property].length.min || newValue > cfg[property].length.max) continue
+
+            }
+        }
+        if (cfg[property].regexp && (typeof propertyValue !== 'object' && !Array.isArray(propertyValue))) {
+
+            if (typeof propertyValue === 'number') {
+                if (!cfg[property].regexp.test(String(propertyValue))) continue
+            }
+            if (typeof propertyValue === 'string') {
+                if (!cfg[property].regexp.test(propertyValue)) continue
+            }
+        }
+        validatedProperties[property] = formDataProperties[property]
+    }
+    return validatedProperties as T
+}
+
 
 function isKeyValid<T>(key: string, allowed: (keyof T & string)[]): key is keyof T & string {
     return allowed.includes(key as keyof T & string)
