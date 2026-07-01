@@ -13,3 +13,21 @@ export interface IRegisterConfig {
     email: { min: number, max: number },
     minimalUsageAge: number
 }
+
+export interface IGlobalConfig {
+    [key: string]: IConfig
+}
+
+interface IConfig {
+    length?: {
+        min: number;
+        max: number
+    }
+    regexp?: RegExp;
+    trim?: boolean
+}
+
+export interface ILogin {
+    email:string;
+    password:string
+}
