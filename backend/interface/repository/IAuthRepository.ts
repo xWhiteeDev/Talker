@@ -1,19 +1,19 @@
 import type { IAccountRow } from "../database/IAccount.js";
 
-export interface IAuthRepository {
+export interface IAccountRepository {
     findWithCredentials(email: string): Promise<IAccountRow | null>;
-    insert( data:IAuthInsertDTO): Promise<boolean>;
-    update(data: IAuthUpdateDTO): Promise<boolean>;
+    insert( data:IAccountInsertDTO): Promise<boolean>;
+    update(data: IAccountUpdateDTO): Promise<boolean>;
     delete(email:string):Promise<boolean>;
     isExist(email: string): Promise<boolean>
 }
-export interface IAuthInsertDTO {
+export interface IAccountInsertDTO {
     email:string
     password: string;
     birthdayDate: string;
     firstName: string;
     lastName: string
 }
-export interface IAuthUpdateDTO extends Partial<IAuthInsertDTO> {
+export interface IAccountUpdateDTO extends Partial<IAccountInsertDTO> {
     email:string
 }
