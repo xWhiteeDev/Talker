@@ -1,56 +1,31 @@
 import bcrypt from "bcryptjs";
-import type { IAccountRow } from "../interface/database/IAccount.js";
-import type { IAccountRepository, IAccountInsertDTO, IAccountUpdateDTO } from "../interface/repository/IAuthRepository.js";
-import type { IAccountService } from "../interface/service/IAuthService.js";
+import type { IAccountService, IUser } from "../interface/service/IAccountService.js";
+import type { IAuthService, ILogin } from "../interface/service/IAuthService.js";
+import jwt from 'jsonwebtoken'
+import { configDotenv } from "dotenv";
+import type { IAccountInsertDTO } from "../interface/repository/IAccountRepository.js";
+import { ErrorHandler } from "../handlers/errorHandler.js";
 
-export class AccountService implements IAccountService {
-    constructor(private accountRepository: IAccountRepository) {
-        console.log(`\x1b[32;1m🚀[AccountService] accountRepository injected \x1b[0m`)
-    }
-    async insertUser(data: IAuthInsertDTO): Promise<boolean> {
-        const existingUser = await this.accountRepository.isExist(data.email)
-
-        if (existingUser) return false
-        const payload = { ...data }
-        payload.firstName = data.firstName.trim();
-        payload.lastName = data.lastName.trim();
-        try {
-            payload.password = await bcrypt.hash(data.password, 12);
-
-        } catch (error) {
-            return false
+configDotenv()
+export class AuthService implements IAuthService {
+    constructor(private accountService: IAccountService) { }
+    async signIn(document: ILogin): Promise<IUser | null> {
+        const existingUser = await this.accountService.findUserWithCredentials(document.email);
+        if (!existingUser) {
+            throw new ErrorHandler("User not found", 400)
         }
-
-        const result = await this.authRepository.insert(payload)
-        return result
-    }
-    async updateUser(data: IAccountUpdateDTO): Promise<boolean> {
-        const existingUser = await this.accountRepository.isExist(data.email)
-        if (!existingUser) return false
-        const payload = { ...data }
-        if (data.password) {
-            try {
-                payload.password = await bcrypt.hash(data.password, 12);
-
-            } catch (error) {
-                return false
-            }
+        const comparedPassword = await bcrypt.compare(document.password, existingUser.password)
+        if (!comparedPassword) {
+            throw new ErrorHandler("Password not match", 400)
         }
-        return await this.accountRepository.update(payload);
-
+        if (!process.env['TALKER_SERVER_JWT_SECRET']) {
+            process.exit(1);
+        }
+        const token = jwt.sign({ id: existingUser.id }, process.env['TALKER_SERVER_JWT_SECRET'])
+        return { id: +existingUser.id, token: token }
     }
-    async findUserWithCredentials(email: string): Promise<IAccountRow | null> {
-        const result = await this.accountRepository.findWithCredentials(email)
-        return result
-    }
-    async isUserExist(email: string): Promise<boolean> {
-        const result = await this.accountRepository.isExist(email)
-        return result
-    }
-    async deleteUser(email: string): Promise<boolean> {
-        const existingUser = await this.accountRepository.isExist(email);
-        if (!existingUser) return false
-        const result = await this.accountRepository.delete(email);
+    async signUp(document: IAccountInsertDTO): Promise<boolean | null> {
+        const result = await this.accountService.insertUser(document)
         return result
     }
 }
