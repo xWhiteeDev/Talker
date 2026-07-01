@@ -1,10 +1,12 @@
-import type { IAccountRow } from "../database/IAccount.js";
-import type { IAccountInsertDTO, IAccountUpdateDTO } from "../repository/IAuthRepository.js";
+import type { IAccountInsertDTO } from "../repository/IAccountRepository.js";
+import type { IUser } from "./IAccountService.js";
 
-export interface IAccountService {
-    findUserWithCredentials(email: string): Promise<IAccountRow | null>;
-    insertUser(document: IAccountInsertDTO): Promise<boolean>;
-    updateUser(document: IAccountUpdateDTO): Promise<boolean>
-    deleteUser(email: string): Promise<boolean>;
-    isUserExist(email: string): Promise<boolean>
+export interface IAuthService {
+    signUp(document: IAccountInsertDTO): Promise<boolean | null>
+
+    signIn(document: ILogin): Promise<IUser | null>
+}
+export interface ILogin {
+    email: string;
+    password: string
 }
