@@ -5,7 +5,7 @@ import type { IRequirementOptions } from "../interface/middleware/IRequirement.j
 
 export const authRouter = express.Router()
 
-const cfg: Record<string, IRequirementOptions> = {
+const registerCfg: Record<string, IRequirementOptions> = {
     email: {
         minLength: 5,
         maxLength: 35,
@@ -43,6 +43,26 @@ const cfg: Record<string, IRequirementOptions> = {
     }
 }
 
-authRouter.post('/register', isDataValid(cfg), async(req,res,next)=>{
-   await authController.createUser(req,res,next)
+const loginCfg: Record<string, IRequirementOptions> = {
+    email: {
+        minLength: 5,
+        maxLength: 35,
+        type: "string",
+        isRequired: true,
+        trimmed: true
+    },
+    password: {
+        minLength: 5,
+        maxLength: 200,
+        type: "string",
+        isRequired: true,
+        trimmed: true
+    },
+}
+authRouter.post('/register', isDataValid(registerCfg), async (req, res, next) => {
+    await authController.createUser(req, res, next)
+})
+
+authRouter.post('/login', isDataValid(loginCfg), async (req, res, next) => {
+    await authController.signIn(req, res, next)
 })
