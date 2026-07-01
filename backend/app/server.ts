@@ -24,7 +24,6 @@ function globalMiddleware(err: ErrorHandler, req: Request, res: Response, next: 
         res.status(500).json({ message: 'Internal server error' });
         return
     }
-
     res.status(err.code).json({ message: err.message })
 }
 
@@ -38,10 +37,8 @@ app.use(globalMiddleware)
 
 app.listen(cfg.serverPort, (err) => {
     if (err) {
-        console.log(cfg.connectionFaultMessage);
         console.error(err)
         return;
     }
-    console.log(cfg.connectionMessage)
 })
 
