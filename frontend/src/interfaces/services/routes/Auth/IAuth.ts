@@ -14,17 +14,32 @@ export interface IRegisterConfig {
     minimalUsageAge: number
 }
 
+
+export interface IConfigLength {
+    min: number;
+    max: number;
+}
+
+export interface IConfig {
+    length?: IConfigLength;
+    trim?: boolean;
+    regex?: RegExp;
+}
+
 export interface IGlobalConfig {
     [key: string]: IConfig
 }
 
-interface IConfig {
-    length?: {
-        min: number;
-        max: number
-    }
-    regexp?: RegExp;
-    trim?: boolean
+
+
+export type LengthFunction = (value: string, rules: IConfigLength) => boolean;
+export type TrimFunction = (value: string, rules: boolean) => boolean;
+rxport type RegexFunction = (value: string, rules: RegExp) => boolean;
+
+export interface IValidators {
+    trim: TrimFunction;
+    length: LengthFunction;
+    regex: RegexFunction;
 }
 
 export interface ILogin {
