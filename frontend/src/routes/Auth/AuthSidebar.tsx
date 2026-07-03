@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useContext } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import Button from "../../components/Button";
 import Input from "../../components/Input";
@@ -8,13 +8,14 @@ import Sidebar from "../../components/Sidebar";
 import CustomText from "../../components/Text";
 
 import style from "../../styles/routes/Auth/auth.module.css";
-import { validateFormData } from "../../services/routes/Auth/authService";
-import type { ILogin } from "../../interfaces/services/routes/Auth/IAuth";
+import {
+  handleSubmitLoginForm,
+} from "../../services/routes/Auth/authService";
+import { NotificationContext } from "../../context/NotificationContext";
 
 export default function AuthorizationSidebar() {
-  const [loginInput, setLoginInput] = useState<string>();
-  const [passwordInput, setPasswordInput] = useState<string>();
   const navigate = useNavigate();
+  const ctx = useContext(NotificationContext);
 
   return (
     <Sidebar className={style.sidebar}>
@@ -27,36 +28,9 @@ export default function AuthorizationSidebar() {
       </div>
       <div className={style.section}>
         <form
-          onSubmit={async (e) => {
-            e.preventDefault();
-            const data = new FormData(e.currentTarget);
-            const validationResult = validateFormData<ILogin>(data, {
-              email: {
-                length: {
-                  min: 5,
-                  max: 35,
-                },
-              },
-              password: {
-                length: {
-                  min: 5,
-                  max: 200,
-                },
-              },
-            });
-            if (!validationResult) return; //todo notify user
-            const res = await fetch("http://localhost:3000/api/auth/login", {
-              method: "POST",
-              headers: {
-                "Content-type": "application/json",
-              },
-              body: JSON.stringify({ data: validationResult }),
-            });
-            if (!res.ok) {
-              const {message} = await res.json()
-              console.log(res.status,message)
-            } else {
-              navigate("/");
+          onSubmit={async (element) => {
+            if (ctx) {
+              await handleSubmitLoginForm(element, ctx, navigate);
             }
           }}
         >
@@ -109,7 +83,7 @@ export default function AuthorizationSidebar() {
               color="#0c81b827"
               textColor="white"
               fontSize="1.7rem"
-              onClick={() => navigate("/auth/register")} 
+              onClick={() => navigate("/auth/register")}
             />
           </div>
         </form>

@@ -1,3 +1,45 @@
 .container {
-    
+    position: absolute;
+    display: flex;
+    align-items: center;
+    bottom: -10%;
+    left: 50%;
+    transform: translateX(-50%);
+    /* Przesuwa środek elementu na środek ekranu */
+    background: linear-gradient(322deg, rgba(187, 245, 254, 1) 0%, rgba(219, 219, 219, 0.7) 100%);
+    backdrop-filter: blur(4px);
+    border-radius: 10px;
+    width: 15%;
+    height: 5%;
+    gap: 2%;
+    font-size: 1.1rem;
+    font-weight: 200;
+    border: 1px solid rgba(22, 22, 22, 0.603);
+    animation: slideup 0.1s ease-in 0s 1 forwards normal;
+}
+
+.type {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* background-color: red; */
+    width: 10%;
+    height: 100%;
+}
+
+.type img {
+    aspect-ratio: 1/1;
+    width: 75%;
+}
+.context {
+    /* background-color: red; */
+    width: auto;
+}
+@keyframes slideup {
+     from {
+        bottom: -2%;
+     }
+     to {
+        bottom:10%
+     }
 }

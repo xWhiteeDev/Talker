@@ -5,6 +5,7 @@ export function isDataValid(requirements: IRequirement) {
     return (req: Request, res: Response, next: NextFunction) => {
         try {
             const data = req.body.data
+            console.log(data)
             if (!data) {
                 throw Error('No data provided')
             }

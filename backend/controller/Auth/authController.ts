@@ -9,9 +9,11 @@ export class AuthController implements IAuthController {
         try {
             const result = await this.authService.signUp(req.body.data)
             if (!result) {
+                next()
                 return false
             }
             res.status(200).json({ message: 'Record added!' });
+            next()
             return true
         } catch (error) {
             next(error)
@@ -35,6 +37,7 @@ export class AuthController implements IAuthController {
                 secure: true
             })
             res.status(200).json({ id: signResult.id })
+            next()
             return true
 
         } catch (error) {

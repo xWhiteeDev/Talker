@@ -12,16 +12,13 @@ export class AuthService implements IAuthService {
     async signIn(document: ILogin): Promise<IUser | null> {
         const existingUser = await this.accountService.findUserWithCredentials(document.email);
         if (!existingUser) {
-            throw new ErrorHandler("User not found", 400)
+            throw new ErrorHandler("Invalid data", 400)
         }
         const comparedPassword = await bcrypt.compare(document.password, existingUser.password)
         if (!comparedPassword) {
-            throw new ErrorHandler("Password not match", 400)
+            throw new ErrorHandler("Invalid data", 400)
         }
-        if (!process.env['TALKER_SERVER_JWT_SECRET']) {
-            process.exit(1);
-        }
-        const token = jwt.sign({ id: existingUser.id }, process.env['TALKER_SERVER_JWT_SECRET'])
+        const token = jwt.sign({ id: existingUser.id }, process.env['TALKER_SERVER_JWT_SECRET']!)
         return { id: +existingUser.id, token: token }
     }
     async signUp(document: IAccountInsertDTO): Promise<boolean | null> {

@@ -24,10 +24,16 @@ interface IConfig {
         max: number
     }
     regexp?: RegExp;
-    trim?: boolean
+    trim?: boolean;
+    minimalUsageAge?:number
 }
 
 export interface ILogin {
-    email:string;
-    password:string
+    email: string;
+    password: string
 }
+
+export type TransmitionResult = TransmitionFault | TransmitionSuccess
+
+type TransmitionFault = { success: false, message: string }
+type TransmitionSuccess = { success: true, data: Record<string,unknown> }

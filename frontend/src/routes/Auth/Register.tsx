@@ -2,15 +2,15 @@ import Button from "../../components/Button";
 import Input from "../../components/Input";
 import CustomText from "../../components/Text";
 import style from "../../styles/routes/Auth/register.module.css";
-import {
-  checkDataRequirements,
-  extractFormData,
-} from "../../services/routes/Auth/authService";
-import { registerConfig } from "../../configs/registerConfig";
-import { redirect, useNavigate } from "react-router-dom";
+import { handleSubmitRegisterForm } from "../../services/routes/Auth/authService";
+import { registerValidationConfig } from "../../configs/validations";
+import { useNavigate } from "react-router-dom";
+import { useContext } from "react";
+import { NotificationContext } from "../../context/NotificationContext";
 
 export default function Register() {
   const nav = useNavigate();
+  const ctx = useContext(NotificationContext);
   return (
     <div className={style.container}>
       <CustomText
@@ -22,32 +22,10 @@ export default function Register() {
       <div className={style.section}>
         <form
           style={{ height: "100%", width: "100%" }}
-          onSubmit={async (e) => {
-            e.preventDefault();
-
-            const formData = new FormData(e.currentTarget);
-            const data = extractFormData(formData);
-            if (!data) return; //todo Error handler / notify user
-            const requirementsCheck = checkDataRequirements(
-              data,
-              registerConfig,
-            );
-            if (requirementsCheck) return; //todo Error handler / notify user
-            const res = await fetch("http://localhost:3000/api/auth/register", {
-              method: "POST",
-              headers: {
-                "Content-type": "application/json",
-              },
-              body: JSON.stringify({ data }),
-            });
-            if (!res.ok) {
-              const {message} = await res.json();
-
-              console.error(res.status, message);
-              //todo Error handler / notify user
-              return;
+          onSubmit={async (event) => {
+            if (ctx) {
+              await handleSubmitRegisterForm(event, ctx, nav);
             }
-            nav("/auth/login");
           }}
         >
           <Input
@@ -57,8 +35,8 @@ export default function Register() {
             width="75%"
             height="15%"
             image="email_ico.png"
-            min={registerConfig.email.min}
-            max={registerConfig.email.max}
+            min={registerValidationConfig.email.length?.min}
+            max={registerValidationConfig.email.length?.max}
             isRequired={true}
           />
           <Input
@@ -77,8 +55,8 @@ export default function Register() {
             width="75%"
             height="15%"
             image="pass_ico.png"
-            min={registerConfig.password.min}
-            max={registerConfig.password.max}
+            min={registerValidationConfig.password.length?.min}
+            max={registerValidationConfig.password.length?.max}
             isRequired={true}
           />
           <div className={style.personalData}>
@@ -88,8 +66,8 @@ export default function Register() {
               placeholder="First name"
               width="45%"
               height="75%"
-              min={registerConfig.personalData.min}
-              max={registerConfig.personalData.max}
+              min={registerValidationConfig.personalData.length?.min}
+              max={registerValidationConfig.personalData.length?.max}
               isRequired={true}
             />
             <Input
@@ -98,8 +76,8 @@ export default function Register() {
               placeholder="Last name"
               width="45%"
               height="75%"
-              min={registerConfig.personalData.min}
-              max={registerConfig.personalData.max}
+              min={registerValidationConfig.personalData.length?.min}
+              max={registerValidationConfig.personalData.length?.max}
               isRequired={true}
             />
           </div>
