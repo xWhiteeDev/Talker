@@ -1,4 +1,4 @@
-import type {IValidators} from "./routes/authService.ts"
+import type {IValidators} from "../interfaces/routes/Auth/IAuth.ts"
 export function validateLength(value: string, rules: IConfigLength): boolean {
     return value.length <= rules.max && value.length >= rules.min
 }
