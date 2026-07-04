@@ -1,4 +1,4 @@
-import type { IGlobalConfig, IRegisterConfig } from "../interfaces/services/routes/Auth/IAuth";
+import type { IGlobalConfig } from "../interfaces/helpers/IValidationHelpers";
 
 export const registerValidationConfig: IGlobalConfig = {
     password: {
@@ -13,7 +13,7 @@ export const registerValidationConfig: IGlobalConfig = {
             min: 3,
             max: 15
         },
-        regexp: /[^\p{L}\p{N}\s]/u,
+        regex: /[^\p{L}\p{N}\s]/u,
 
     },
     email: {
@@ -23,7 +23,7 @@ export const registerValidationConfig: IGlobalConfig = {
         }
     },
     birthdayDate: {
-        minimalUsageAge: 14
+        minimalAge: 14
     }
 };
 export const loginValidationConfig: IGlobalConfig = {
