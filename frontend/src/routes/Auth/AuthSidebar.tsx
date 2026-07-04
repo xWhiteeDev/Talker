@@ -8,13 +8,13 @@ import Sidebar from "../../components/Sidebar";
 import CustomText from "../../components/Text";
 
 import style from "../../styles/routes/Auth/auth.module.css";
-import {
-  handleSubmitLoginForm,
-} from "../../services/routes/Auth/authService";
+import { handleSubmitAuthForm } from "../../services/routes/Auth/authService";
 import { NotificationContext } from "../../context/NotificationContext";
+import { registerValidationConfig } from "../../configs/validations";
+import { validatorFunctions } from "../../services/validators";
 
 export default function AuthorizationSidebar() {
-  const navigate = useNavigate();
+  const nav = useNavigate();
   const ctx = useContext(NotificationContext);
 
   return (
@@ -28,9 +28,15 @@ export default function AuthorizationSidebar() {
       </div>
       <div className={style.section}>
         <form
-          onSubmit={async (element) => {
+          onSubmit={async (event) => {
             if (ctx) {
-              await handleSubmitLoginForm(element, ctx, navigate);
+              await handleSubmitAuthForm(event, ctx, nav, {
+                transmisionEndpoint: "login",
+                successContent: "Logged into account!",
+                navigationPoint: "/",
+                validationConfiguration: registerValidationConfig,
+                validationFunctions: validatorFunctions,
+              });
             }
           }}
         >
@@ -83,7 +89,7 @@ export default function AuthorizationSidebar() {
               color="#0c81b827"
               textColor="white"
               fontSize="1.7rem"
-              onClick={() => navigate("/auth/register")}
+              onClick={() => nav("/auth/register")}
             />
           </div>
         </form>

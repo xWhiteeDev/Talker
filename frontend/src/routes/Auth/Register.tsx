@@ -2,11 +2,12 @@ import Button from "../../components/Button";
 import Input from "../../components/Input";
 import CustomText from "../../components/Text";
 import style from "../../styles/routes/Auth/register.module.css";
-import { handleSubmitRegisterForm } from "../../services/routes/Auth/authService";
 import { registerValidationConfig } from "../../configs/validations";
 import { useNavigate } from "react-router-dom";
 import { useContext } from "react";
 import { NotificationContext } from "../../context/NotificationContext";
+import { handleSubmitAuthForm } from "../../services/routes/Auth/authService";
+import { validatorFunctions } from "../../services/validators";
 
 export default function Register() {
   const nav = useNavigate();
@@ -24,7 +25,13 @@ export default function Register() {
           style={{ height: "100%", width: "100%" }}
           onSubmit={async (event) => {
             if (ctx) {
-              await handleSubmitRegisterForm(event, ctx, nav);
+              await handleSubmitAuthForm(event, ctx, nav, {
+                transmisionEndpoint: "register",
+                successContent: "Acconut created!",
+                navigationPoint: "/auth/login",
+                validationConfiguration: registerValidationConfig,
+                validationFunctions: validatorFunctions
+              });
             }
           }}
         >
