@@ -1,0 +1,61 @@
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(322deg, rgba(187, 245, 254, 1) 0%, rgba(219, 219, 219, 0.562) 100%);
+    height: 100%;
+    width: 65%;
+    backdrop-filter: blur(6px);
+    border-right: 2px solid black;
+}
+
+
+.mediaInfo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    height: 35%;
+    gap: 4%;
+    width: 100%;
+    text-align: center;
+    font-size: 2.2rem;
+    border-bottom: 2px solid rgb(51, 51, 51);
+}
+
+.mediaLogo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+
+.section {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+}
+
+.section form {
+    margin-top: 2%;
+    display: flex;
+    flex-direction: column;
+    justify-content:center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    gap: 2%;
+}
+
+.buttonSection {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+    width: 100%;
+    height:43%;
+    gap: 10%;
+}

@@ -1,19 +1,38 @@
 import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import Auth from "../routes/Auth/Auth.tsx";
-import "../styles/main/main.css";
-import AuthorizationSidebar from "../routes/Auth/AuthSidebar.tsx";
-import Register from "../routes/Auth/Register.tsx";
+import Auth from "../routes/Auth/AuthLayout.tsx";
 import { useState } from "react";
-import CustomNotification from "../components/Notification.tsx";
-import { NotificationContext } from "../context/NotificationContext.ts";
-import type { INotification } from "../interfaces/components/INotification.ts";
+import CustomNotification from "../components/Notification/Notification.tsx";
+import Home from "../routes/Main/Home/Home.tsx";
+import Login from "../routes/Auth/Login/Login.tsx";
+import Register from "../routes/Auth/Register/Register.tsx";
+import { NotificationContext } from "../components/Notification/context/NotificationContext.ts";
+import "./Main.css";
+import type { Notification } from "../components/Notification/types.ts";
+import ProtectedRoute from "../components/ProtectedRoute/ProtectedRoute.tsx";
+import AuthorizationProtectedRoute from "../components/ProtectedRoute/AuthorizationProtectedRoute.tsx";
+import { ServerErrorContext } from "../components/Error/errorContext.ts";
+import ErrorPage from "../components/Error/ErrorPage.tsx";
 const root = document.getElementById("root");
 const routes = createBrowserRouter([
   {
     path: "/",
     element: <App />,
+    children: [
+      {
+        path: "/home",
+        element: (
+          <ProtectedRoute>
+            <Home />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/friends",
+        element: <Home />,
+      },
+    ],
   },
   {
     path: "/auth",
@@ -21,7 +40,11 @@ const routes = createBrowserRouter([
     children: [
       {
         path: "login",
-        element: <AuthorizationSidebar />,
+        element: (
+          <AuthorizationProtectedRoute>
+            <Login />
+          </AuthorizationProtectedRoute>
+        ),
       },
       {
         path: "register",
@@ -31,10 +54,14 @@ const routes = createBrowserRouter([
   },
 ]);
 function Main() {
-  const [notification, setNotification] = useState<INotification | null>();
-  function setNotify(notiContext: INotification) {
+  const [serverError, showServerError] = useState<boolean>(false);
+  function setServerError(state: boolean) {
+    showServerError(state);
+  }
+  const [notification, setNotification] = useState<Notification | null>();
+  function setNotify(notiContext: Notification) {
     if (notification) {
-      setNotification(()=> null);
+      setNotification(() => null);
     }
     setNotification(notiContext);
     setTimeout(() => {
@@ -42,15 +69,17 @@ function Main() {
     }, 4000);
   }
   return (
-    <NotificationContext.Provider value={{ setNotify }}>
-      <RouterProvider router={routes} />
-      {notification && (
-        <CustomNotification
-          type={notification.type}
-          message={notification.message}
-        />
-      )}
-    </NotificationContext.Provider>
+    <ServerErrorContext.Provider value={{ setServerError }}>
+      <NotificationContext.Provider value={{ setNotify }}>
+        {serverError ? <ErrorPage /> : <RouterProvider router={routes} />}
+        {notification && (
+          <CustomNotification
+            type={notification.type}
+            message={notification.message}
+          />
+        )}
+      </NotificationContext.Provider>
+    </ServerErrorContext.Provider>
   );
 }
 

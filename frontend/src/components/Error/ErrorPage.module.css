@@ -1,0 +1,23 @@
+.container {
+    position: absolute;
+    display: flex;
+    background: linear-gradient(322deg, rgba(187, 245, 254, 1) 0%, rgba(219, 219, 219, 0.61) 100%);
+    width: 100vw;
+    height: 100vw;
+}
+
+.content {
+    display: flex;
+    flex-direction: row;
+    align-items: start;
+    width: 75vw;
+    height: 85vh;
+}
+
+.text {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 45%;
+    height: 100%;
+}

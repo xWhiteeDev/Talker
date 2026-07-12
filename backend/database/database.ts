@@ -15,7 +15,8 @@ const cfg = {
 
 export function createPool(): Pool {
     if (!cfg.password || !cfg.database) {
-        if (!process.env['TALKER_SERVER_JWT_SECRET']) {
+        if (!process.env['TALKER_SERVER_JWT_ACCESS_SECRET'] || !process.env['TALKER_SERVER_JWT_REFRESH_SECRET']) {
+            console.error('CRITICAL CONFIG POINT ISNT SET: TALKER_SERVER_JWT_ACCESS_SECRET OR  TALKER_SERVER_JWT_REFRESH_SECRET')
             process.exit(1);
         }
         console.error('CRITICAL CONFIG POINT ISNT SET! PASSWORD OR DATABASE');

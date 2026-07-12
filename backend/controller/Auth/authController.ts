@@ -1,6 +1,13 @@
 import type { NextFunction, Request, Response } from "express";
 import type { IAuthService } from "../../interface/service/IAuthService.js";
 import type { IAuthController } from "../../interface/controller/IAuthController.js";
+import jwt from 'jsonwebtoken'
+import { configDotenv } from "dotenv";
+import type { currentUser } from "../../interface/user/types.js";
+import { ErrorHandler } from "../../handlers/errorHandler.js";
+
+
+configDotenv()
 export class AuthController implements IAuthController {
     constructor(private authService: IAuthService) {
         console.log(`\x1b[32;1m🚀[authController] AccountService injected \x1b[0m`)
@@ -31,11 +38,22 @@ export class AuthController implements IAuthController {
                 next()
                 return false
             }
-            res.cookie('token', signResult.token, {
+            res.cookie('accessToken', signResult.access, {
                 httpOnly: true,
-                sameSite: true,
-                secure: true
+                sameSite: 'lax',
+                secure: true,
+                maxAge: 5 * 60 * 1000 //5 Minutes from now
             })
+            res.cookie('refreshToken', signResult.refresh, {
+                httpOnly: true,
+                sameSite: 'lax',
+                secure: true,
+                maxAge: 60000 * 60 * 24 * 7 //7 Days from now
+            })
+            if (!req.currentUser) {
+                req.currentUser = {} as currentUser
+            }
+            req['currentUser'] = { id: signResult.id }
             res.status(200).json({ id: signResult.id })
             next()
             return true
@@ -44,6 +62,23 @@ export class AuthController implements IAuthController {
             next(error)
 
         }
+        return true
+    }
+    refreshToken(req: Request, res: Response, next: NextFunction) {
+        if (!req.currentUser) {
+
+            throw new ErrorHandler('Unauthorised!!!',401,true);
+        }
+        const { id } = req.currentUser
+        const signedToken = this.authService.signNewToken(id, 'access')
+        res.cookie('accessToken', signedToken, {
+            httpOnly: true,
+            sameSite: 'lax',
+            secure: true,
+            maxAge: 5 * 60 * 1000
+        })
+        res.status(200).json({ id })
+        next()
         return true
     }
 }

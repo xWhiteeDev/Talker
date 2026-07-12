@@ -1,9 +1,9 @@
-import express from "express";
-import { isDataValid } from "../middleware/middleware.js";
-import { authController } from "../loader/dependencyLoader.js";
-import type { IRequirementOptions } from "../interface/middleware/IRequirement.js";
+import express, {type Request, type Response} from "express";
+import {isAccessTokenActive, isDataValid, isRefreshTokenValid} from "../middleware/middleware.js";
+import {authController} from "../loader/dependencyLoader.js";
+import type {IRequirementOptions} from "../interface/middleware/types.js";
 
-export const authRouter = express.Router()
+export const authRouter = express.Router();
 
 const registerCfg: Record<string, IRequirementOptions> = {
     email: {
@@ -41,7 +41,7 @@ const registerCfg: Record<string, IRequirementOptions> = {
         isRequired: true,
         trimmed: true
     }
-}
+};
 
 const loginCfg: Record<string, IRequirementOptions> = {
     email: {
@@ -58,11 +58,17 @@ const loginCfg: Record<string, IRequirementOptions> = {
         isRequired: true,
         trimmed: true
     },
-}
+};
 authRouter.post('/register', isDataValid(registerCfg), async (req, res, next) => {
-    await authController.createUser(req, res, next)
-})
+    await authController.createUser(req, res, next);
+});
 
 authRouter.post('/login', isDataValid(loginCfg), async (req, res, next) => {
-    await authController.signIn(req, res, next)
-})
+    await authController.signIn(req, res, next);
+});
+authRouter.post('/refresh', isRefreshTokenValid(), async (req, res, next) => {
+    authController.refreshToken(req, res, next);
+});
+authRouter.get('/isAuth', isAccessTokenActive(), (req: Request, res, next) => {
+    res.status(200).json({user: req.currentUser});
+});

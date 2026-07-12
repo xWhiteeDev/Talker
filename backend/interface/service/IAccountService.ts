@@ -11,5 +11,6 @@ export interface IAccountService {
 
 export interface IUser {
     id:number;
-    token:string
+    access:string;
+    refresh:string;
 }

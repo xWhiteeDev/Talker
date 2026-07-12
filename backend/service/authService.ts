@@ -18,11 +18,20 @@ export class AuthService implements IAuthService {
         if (!comparedPassword) {
             throw new ErrorHandler("Invalid data", 400)
         }
-        const token = jwt.sign({ id: existingUser.id }, process.env['TALKER_SERVER_JWT_SECRET']!)
-        return { id: +existingUser.id, token: token }
+        const accessToken: string = jwt.sign({ id: +existingUser.id, tokenType: 'access' }, process.env['TALKER_SERVER_JWT_ACCESS_SECRET']!, { expiresIn: '5m' })
+        const refreshToken: string = jwt.sign({ id: +existingUser.id, tokenType: 'refresh' }, process.env['TALKER_SERVER_JWT_REFRESH_SECRET']!, { expiresIn: '7d' })
+        return { id: +existingUser.id, access: accessToken, refresh: refreshToken }
     }
     async signUp(document: IAccountInsertDTO): Promise<boolean | null> {
         const result = await this.accountService.insertUser(document)
         return result
+    }
+    signNewToken(userId: number, tokenType: 'access' | 'refresh'): string {
+        const secret = {
+            'access': { secret: process.env['TALKER_SERVER_JWT_ACCESS_SECRET']!, expiresIn: '5m' as const },
+            'refresh': { secret: process.env['TALKER_SERVER_JWT_REFRESH_SECRET']!, expiresIn: '7d' as const }
+        }
+        const token = jwt.sign({ id: userId, tokenType }, secret[tokenType].secret, { expiresIn: secret[tokenType].expiresIn })
+        return token
     }
 }

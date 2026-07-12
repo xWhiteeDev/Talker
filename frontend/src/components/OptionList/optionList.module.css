@@ -1,0 +1,24 @@
+.container {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    width: 2vw;
+    height: 10vh;
+}
+
+.container input {
+    border: none;
+    outline: none;
+    font-size: 0.7rem;
+    font-weight: 600;
+    border: 1px solid rgba(0, 0, 0, 0.24);
+}
+
+.container input::placeholder {
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+select {
+    font-size: 0.4rem;
+}
