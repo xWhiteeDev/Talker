@@ -5,6 +5,7 @@ import cors from 'cors'
 import cookieparser from 'cookie-parser'
 import { authRouter } from '../routes/authRoute.js';
 import { ErrorHandler } from '../handlers/errorHandler.js'
+import {postRouter} from '../routes/postRoute.js';
 dotEnv.config();
 const cfg = {
     serverPort: process.env['TALKER_SERVER_PORT'] ?? 3000,
@@ -32,6 +33,8 @@ app.use(cors({ origin: ['http://localhost:5173', 'http://127.0.0.1:5173'],creden
 app.use(express.json())
 app.use(cookieparser())
 app.use('/api/auth', authRouter)
+app.use('/api/posts', postRouter)
+
 app.use(globalMiddleware)
 
 
