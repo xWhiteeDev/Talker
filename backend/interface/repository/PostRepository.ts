@@ -2,6 +2,7 @@ import type {RowDataPacket} from "mysql2";
 
 export interface IPostRepository {
     findById(id: number): Promise<PostRow | undefined>;
+    findByAuthor(authorId: number): Promise<PostRow[] | PostRow | undefined>;
     insert(dto: PostInsertDTO): Promise<boolean>;
     update(id: number, dto: PostUpdateDTO): Promise<boolean>;
     delete(id: number): Promise<boolean>;
@@ -10,9 +11,9 @@ export interface IPostRepository {
 export interface PostRow extends RowDataPacket {
     id: number;
     author: string;
-    authorId: string;
+    authorId: number;
     content: string;
-    visibleFor: string;
+    visibleFor: Visibility;
     created_at: string;
     photo?: string[];
     video?: string[];
@@ -27,3 +28,4 @@ export interface PostInsertDTO extends Exclude<PostRow, 'createdAt' | 'id' | 'co
 export interface PostUpdateDTO extends Exclude<PostRow, 'author' | 'authorId'> { }
 
 
+type Visibility = 'public' | 'friends' | 'private'

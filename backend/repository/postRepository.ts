@@ -9,6 +9,11 @@ export class PostRepository implements IPostRepository {
         const [[result]] = await this.pool.query<PostRow[]>(query, {id});
         return result;
     }
+    async findByAuthor(authorId: number): Promise<PostRow[]> {
+        const query: string = 'SELECT * FROM posts WHERE authorId=:authorId';
+        const [result] = await this.pool.query<PostRow[]>(query, {authorId});
+        return result;
+    }
     async insert(dto: PostInsertDTO): Promise<boolean> {
         const query: string = 'INSERT INTO posts (author, authorId, content, visibleFor,photo,video,file,gif,taggedPeopleIds,pinnedPlace) VALUES (:author, :authorId, :content, :visibleFor, :photo, :video, :file, :gif, :taggedPeopleIds, :pinnedPlace';
         const [result] = await this.pool.execute<ResultSetHeader>(query, {
@@ -49,7 +54,7 @@ export class PostRepository implements IPostRepository {
         return result.affectedRows > 0;
     }
     async delete(id: number): Promise<boolean> {
-        const query: string = 'DELETE * FROM posts WHERE id=:id LIMIT 1';
+        const query: string = 'DELETE FROM posts WHERE id=:id LIMIT 1';
         const [result] = await this.pool.execute<ResultSetHeader>(query, {id});
         return result.affectedRows > 0;
     }
