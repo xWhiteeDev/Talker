@@ -3,6 +3,8 @@ import Button from "../Button/Button";
 import EditableTextArea from "../EditableTextArea/EditableTextArea";
 import FileOption from "../FileOption/FileOption";
 import OptionList from "../OptionList/OptionList";
+import type { PostCreator } from "./types";
+import {useRef} from "react";
 
 const postClickableOptions = [
   {
@@ -37,11 +39,7 @@ const postClickableOptions = [
   },
 ];
 
-export function PostCreator({
-  stateControllerFuction,
-}: {
-  stateControllerFuction: (state: boolean) => void;
-}) {
+export function PostCreator({ stateControllerFuction, onInput,onAdd }: PostCreator) {
   return (
     <div className={style.postCreator}>
       <div className={style.closeXCreator}>
@@ -49,8 +47,8 @@ export function PostCreator({
           text="X"
           onClick={() => stateControllerFuction(false)}
           additionalStyle={{
-            position:'absolute',
-            right:"0",
+            position: "absolute",
+            right: "0",
             background: "none",
             border: "none",
             fontWeight: "600",
@@ -67,7 +65,13 @@ export function PostCreator({
       <div className={style.options}>
         <OptionList
           placeholderText="Who will see it?"
-          additionalStyle={{ backgroundColor: "#524c4c00", marginLeft: "2%" ,width:"45%",fontSize:"0.8rem",height:'75%'}}
+          additionalStyle={{
+            backgroundColor: "#524c4c00",
+            marginLeft: "2%",
+            width: "45%",
+            fontSize: "0.8rem",
+            height: "75%",
+          }}
         />
       </div>
       <div className={style.inputArea}>
@@ -75,7 +79,12 @@ export function PostCreator({
           placeholderColor="#1a191991"
           placeholderFontSize="1.5rem"
           placeholder="What's happening..."
-          additionalStyle={{width:"100%",fontSize:'1.4rem', maxWidth:"100%"}}
+          additionalStyle={{
+            width: "100%",
+            fontSize: "1.4rem",
+            maxWidth: "100%",
+          }}
+          onInput={(e) => onInput(e)}
         />
       </div>
       <div className={style.fileOptions}>
@@ -84,13 +93,20 @@ export function PostCreator({
             fileIcon={v.fileIcon}
             key={v.key}
             text={v.text}
-            additionalStyle={{fontSize:'1.2rem'}}
+            additionalStyle={{ fontSize: "1.2rem" }}
           />
         ))}
       </div>
       <Button
         text="+"
-        additionalStyle={{width:"6.5%",fontSize:"2.4rem",aspectRatio:"1/1", border: "none", backgroundColor: "#ff000000" }}
+        additionalStyle={{
+          width: "6.5%",
+          fontSize: "2.4rem",
+          aspectRatio: "1/1",
+          border: "none",
+          backgroundColor: "#ff000000",
+        }}
+        onClick={(ev) => onAdd(ev)}
       />
     </div>
   );
