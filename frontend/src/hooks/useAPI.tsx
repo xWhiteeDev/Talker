@@ -26,6 +26,8 @@ export function useAPI() {
           context?.setServerError(true);
           return;
         }
+      } else {
+        context?.setServerError(true);
       }
     }
   }
