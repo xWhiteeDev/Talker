@@ -28,10 +28,6 @@ const routes = createBrowserRouter([
           </ProtectedRoute>
         ),
       },
-      {
-        path: "/friends",
-        element: <Home />,
-      },
     ],
   },
   {
@@ -48,7 +44,11 @@ const routes = createBrowserRouter([
       },
       {
         path: "register",
-        element: <Register />,
+        element: (
+          <AuthorizationProtectedRoute>
+            <Register />
+          </AuthorizationProtectedRoute>
+        ),
       },
     ],
   },
