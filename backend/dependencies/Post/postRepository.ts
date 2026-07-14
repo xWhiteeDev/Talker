@@ -1,5 +1,5 @@
-import type {IPostRepository, PostInsertDTO, PostRow, PostUpdateDTO} from "../interface/repository/PostRepository.js";
 import type {ResultSetHeader, ExecuteValues, Pool} from "mysql2/promise";
+import type {IPostRepository, PostInsertDTO, PostRow, PostUpdateDTO} from "./types.js";
 export class PostRepository implements IPostRepository {
     constructor(private pool: Pool) {
         console.log(`\x1b[32;1m🚀[PostRepository] Pool injected \x1b[0m`);

@@ -1,6 +1,5 @@
-import {ErrorHandler} from "../handlers/errorHandler.js";
-import type {FriendsRelation, FriendsRelationInsertDTO, FriendsRelationUpdateDTO, IFriendshipRepository} from "../interface/repository/FriendshipRepository.js";
-import type {IFriendshipService} from "../interface/service/FriendshipService.js";
+import {ErrorHandler} from "../../handlers/errorHandler.js";
+import type {IFriendshipService, IFriendshipRepository, FriendsRelation, FriendsRelationInsertDTO, FriendsRelationUpdateDTO} from "./types.js";
 
 export class friendshipService implements IFriendshipService {
     constructor(private FriendRepository: IFriendshipRepository) {

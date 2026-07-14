@@ -1,5 +1,9 @@
-import type { JwtPayload } from "jsonwebtoken";
+import type {JwtPayload} from "jsonwebtoken";
 
+export interface DecodedPayload extends JwtPayload {
+    id:number;
+    tokenType:string;
+}
 export interface IRequirement {
     [key: string]: IRequirementOptions
 }

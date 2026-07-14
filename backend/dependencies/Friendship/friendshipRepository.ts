@@ -1,5 +1,5 @@
 import type {ResultSetHeader, Pool} from "mysql2/promise";
-import type {FriendsRelation, FriendsRelationInsertDTO, FriendsRelationRow, FriendsRelationUpdateDTO, IFriendshipRepository} from "../interface/repository/FriendshipRepository.js";
+import type {IFriendshipRepository, FriendsRelation, FriendsRelationRow, FriendsRelationInsertDTO, FriendsRelationUpdateDTO} from "./types.js";
 
 export class friendshipRepository implements IFriendshipRepository {
     constructor(private pool: Pool) {

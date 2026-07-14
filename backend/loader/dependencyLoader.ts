@@ -1,8 +1,8 @@
-import { AuthController } from "../controller/Auth/authController.js";
+import { AuthController } from "../dependencies/Auth/authController.js";
 import { createPool } from "../database/database.js";
-import { AccountRepository } from "../repository/accountRepository.js";
-import { AccountService } from "../service/accountService.js";
-import { AuthService } from "../service/authService.js";
+import { AuthService } from "../dependencies/Auth/authService.js";
+import {AccountRepository} from "../dependencies/Account/accountRepository.js";
+import {AccountService} from "../dependencies/Account/accountService.js";
 
 export const dbPool = createPool();
 const accountRepository = new AccountRepository(dbPool)

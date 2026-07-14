@@ -1,6 +1,5 @@
 import { type ResultSetHeader, type ExecuteValues, type Pool, type RowDataPacket } from 'mysql2/promise';
-import type { IAccountInsertDTO, IAccountRepository, IAccountUpdateDTO } from '../interface/repository/IAccountRepository.js';
-import type { IAccountRow } from '../interface/database/IAccount.js';
+import type {IAccountRepository, IAccountRow, IAccountInsertDTO, IAccountUpdateDTO} from './types.js';
 
 export class AccountRepository implements IAccountRepository {
     constructor(private pool: Pool) {

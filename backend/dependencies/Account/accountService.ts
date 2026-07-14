@@ -1,8 +1,6 @@
 import bcrypt from "bcryptjs";
-import type { IAccountRow } from "../interface/database/IAccount.js";
-import type { IAccountRepository, IAccountInsertDTO, IAccountUpdateDTO } from "../interface/repository/IAccountRepository.js";
-import type { IAccountService } from "../interface/service/IAccountService.js";
-import { ErrorHandler } from "../handlers/errorHandler.js";
+import type {IAccountInsertDTO, IAccountRepository, IAccountRow, IAccountService, IAccountUpdateDTO} from "./types.js";
+import {ErrorHandler} from "../../handlers/errorHandler.js";
 
 export class AccountService implements IAccountService {
     constructor(private accountRepository: IAccountRepository) {
