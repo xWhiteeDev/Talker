@@ -1,8 +1,8 @@
 import type {NextFunction, Request, Response} from "express";
-import type {DecodedPayload, IRequirement} from "../interface/middleware/types.js";
 import jwt from 'jsonwebtoken';
 import {configDotenv} from "dotenv";
 import {ErrorHandler} from "../handlers/errorHandler.js";
+import type {DecodedPayload, IRequirement} from "./types.js";
 
 
 configDotenv();
