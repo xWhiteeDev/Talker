@@ -43,3 +43,4 @@ export interface IAccountUpdateDTO extends Partial<IAccountInsertDTO> {
 export interface currentUser {
     id:number;
 }
+

@@ -1,4 +1,4 @@
-import type {NextFunction,Response,Request} from "express";
+import type {NextFunction, Response, Request} from "express";
 import type {RowDataPacket} from "mysql2";
 
 export interface IFriendshipRepository {
@@ -15,13 +15,15 @@ export interface IFriendshipService {
     findRelationBetween(userId: number, otherId: number): Promise<FriendsRelation>;
     insertRelation(dto: FriendsRelationInsertDTO): Promise<boolean>;
     updateRelation(userId: number, otherId: number, dto: FriendsRelationUpdateDTO): Promise<boolean>;
-    deleteRelation(userId: number, otherId: number): Promise<boolean>;
+    removeRelation(userId: number, otherId: number): Promise<boolean>;
+    acceptRelation(userId: number, otherId: number): Promise<boolean>;
 }
 
 export interface IFriendshipController {
     areInRelation(req: Request, res: Response, next: NextFunction): Promise<boolean>;
     setRelation(req: Request, res: Response, next: NextFunction): Promise<boolean>;
-    changeRelationStatus(req: Request, res: Response, next: NextFunction): Promise<boolean>;
+    removeRelation(req: Request, res: Response, next: NextFunction): Promise<boolean>;
+    acceptRelation(req: Request, res: Response, next: NextFunction): Promise<boolean>;
 }
 
 
@@ -46,4 +48,4 @@ export interface FriendsRelationInsertDTO {
 export interface FriendsRelationUpdateDTO extends Pick<FriendsRelationInsertDTO, 'status'> {
 }
 
-export type FriendsRelationStatus = 'inprogress' | 'related' | 'declined';
+export type FriendsRelationStatus = 'pending' | 'accepted';

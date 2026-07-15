@@ -31,15 +31,23 @@ export class friendshipService implements IFriendshipService {
     async updateRelation(userId: number, friendId: number, dto: FriendsRelationUpdateDTO): Promise<boolean> {
         const existingRelation = await this.FriendRepository.findRelationBetween(userId, friendId);
         if (!existingRelation) throw new ErrorHandler('Relation not found with exact user', 400);
-        if (existingRelation.friendId !== userId) throw new ErrorHandler('Cannot accept yourself ', 400);
+        if (existingRelation.friendId !== userId) throw new ErrorHandler('Cannot accept yourself ', 403);
         const result = await this.FriendRepository.update(userId, friendId, dto);
         return result;
     }
-    async deleteRelation(userId: number, otherId: number): Promise<boolean> {
+    async acceptRelation(userId: number, otherId: number): Promise<boolean> {
+        const existingRelation = await this.FriendRepository.findRelationBetween(userId, otherId);
+        if (!existingRelation) throw new ErrorHandler('Relation not found with exact user', 400);
+        if (userId !== existingRelation.friendId) throw new ErrorHandler('You cannot accept relation offer sent by you', 403);
+        const result = await this.FriendRepository.update(userId, otherId, {status: 'accepted'});
+        return result;
+    }
+    async removeRelation(userId: number, otherId: number): Promise<boolean> {
         const existingRelation = await this.FriendRepository.findRelationBetween(userId, otherId);
         if (!existingRelation) throw new ErrorHandler('Relation not found with exact user', 400);
         const result = await this.FriendRepository.delete(userId, otherId);
         return result;
     }
+
 
 }
