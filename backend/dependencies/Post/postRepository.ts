@@ -15,7 +15,6 @@ export class PostRepository implements IPostRepository {
         return result;
     }
     async insert(dto: PostInsertDTO): Promise<boolean> {
-        console.log(`Got: ${JSON.stringify(dto)}`)
         const query: string = 'INSERT INTO posts (author_Id, content, visibleFor,photo,video,file,gif,taggedPeopleIds,pinnedPlace) VALUES (:authorId, :content, :visibleFor, :photo, :video, :file, :gif, :taggedPeopleIds, :pinnedPlace)';
         const [result] = await this.pool.execute<ResultSetHeader>(query, {
             authorId: dto.authorId,
@@ -25,8 +24,8 @@ export class PostRepository implements IPostRepository {
             video: JSON.stringify(dto.video) ?? null,
             file: JSON.stringify(dto.file) ?? null,
             gif: JSON.stringify(dto.gif) ?? null,
-            taggedPeopleIds: JSON.stringify(dto.taggetPeopleIds) ?? null,
-            pinnedPlace: dto.pinedPlace ?? null
+            taggedPeopleIds: JSON.stringify(dto.taggedPeopleIds) ?? null,
+            pinnedPlace: dto.pinnedPlace ?? null
         });
         return result.affectedRows > 0;
     }

@@ -46,8 +46,8 @@ export type PostInsertDTO = {
     video?: string[];
     file?: string[];
     gif?: string[];
-    taggetPeopleIds?: string[];
-    pinedPlace?: string;
+    taggedPeopleIds?: string[];
+    pinnedPlace?: string;
 }; 
 export interface PostUpdateDTO extends Omit<PostInsertDTO, 'author' | 'authorId'> { }
 
