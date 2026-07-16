@@ -6,6 +6,9 @@ import {AccountService} from "../dependencies/Account/accountService.js";
 import {friendshipRepository} from "../dependencies/Friendship/friendshipRepository.js";
 import {friendshipService} from "../dependencies/Friendship/friendshipService.js";
 import {friendshipController} from "../dependencies/Friendship/friendshipController.js";
+import {PostRepository} from "../dependencies/Post/postRepository.js";
+import {PostService} from "../dependencies/Post/postService.js";
+import {PostController} from "../dependencies/Post/postController.js";
 
 export const dbPool = createPool();
 const accountRepository = new AccountRepository(dbPool);
@@ -14,6 +17,10 @@ export const authService = new AuthService(accountService);
 export const authController = new AuthController(authService);
 const friendsRepository = new friendshipRepository(dbPool);
 const friendsService = new friendshipService(friendsRepository);
-export const friendsController = new friendshipController(friendsService)
+export const friendsController = new friendshipController(friendsService);
 
+
+const postRepository = new PostRepository(dbPool);
+const postService = new PostService(postRepository, friendsService);
+export const postController = new PostController(postService);
 console.log(`\x1b[42;1m✅ All dependencies loaded correctly! \x1b[0m`);
