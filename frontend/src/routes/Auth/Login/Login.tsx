@@ -11,13 +11,10 @@ import { NotificationContext } from "../../../components/Notification/context/No
 import { registerValidationConfig } from "../configs/authConfig.ts";
 import { handleSubmitAuthForm } from "../services/authService.ts";
 import { validatorFunctions } from "../validation/validationMethods.ts";
-import { ServerErrorContext } from "../../../components/Error/errorContext.ts";
 
 export default function Login() {
   const nav = useNavigate();
-  const ctx = useContext(NotificationContext);
-  const context = useContext(ServerErrorContext);
-  
+  const ctx = useContext(NotificationContext);  
   return (
     <Sidebar className={style.sidebar}>
       <div className={style.mediaInfo}>
