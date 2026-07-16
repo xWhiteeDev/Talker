@@ -15,9 +15,9 @@ export class PostRepository implements IPostRepository {
         return result;
     }
     async insert(dto: PostInsertDTO): Promise<boolean> {
-        const query: string = 'INSERT INTO posts (author, authorId, content, visibleFor,photo,video,file,gif,taggedPeopleIds,pinnedPlace) VALUES (:author, :authorId, :content, :visibleFor, :photo, :video, :file, :gif, :taggedPeopleIds, :pinnedPlace';
+        console.log(`Got: ${JSON.stringify(dto)}`)
+        const query: string = 'INSERT INTO posts (author_Id, content, visibleFor,photo,video,file,gif,taggedPeopleIds,pinnedPlace) VALUES (:authorId, :content, :visibleFor, :photo, :video, :file, :gif, :taggedPeopleIds, :pinnedPlace)';
         const [result] = await this.pool.execute<ResultSetHeader>(query, {
-            author: dto.author,
             authorId: dto.authorId,
             content: dto.content,
             visibleFor: dto.visibleFor,
@@ -57,5 +57,10 @@ export class PostRepository implements IPostRepository {
         const query: string = 'DELETE FROM posts WHERE id=:id LIMIT 1';
         const [result] = await this.pool.execute<ResultSetHeader>(query, {id});
         return result.affectedRows > 0;
+    }
+    async findAll(userId: number): Promise<PostRow[]> {
+        const query: string = `SELECT * FROM posts WHERE (visibleFor='public' OR (visibleFor='friends' AND author_Id IN (SELECT CASE WHEN userId=:userId THEN friendId ELSE userId END FROM friendships WHERE (userId=:userId OR friendId=:userId) AND status='accepted'))) `;
+        const [result] = await this.pool.query<PostRow[]>(query, {userId});
+        return result;
     }
 }

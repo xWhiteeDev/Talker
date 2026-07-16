@@ -1,9 +1,10 @@
 import {ErrorHandler} from "../../handlers/errorHandler.js";
 import type {IAccountRepository} from "../Account/types.js";
-import type {PostRow, PostInsertDTO, PostUpdateDTO, IPostService,IPostRepository} from "./types.js";
+import type {IFriendshipService} from "../Friendship/types.js";
+import type {PostRow, PostInsertDTO, PostUpdateDTO, IPostService, IPostRepository} from "./types.js";
 
 export class PostService implements IPostService {
-    constructor(private PostRepository: IPostRepository, private AccountRepository: IAccountRepository) {
+    constructor(private PostRepository: IPostRepository, private FriendsService: IFriendshipService) {
         console.log(`\x1b[32;1m🚀[PostService] PostRepository injected \x1b[0m`);
     }
     async findById(userId: number, id: number): Promise<PostRow | null> {
@@ -13,13 +14,25 @@ export class PostService implements IPostService {
         const postVisibility = existingPost.visibleFor;
         if (postVisibility === 'public') {
             return existingPost;
-        }
-        if (postVisibility === 'friends') {
-            //TODO: Check is in friends
-        }
 
+        } else if (postVisibility === 'friends') {
+            const relationBetweenUsers = await this.FriendsService.findRelationBetween(userId, existingPost.authorId);
+            if (!relationBetweenUsers) return null;
+            return existingPost;
+        } else if (postVisibility === 'private' && existingPost.authorId === userId) {
+            return existingPost;
+        }
+        return null;
 
-        return existingPost;
+    }
+    async findLatestPosts(userId: number): Promise<PostRow[] | null> {
+        const postsToFeed = await this.PostRepository.findAll(userId);
+        //TODO: Add pagination
+        if (postsToFeed == null) {
+            return null;
+        }
+        return postsToFeed;
+
     }
     async findByAuthor(userId: number, authorId: number): Promise<PostRow[] | null> {
         if (userId !== authorId) throw new ErrorHandler('Access denied', 403);

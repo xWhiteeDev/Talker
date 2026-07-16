@@ -9,7 +9,7 @@ export class friendshipController implements IFriendshipController {
         try {
             const user: currentUser = req.currentUser;
             const result = await this.friendshipService.findRelationBetween(user.id, req.otherUserId!);
-            res.status(200).json({isRelated: !!result});
+            res.status(200).json({success: true, data: result});
             return !!result;
         } catch (error) {
             next(error);
@@ -29,7 +29,7 @@ export class friendshipController implements IFriendshipController {
                 next(new ErrorHandler('Failed to sent relation offer', 400));
                 return false;
             }
-            res.status(201).json({isInviteSent: result});
+            res.status(201).json({success: true, data: result});
             return result;
 
         } catch (error) {
@@ -46,7 +46,7 @@ export class friendshipController implements IFriendshipController {
                 next(new ErrorHandler('Failed to remove relation', 400));
                 return false;
             }
-            res.status(200).json({isRelationDeleted: result});
+            res.status(200).json({success: true, data: result});
             return true;
         } catch (error) {
             next(error);
@@ -61,7 +61,7 @@ export class friendshipController implements IFriendshipController {
                 next(new ErrorHandler('Failed to accept relation', 400));
                 return false;
             }
-            res.status(202).json({isAccepted: result});
+            res.status(202).json({success: true, data: result});
             return true;
         } catch (error) {
             next(error);

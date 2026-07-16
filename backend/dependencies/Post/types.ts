@@ -6,6 +6,8 @@ export interface IPostRepository {
     insert(dto: PostInsertDTO): Promise<boolean>;
     update(id: number, dto: PostUpdateDTO): Promise<boolean>;
     delete(id: number): Promise<boolean>;
+    findAll(userId: number): Promise<PostRow[]>;
+
 }
 export interface IPostService {
     findById(userId: number, id: number): Promise<PostRow | null>;
@@ -13,7 +15,13 @@ export interface IPostService {
     insertPost(dto: PostInsertDTO): Promise<boolean>;
     updatePost(userId: number, id: number, dto: PostUpdateDTO): Promise<boolean>;
     deletePost(userId: number, id: number): Promise<boolean>;
+    findLatestPosts(userId: number): Promise<PostRow[] | null>;
 }
+
+export interface IPostController {
+
+}
+
 export interface PostRow extends RowDataPacket {
     id: number;
     author: string;
@@ -25,13 +33,23 @@ export interface PostRow extends RowDataPacket {
     video?: string[];
     file?: string[];
     gif?: string[];
-    taggetPeopleIds?: string[];
+    taggedPeopleIds?: string[];
     pinedPlace?: string;
 
 }
 
-export interface PostInsertDTO extends Exclude<PostRow, 'createdAt' | 'id' | 'constructor' | 'created_at'> { }
-export interface PostUpdateDTO extends Exclude<PostRow, 'author' | 'authorId'> { }
+export type PostInsertDTO = {
+    authorId: number;
+    content: string;
+    visibleFor: Visibility;
+    photo?: string[];
+    video?: string[];
+    file?: string[];
+    gif?: string[];
+    taggetPeopleIds?: string[];
+    pinedPlace?: string;
+}; 
+export interface PostUpdateDTO extends Omit<PostInsertDTO, 'author' | 'authorId'> { }
 
 
 type Visibility = 'public' | 'friends' | 'private';

@@ -17,7 +17,7 @@ export class AuthController implements IAuthController {
                 next();
                 return false;
             }
-            res.status(200).json({message: 'Record added!'});
+            res.status(200).json({status: true, data: result});
             next();
             return true;
         } catch (error) {
@@ -52,7 +52,7 @@ export class AuthController implements IAuthController {
                 req.currentUser = {} as currentUser;
             }
             req['currentUser'] = {id: signResult.id};
-            res.status(200).json({id: signResult.id});
+            res.status(200).json({success: true, data: {id: signResult.id}});
             next();
             return true;
 
@@ -75,7 +75,7 @@ export class AuthController implements IAuthController {
             secure: true,
             maxAge: 5 * 60 * 1000
         });
-        res.status(200).json({id});
+        res.status(200).json({success: true, data: {id}});
         next();
         return true;
     }

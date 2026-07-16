@@ -17,6 +17,7 @@ export interface IFriendshipService {
     updateRelation(userId: number, otherId: number, dto: FriendsRelationUpdateDTO): Promise<boolean>;
     removeRelation(userId: number, otherId: number): Promise<boolean>;
     acceptRelation(userId: number, otherId: number): Promise<boolean>;
+    
 }
 
 export interface IFriendshipController {
