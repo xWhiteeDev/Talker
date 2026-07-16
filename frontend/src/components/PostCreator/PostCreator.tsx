@@ -4,7 +4,6 @@ import EditableTextArea from "../EditableTextArea/EditableTextArea";
 import FileOption from "../FileOption/FileOption";
 import OptionList from "../OptionList/OptionList";
 import type { PostCreator } from "./types";
-import {useRef} from "react";
 
 const postClickableOptions = [
   {
@@ -39,7 +38,12 @@ const postClickableOptions = [
   },
 ];
 
-export function PostCreator({ stateControllerFuction, onInput,onAdd }: PostCreator) {
+export function PostCreator({
+  stateControllerFuction,
+  onInput,
+  onAdd,
+  onVisibilityChange,
+}: PostCreator) {
   return (
     <div className={style.postCreator}>
       <div className={style.closeXCreator}>
@@ -64,6 +68,10 @@ export function PostCreator({ stateControllerFuction, onInput,onAdd }: PostCreat
       </div>
       <div className={style.options}>
         <OptionList
+          onOptionChange={(v) => {
+            if (!onVisibilityChange) return
+            onVisibilityChange(v);
+          }}
           placeholderText="Who will see it?"
           additionalStyle={{
             backgroundColor: "#524c4c00",
@@ -106,7 +114,7 @@ export function PostCreator({ stateControllerFuction, onInput,onAdd }: PostCreat
           border: "none",
           backgroundColor: "#ff000000",
         }}
-        onClick={(ev) => onAdd(ev)}
+        onClick={(ev) => onAdd()}
       />
     </div>
   );
