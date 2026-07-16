@@ -1,7 +1,7 @@
 import express, {type Request, type Response} from "express";
-import {isAccessTokenActive, isDataValid, isRefreshTokenValid} from "../middleware/middleware.js";
-import {authController} from "../loader/dependencyLoader.js";
-import type {IRequirementOptions} from "../interface/middleware/types.js";
+import {authController} from "../../loader/dependencyLoader.js";
+import {isDataValid, isRefreshTokenValid, isAccessTokenActive} from "../../middleware/middleware.js";
+import type {IRequirementOptions} from "../../middleware/types.js";
 
 export const authRouter = express.Router();
 
@@ -70,5 +70,5 @@ authRouter.post('/refresh', isRefreshTokenValid(), async (req, res, next) => {
     authController.refreshToken(req, res, next);
 });
 authRouter.get('/isAuth', isAccessTokenActive(), (req: Request, res, next) => {
-    res.status(200).json({user: req.currentUser});
+    res.status(200).json({success: true, data: {user: req.currentUser}});
 });
