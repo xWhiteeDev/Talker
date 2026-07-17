@@ -1,21 +1,52 @@
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import style from "./Home.module.css";
 import Logo from "../../../components/Logo/Logo";
 import Input from "../../../components/Input/Input";
 import { PostCreator } from "../../../components/PostCreator/PostCreator";
 import Button from "../../../components/Button/Button";
 import { useAPI } from "../../../hooks/useAPI";
+import { NotificationContext } from "../../../components/Notification/context/NotificationContext";
+import { usePosts } from "../../../hooks/usePosts";
+import Post from "../../../components/Post/Post";
 
 export default function Home() {
   const [focusedInput, setInputFocused] = useState<boolean>(false);
   const [postText, setPostText] = useState<string | undefined>(undefined);
+  const [visibility, setVisibility] = useState<string | undefined>(undefined);
   const { request } = useAPI();
+  const { refresh, posts } = usePosts();
+  useEffect(() => {
+    refresh(); //todo
+  }, []);
+  const ctx = useContext(NotificationContext);
   async function pushPost() {
+    if (!visibility || visibility.trim() === "") {
+      ctx?.setNotify({ type: "error", message: "Select visibility!" });
+      return false;
+    }
+    if (!postText || postText.trim() === "" || postText.length < 4) {
+      ctx?.setNotify({ type: "error", message: "Write more text!" });
+      return false;
+    }
     const payload = {
+      visibleFor: visibility,
       content: postText,
     };
-    await request<boolean>("/api/posts", "POST", payload);
-    console.log("Kliknieto dodaj post");
+    try {
+      const res = await request<boolean>("/api/posts", "POST", payload);
+      if (res?.success) {
+        ctx?.setNotify({ type: "success", message: "Post added!" });
+      } else {
+        throw new Error("Post cannot be added");
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        ctx?.setNotify({ type: "error", message: error.message });
+      } else {
+        ctx?.setNotify({ type: "error", message: "Unknown error!" });
+      }
+    }
+    setInputFocused(false);
   }
 
   return (
@@ -65,11 +96,25 @@ export default function Home() {
             stateControllerFuction={setInputFocused}
             onInput={(e) => {
               setPostText(e);
-              console.log(e);
+            }}
+            onVisibilityChange={(v) => {
+              setVisibility(v);
             }}
             onAdd={async () => await pushPost()}
           />
         )}
+        {!focusedInput &&
+          posts?.map((v) => {
+            return (
+              <Post
+                avatar={null}
+                authorName={v.author}
+                content={v.content}
+                visibiliy={v.visibleFor}
+                createdAt={v.created_at}
+              />
+            );
+          })}
       </div>
     </>
   );
