@@ -58,7 +58,7 @@ export class PostRepository implements IPostRepository {
         return result.affectedRows > 0;
     }
     async findAll(userId: number): Promise<PostRow[]> {
-        const query: string = `SELECT * FROM posts WHERE (visibleFor='public' OR (visibleFor='friends' AND author_Id IN (SELECT CASE WHEN userId=:userId THEN friendId ELSE userId END FROM friendships WHERE (userId=:userId OR friendId=:userId) AND status='accepted'))) `;
+        const query: string = `SELECT posts.*, accounts.firstName,accounts.lastName, MAX(CASE WHEN reactions_post.author_id = :userId THEN reactions_post.type END) AS myReaction ,GROUP_CONCAT(reactions_post.type) as reactionsTypes FROM posts JOIN accounts ON posts.author_Id = accounts.id LEFT JOIN reactions_post ON reactions_post.post_id=posts.id WHERE (visibleFor='public' OR (visibleFor='friends' AND posts.author_id IN (SELECT CASE WHEN userId=:userId THEN friendId ELSE userId END FROM friendships WHERE (userId=:userId OR friendId=:userId) AND status='accepted'))) GROUP BY posts.id `;
         const [result] = await this.pool.query<PostRow[]>(query, {userId});
         return result;
     }
