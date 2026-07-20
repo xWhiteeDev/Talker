@@ -1,0 +1,68 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    background-color: rgba(0, 0, 0, 0.116);
+    width: 53%;
+    height: auto;
+    max-height: 25vh;
+    border: 1px solid rgba(128, 128, 128, 0.315);
+    gap: 1%;
+
+}
+
+.user {
+    font-weight: 400;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    width: 100%;
+    height: auto;
+}
+
+.userAvatar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-width: 3vw;
+    width: auto;
+    height: 100%;
+}
+.avatar {
+  width: 2.6vw;
+  aspect-ratio: 1/1;
+  border-radius: 50%;
+}
+
+.postInfo {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 45%;
+}
+
+.content {
+    width: 100%;
+    min-height: 3dvb;
+    height: auto;
+    /* background-color: rgb(75, 41, 41); */
+    overflow-y: auto;
+    overflow-x: hidden;
+    text-overflow: clip;
+    overflow-wrap: break-word;
+}
+
+.interactions {
+    display: grid;
+    grid-template-columns: 0.8fr 0.7fr 0.7fr;
+    gap: 2%;
+    min-height: 3vh;
+    height: 3vh;
+    border-top: 1px solid gray;
+}
+
+.interactions Button {
+    height: 100%;
+    width: 70%;
+    font-weight: 600;
+}
