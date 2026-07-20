@@ -6,6 +6,7 @@ import cookieparser from 'cookie-parser';
 import {ErrorHandler} from '../handlers/errorHandler.js';
 import {authRouter} from '../routes/auth/authRoute.js';
 import {postRouter} from '../routes/post/postRoute.js';
+import {postReactionRouter} from '../routes/reaction/reactionRoute.js';
 dotEnv.config();
 const cfg = {
     serverPort: process.env['TALKER_SERVER_PORT'] ?? 3000,
@@ -35,6 +36,7 @@ app.use(express.json());
 app.use(cookieparser());
 app.use('/api/auth', authRouter);
 app.use('/api/posts', postRouter);
+app.use('/api/postReactions', postReactionRouter);
 
 app.use(globalMiddleware);
 
