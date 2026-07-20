@@ -1,23 +1,29 @@
 export interface PostComponent {
     avatar: string | null;
     authorName: string;
-    visibiliy: string;
+    visibility: string;
     createdAt: string;
     content: string;
+    reactions: PostReaction[];
+    id: number;
 }
-
+interface PostReaction {
+    name: ReactionUnion;
+    count: number;
+    isActive: boolean;
+}
 
 
 
 
 export interface PostReactions {
-    availableReactions: Reaction[];
     additionalStyle?: React.CSSProperties;
+    reactions: ReactionComponent[];
+    isActive: boolean;
+
 }
 
-export type Reaction =
-    'fire' |
-    'rocket' |
+export type ReactionUnion =
     'love' |
     'like' |
     'wow' |
@@ -26,5 +32,9 @@ export type Reaction =
 
 
 export interface ReactionComponent {
-    reaction: Reaction;
+    name: ReactionUnion;
+    count: number;
+    isActive: boolean;
+    onReactionAdd(name: string): void;
+
 }
