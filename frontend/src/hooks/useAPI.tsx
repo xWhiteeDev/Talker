@@ -26,7 +26,7 @@ export function useAPI() {
           context?.setServerError(true);
           return;
         }
-        throw error;
+        throw error
       } else {
         context?.setServerError(true);
       }
