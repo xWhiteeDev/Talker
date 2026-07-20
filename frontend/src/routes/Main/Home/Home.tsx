@@ -36,6 +36,7 @@ export default function Home() {
       const res = await request<boolean>("/api/posts", "POST", payload);
       if (res?.success) {
         ctx?.setNotify({ type: "success", message: "Post added!" });
+        refresh();
       } else {
         throw new Error("Post cannot be added");
       }
@@ -103,15 +104,45 @@ export default function Home() {
             onAdd={async () => await pushPost()}
           />
         )}
+
         {!focusedInput &&
           posts?.map((v) => {
             return (
               <Post
-                avatar={null}
-                authorName={v.author}
+                key={v.id}
+                avatar={null} //todo
+                authorName={v.firstName + " " + v.lastName}
                 content={v.content}
-                visibiliy={v.visibleFor}
+                visibility={v.visiblefor}
                 createdAt={v.created_at}
+                reactions={[
+                  {
+                    name: "love",
+                    count: 0,
+                    isActive: false,
+                  },
+                  {
+                    name: "like",
+                    count: 0,
+                    isActive: true,
+                  },
+                  {
+                    name: "sad",
+                    count: 0,
+                    isActive: false,
+                  },
+                  {
+                    name: "wow",
+                    count: 0,
+                    isActive: false,
+                  },
+                  {
+                    name: "wrr",
+                    count: 0,
+                    isActive: false,
+                  },
+                ]}
+                id={v.id}
               />
             );
           })}
