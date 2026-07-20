@@ -35,6 +35,8 @@ export interface PostRow extends RowDataPacket {
     gif?: string[];
     taggedPeopleIds?: string[];
     pinedPlace?: string;
+    firstName:string;
+    lastName:string
 
 }
 
