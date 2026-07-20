@@ -2,6 +2,8 @@ import type {RowDataPacket} from "mysql2/promise";
 
 export interface IAccountRepository {
     findWithCredentials(email: string): Promise<IAccountRow | null>;
+    findById(id: number): Promise<IAccountRow | null>;
+
     insert(data: IAccountInsertDTO): Promise<boolean>;
     update(data: IAccountUpdateDTO): Promise<boolean>;
     delete(email: string): Promise<boolean>;
@@ -10,16 +12,17 @@ export interface IAccountRepository {
 
 export interface IAccountService {
     findUserWithCredentials(email: string): Promise<IAccountRow | null>;
+    findUserById(id: number): Promise<IAccountRow | null>;
     insertUser(document: IAccountInsertDTO): Promise<boolean>;
     updateUser(document: IAccountUpdateDTO): Promise<boolean>;
     deleteUser(email: string): Promise<boolean>;
     isUserExist(email: string): Promise<boolean>;
 }
 export interface IAccountRow extends RowDataPacket {
-    id: string;
+    id: number;
     created_at: string;
     email: string;
-    password: string
+    password: string;
 }
 
 export interface IUser {
@@ -41,6 +44,6 @@ export interface IAccountUpdateDTO extends Partial<IAccountInsertDTO> {
 
 
 export interface currentUser {
-    id:number;
+    id: number;
 }
 
