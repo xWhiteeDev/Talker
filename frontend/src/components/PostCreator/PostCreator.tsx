@@ -114,7 +114,7 @@ export function PostCreator({
           border: "none",
           backgroundColor: "#ff000000",
         }}
-        onClick={(ev) => onAdd()}
+        onClick={() => onAdd()}
       />
     </div>
   );
