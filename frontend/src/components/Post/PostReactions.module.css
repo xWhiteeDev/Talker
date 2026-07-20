@@ -1,0 +1,8 @@
+.reaction {
+    font-size: 0.9rem;
+    text-align: start;
+    cursor: pointer;
+    user-select: none;
+    min-width: 2vw;
+    opacity: 0.5;
+}
