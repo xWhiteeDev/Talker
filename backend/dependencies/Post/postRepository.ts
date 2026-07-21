@@ -58,7 +58,7 @@ export class PostRepository implements IPostRepository {
         return result.affectedRows > 0;
     }
     async findAll(userId: number): Promise<PostRow[]> {
-        const query: string = `SELECT posts.*, accounts.firstName,accounts.lastName, MAX(CASE WHEN reactions_post.author_id = :userId THEN reactions_post.type END) AS myReaction ,GROUP_CONCAT(reactions_post.type) as reactionsTypes FROM posts JOIN accounts ON posts.author_Id = accounts.id LEFT JOIN reactions_post ON reactions_post.post_id=posts.id WHERE (visibleFor='public' OR (visibleFor='friends' AND posts.author_id IN (SELECT CASE WHEN userId=:userId THEN friendId ELSE userId END FROM friendships WHERE (userId=:userId OR friendId=:userId) AND status='accepted'))) GROUP BY posts.id `;
+        const query: string = `WITH post_reactions AS (SELECT post_id,type,COUNT(type) as reaction_count FROM reactions_post GROUP BY post_id, type), reactions AS (SELECT post_id, JSON_OBJECTAGG(post_reactions.type,post_reactions.reaction_count) AS reactions_object FROM post_reactions GROUP BY post_id) SELECT posts.*, accounts.firstName,accounts.lastName,reactions.reactions_object ,MAX(CASE WHEN reactions_post.author_id = :userId THEN reactions_post.type END) AS myReaction FROM posts JOIN accounts ON posts.author_Id = accounts.id LEFT JOIN reactions_post ON reactions_post.post_id=posts.id LEFT JOIN reactions ON reactions.post_id = posts.id WHERE (visibleFor='public' OR (visibleFor='friends' AND posts.author_id IN (SELECT CASE WHEN userId=:userId THEN friendId ELSE userId END FROM friendships WHERE (userId=:userId OR friendId=:userId) AND status='accepted'))) GROUP BY posts.id `;
         const [result] = await this.pool.query<PostRow[]>(query, {userId});
         return result;
     }
