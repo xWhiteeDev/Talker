@@ -4,10 +4,11 @@ export interface PostComponent {
     visibility: string;
     createdAt: string;
     content: string;
-    reactions: PostReaction[];
+    reactions: Record<string, number>;
+    activeReaction:string
     id: number;
 }
-interface PostReaction {
+export interface PostReaction {
     name: ReactionUnion;
     count: number;
     isActive: boolean;
