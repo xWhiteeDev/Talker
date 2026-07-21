@@ -115,33 +115,8 @@ export default function Home() {
                 content={v.content}
                 visibility={v.visiblefor}
                 createdAt={v.created_at}
-                reactions={[
-                  {
-                    name: "love",
-                    count: 0,
-                    isActive: false,
-                  },
-                  {
-                    name: "like",
-                    count: 0,
-                    isActive: true,
-                  },
-                  {
-                    name: "sad",
-                    count: 0,
-                    isActive: false,
-                  },
-                  {
-                    name: "wow",
-                    count: 0,
-                    isActive: false,
-                  },
-                  {
-                    name: "wrr",
-                    count: 0,
-                    isActive: false,
-                  },
-                ]}
+                reactions={v.reactions_object ?? {}}
+                activeReaction = {v.myReaction}
                 id={v.id}
               />
             );
