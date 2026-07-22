@@ -51,6 +51,8 @@ export default function Post({
   const [activeReactionName, setActiveReactionName] = useState<
     ReactionUnion | undefined
   >(undefined);
+  const postContent = useRef<HTMLDivElement>(null);
+  const [isExpanded, setExpanded] = useState<boolean>(false);
 
   const [defaultReactions, setDefaultReactions] =
     useState<PostReaction[]>(defaultPayload);
@@ -65,7 +67,7 @@ export default function Post({
         };
       });
     });
-    setActiveReactionName(activeReaction as ReactionUnion)
+    setActiveReactionName(activeReaction as ReactionUnion);
   }, []);
 
   const notificationContext = useContext(NotificationContext);
@@ -86,7 +88,7 @@ export default function Post({
         type: name,
       });
       if (result?.success) {
-        console.log(result.success)
+        console.log(result.success);
         setActiveReactionName(name);
         setDefaultReactions((prev) =>
           prev.map<PostReaction>((v, i) => {
@@ -142,8 +144,9 @@ export default function Post({
       });
     }
   }
+
   return (
-    <div className={style.container}>
+    <div className={isExpanded ? style.expandedContainer : style.container}>
       <div className={style.user}>
         <div className={style.userAvatar}>
           <img src={unk_person} className={style.avatar} alt="user avatar" />
@@ -154,8 +157,28 @@ export default function Post({
           <span>{new Date(createdAt).toLocaleString()}</span>
         </div>
       </div>
-      <div className={style.content}>
-        <span>{content}</span>
+      <div className={isExpanded ? style.expandedContentContainer :style.contentContainer}>
+        <div className={isExpanded ?style.expandedContent : style.content} ref={postContent}>
+          <span>{content}</span>
+        </div>
+        {postContent.current && !isExpanded &&
+        postContent.current.scrollHeight > postContent.current.clientHeight ? (
+          <div>
+            <span
+              style={{
+                fontWeight: "600",
+                cursor: "pointer",
+                fontSize: "1.3rem",
+                opacity: "0.7",
+              }}
+              onClick={() => setExpanded(true)}
+            >
+              See more...
+            </span>
+          </div>
+        ) : (
+          ""
+        )}
       </div>
       <div className={style.interactions}>
         <div style={{ width: "100%", display: "flex", height: "100%" }}>
