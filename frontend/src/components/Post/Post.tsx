@@ -8,6 +8,9 @@ import { postReactionContext } from "./context/postReactionContext";
 import Reaction from "./Reaction";
 import { NotificationContext } from "../Notification/context/NotificationContext";
 import { ErrorHandler } from "../../lib/customError";
+import Comment from "./comments/Comment";
+import UserPostInfo from "./extra/User/User";
+import EditableTextArea from "../EditableTextArea/EditableTextArea";
 
 const defaultPayload: PostReaction[] = [
   {
@@ -53,7 +56,7 @@ export default function Post({
   >(undefined);
   const postContent = useRef<HTMLDivElement>(null);
   const [isExpanded, setExpanded] = useState<boolean>(false);
-
+  const [comment, setComment] = useState<string>('');
   const [defaultReactions, setDefaultReactions] =
     useState<PostReaction[]>(defaultPayload);
 
@@ -145,23 +148,32 @@ export default function Post({
     }
   }
 
+  async function handleAddCommentToPost() {
+    const result = await request<boolean>('/api/postComments', 'POST', {
+      content:comment
+    })
+  }
   return (
     <div className={isExpanded ? style.expandedContainer : style.container}>
-      <div className={style.user}>
-        <div className={style.userAvatar}>
-          <img src={unk_person} className={style.avatar} alt="user avatar" />
-        </div>
-        <div className={style.postInfo}>
-          <span style={{ fontWeight: "600" }}>{authorName}</span>
-          <span>{visibility}</span>
-          <span>{new Date(createdAt).toLocaleString()}</span>
-        </div>
-      </div>
-      <div className={isExpanded ? style.expandedContentContainer :style.contentContainer}>
-        <div className={isExpanded ?style.expandedContent : style.content} ref={postContent}>
+      <UserPostInfo
+        avatar={null}
+        visibility={visibility}
+        authorName={authorName}
+        createdAt={createdAt}
+      />
+      <div
+        className={
+          isExpanded ? style.expandedContentContainer : style.contentContainer
+        }
+      >
+        <div
+          className={isExpanded ? style.expandedContent : style.content}
+          ref={postContent}
+        >
           <span>{content}</span>
         </div>
-        {postContent.current && !isExpanded &&
+        {postContent.current &&
+        !isExpanded &&
         postContent.current.scrollHeight > postContent.current.clientHeight ? (
           <div>
             <span
@@ -205,6 +217,40 @@ export default function Post({
           text="Share"
         />
       </div>
+      {isExpanded && (
+        <div className={style.expandedComments}>
+          <div className={style.expandedCommentCreator}>
+            <EditableTextArea
+              additionalStyle={{
+                height: "auto",
+                fontSize: "1.5rem",
+                width: "36vw",
+              }}
+              placeholder="+ Add your comment"
+              placeholderFontSize="1.4rem"
+              onInput={(text)=>setComment(text)}
+            />
+            <div className={style.expandedCommentBar}>
+              <Button
+                text="Dodaj"
+                isDisabled={comment.length === 0 || comment.length > 200 ? true : false}
+                additionalStyle={{
+                  minWidth: "3.8vw",
+                  aspectRatio: "3/1",
+                  padding: "0.4%",
+                  fontWeight: "600",
+                  background: "#b4d4e0",
+                  borderRadius: "10px",
+                  border: "none",
+                  fontSize: "16px",
+                  boxShadow: "0px 2px 5px #2222223d",
+                }}
+              />
+              <span style={{color:comment.length > 200 ? 'red' : 'black', fontWeight:comment.length > 200 ? '600' : '400'}}>{comment.length}/200</span>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
