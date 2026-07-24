@@ -12,12 +12,12 @@ export default function EditableTextArea({
   const [focused, setFocused] = useState<boolean>(false);
   return (
     <div
-      style={{ maxHeight:"100%", width: "auto", minWidth: "40%", marginLeft:"2%",overflowY:'auto' }}
+      style={{ maxHeight:"100%", overflowY:'auto' }}
     >
       {!focused &&
       (!placeholderRef.current ||
         (placeholderRef.current && placeholderRef.current.textContent.trim().length == 0)) ? (
-        <span  style={{ position: "absolute", zIndex: -1,color:placeholderColor,fontSize:placeholderFontSize,fontWeight:placeholderFontWeight }}>{placeholder}</span>
+        <span style={{ position: "absolute", zIndex: -1,color:placeholderColor,fontSize:placeholderFontSize,fontWeight:placeholderFontWeight }}>{placeholder}</span>
       ) : (
         ""
       )}
