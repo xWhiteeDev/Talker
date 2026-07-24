@@ -11,36 +11,6 @@
 
 }
 
-.user {
-    font-weight: 400;
-    display: flex;
-    flex-direction: row;
-    align-items: flex-start;
-    width: 100%;
-    height: auto;
-}
-
-.userAvatar {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-width: 3vw;
-    width: auto;
-    height: 100%;
-}
-
-.avatar {
-    width: 2.6vw;
-    aspect-ratio: 1/1;
-    border-radius: 50%;
-}
-
-.postInfo {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    width: 45%;
-}
 
 .contentContainer {
     display: flex;
@@ -91,11 +61,11 @@
 .expandedContainer {
     position: fixed;
     width: 45%;
-    height: 70%;
+    height: 84%;
     background-color: rgb(243, 243, 243);
     padding: 1%;
     z-index: 1;
-    top: 20%;
+    top: 10%;
     box-shadow: 0px 4px 15px 2px rgba(0, 0, 0, 0.24);
 }
 
@@ -120,4 +90,45 @@
     max-height: 33vh;
     word-break: break-word;
     overflow-y: auto;
+}
+
+.expandedComments {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 35vh;
+    max-height: 46vh;
+    overflow-wrap: anywhere;
+    overflow-y: auto;
+    gap: 0.2vh;
+    border-top: 1px solid gray;
+    /* background-color: red; */
+}
+
+.expandedCommentCreator {
+    display: flex;
+    flex-direction: column;
+    border-bottom: 2px solid rgba(128, 128, 128, 0.384);
+    width: 100%;
+    height: auto;
+    max-height: 22vh;
+    padding: 1%;
+    gap:0.6rem
+}
+.expandedCommentBar {
+    display: flex;
+    align-items: center;
+    height: 4vh;
+    gap: 3%;
+}
+.expandedComments::-webkit-scrollbar {
+    background: none;
+    background-color: rgba(5, 5, 5, 0.034);
+    width: 0.1vw;
+}
+
+.expandedComments::-webkit-scrollbar-thumb {
+    background: none;
+    background-color: rgba(5, 5, 5, 0.205);
+    width: 0.1vw;
 }
