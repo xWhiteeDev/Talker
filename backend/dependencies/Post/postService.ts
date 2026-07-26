@@ -1,5 +1,5 @@
 import {ErrorHandler} from "../../handlers/errorHandler.js";
-import type { IAccountService} from "../Account/types.js";
+import type {IAccountService} from "../Account/types.js";
 import type {IFriendshipService} from "../Friendship/types.js";
 import type {PostRow, PostInsertDTO, PostUpdateDTO, IPostService, IPostRepository} from "./types.js";
 
@@ -12,11 +12,15 @@ export class PostService implements IPostService {
         if (!existingPost) throw new ErrorHandler('Post does not exist', 404);
 
         const postVisibility = existingPost.visibleFor;
-        if (postVisibility === 'public') {
+        if (postVisibility == 'Public') {
             return existingPost;
 
-        } else if (postVisibility === 'friends') {
+        } else if (existingPost.authorId === userId) {
+            return existingPost;
+        }
+        else if (postVisibility === 'friends') {
             const relationBetweenUsers = await this.FriendsService.findRelationBetween(userId, existingPost.authorId);
+
             if (!relationBetweenUsers) return null;
             return existingPost;
         } else if (postVisibility === 'private' && existingPost.authorId === userId) {

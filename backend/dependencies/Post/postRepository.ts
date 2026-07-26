@@ -4,8 +4,12 @@ export class PostRepository implements IPostRepository {
     constructor(private pool: Pool) {
         console.log(`\x1b[32;1m🚀[PostRepository] Pool injected \x1b[0m`);
     }
-    async findById(id: number): Promise<PostRow | undefined> {
-        const query: string = 'SELECT * FROM posts WHERE id=:id LIMIT 1';
+    async findById(id: number,withComments?:boolean): Promise<PostRow | undefined> {
+        let query: string = 'SELECT posts.id, posts.created_at,posts.author_id,posts.content,posts.visibleFor,posts.photo,posts.video,posts.file,posts.gif,posts.taggedPeopleIds,posts.pinnedPlace,accounts.firstName,accounts.lastName FROM posts LEFT JOIN accounts ON accounts.id=posts.author_id WHERE posts.id=:id LIMIT 1';
+        if (withComments) {
+          //TODO Subquery with commments
+          //   query = 'WITH post_commments AS (SELECT id, post_id,user_id,parent_id,content,created_at FROM comments GROUP BY post_id) SELECT posts.id, posts.created_at,posts.author_id,posts.content,posts.visibleFor,posts.photo,posts.video,posts.file,posts.gif,posts.taggedPeopleIds,posts.pinnedPlace,accounts.firstName,accounts.lastName FROM posts LEFT JOIN accounts'
+        }
         const [[result]] = await this.pool.query<PostRow[]>(query, {id});
         return result;
     }
