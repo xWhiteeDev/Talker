@@ -54,4 +54,4 @@ export type PostInsertDTO = {
 export interface PostUpdateDTO extends Omit<PostInsertDTO, 'author' | 'authorId'> { }
 
 
-type Visibility = 'public' | 'friends' | 'private';
+type Visibility = 'Public' | 'friends' | 'private';
