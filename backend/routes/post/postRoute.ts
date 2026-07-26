@@ -12,3 +12,6 @@ postRouter.post('/', isRefreshTokenValid(), async (req, res, next) => {
 postRouter.get('/', isRefreshTokenValid(), async (req, res, next) => {
     await postController.fetchLatestPosts(req, res, next);
 });
+postRouter.get('/:id', isRefreshTokenValid(), async (req, res, next) => {
+    await postController.getSpecifiedPost(req, res, next);
+});
