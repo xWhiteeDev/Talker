@@ -14,6 +14,7 @@ import ProtectedRoute from "../components/ProtectedRoute/ProtectedRoute.tsx";
 import AuthorizationProtectedRoute from "../components/ProtectedRoute/AuthorizationProtectedRoute.tsx";
 import { ServerErrorContext } from "../components/Error/errorContext.ts";
 import ErrorPage from "../components/Error/ErrorPage.tsx";
+import { PostDetail } from "../components/PostDetail/PostDetail.tsx";
 const root = document.getElementById("root");
 const routes = createBrowserRouter([
   {
@@ -21,10 +22,18 @@ const routes = createBrowserRouter([
     element: <App />,
     children: [
       {
-        path: "/home",
+        path: "/",
         element: (
           <ProtectedRoute>
             <Home />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/post/:postid",
+        element: (
+          <ProtectedRoute>
+            <PostDetail />
           </ProtectedRoute>
         ),
       },
