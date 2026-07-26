@@ -12,6 +12,9 @@ import {PostController} from "../dependencies/Post/postController.js";
 import {PostReactionRepository} from "../dependencies/PostReaction/postReactionRepository.js";
 import {PostReactionService} from "../dependencies/PostReaction/postReactionService.js";
 import {PostReactionController} from "../dependencies/PostReaction/postReactionController.js";
+import {CommentsRepository} from "../dependencies/Comments/CommentsRepository.js";
+import {CommentsService} from "../dependencies/Comments/CommentsService.js";
+import {CommentsController} from "../dependencies/Comments/CommentsController.js";
 
 export const dbPool = createPool();
 const accountRepository = new AccountRepository(dbPool);
@@ -30,4 +33,9 @@ export const postController = new PostController(postService);
 const postReactionRepository = new PostReactionRepository(dbPool);
 const postReactionService = new PostReactionService(postReactionRepository);
 export const postReactionController = new PostReactionController(postReactionService);
+
+const commentsRepository = new CommentsRepository(dbPool);
+const commentsService = new CommentsService(commentsRepository);
+export const commmentsController = new CommentsController(commentsService);
+
 console.log(`\x1b[42;1m✅ All dependencies loaded correctly! \x1b[0m`);
