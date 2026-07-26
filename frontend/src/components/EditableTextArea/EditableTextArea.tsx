@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import type {EditableTextArea} from './types'
+import type { EditableTextArea } from "./types";
 export default function EditableTextArea({
   placeholder,
   placeholderFontSize,
@@ -11,28 +11,19 @@ export default function EditableTextArea({
   const placeholderRef = useRef<HTMLDivElement | null>(null);
   const [focused, setFocused] = useState<boolean>(false);
   return (
-    <div
-      style={{ maxHeight:"100%", overflowY:'auto' }}
-    >
-      {!focused &&
-      (!placeholderRef.current ||
-        (placeholderRef.current && placeholderRef.current.textContent.trim().length == 0)) ? (
-        <span style={{ position: "absolute", zIndex: -1,color:placeholderColor,fontSize:placeholderFontSize,fontWeight:placeholderFontWeight }}>{placeholder}</span>
-      ) : (
-        ""
-      )}
+    <div style={{ maxHeight: "100%", overflowY: "hidden" }}>
       <div
         ref={placeholderRef}
         contentEditable="plaintext-only"
         style={{
           outline: "none",
           border: "none",
-          overflowY:'auto',
-          ...additionalStyle
+          overflowY: "auto",
+          ...additionalStyle,
         }}
-        onInput={()=>{
+        onInput={() => {
           if (placeholderRef.current) {
-            onInput?.(placeholderRef.current.textContent)
+            onInput?.(placeholderRef.current.textContent);
           }
         }}
         onFocus={() => {
@@ -41,7 +32,21 @@ export default function EditableTextArea({
         onBlur={() => {
           setFocused(false);
         }}
-      ></div>
+      >
+
+        {!focused && placeholderRef.current && placeholderRef.current.textContent.trim().length < 2 ? <span
+              style={{
+                color: placeholderColor,
+                fontSize: placeholderFontSize,
+                fontWeight: placeholderFontWeight,
+              }}
+            >
+              {placeholder}
+            </span> : '' }
+
+
+      
+      </div>
     </div>
   );
 }
