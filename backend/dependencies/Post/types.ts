@@ -1,7 +1,7 @@
 import type {RowDataPacket} from "mysql2";
 
 export interface IPostRepository {
-    findById(id: number): Promise<PostRow | undefined>;
+    findById(id: number,withComments?: boolean): Promise<PostRow | undefined>;
     findByAuthor(authorId: number): Promise<PostRow[] | null>;
     insert(dto: PostInsertDTO): Promise<boolean>;
     update(id: number, dto: PostUpdateDTO): Promise<boolean>;
@@ -10,7 +10,7 @@ export interface IPostRepository {
 
 }
 export interface IPostService {
-    findById(userId: number, id: number): Promise<PostRow | null>;
+    findById(userId: number, id: number,withComments?: boolean): Promise<PostRow | null>;
     findByAuthor(userId: number, authorId: number): Promise<PostRow[] | null>;
     insertPost(dto: PostInsertDTO): Promise<boolean>;
     updatePost(userId: number, id: number, dto: PostUpdateDTO): Promise<boolean>;

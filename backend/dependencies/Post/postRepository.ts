@@ -4,13 +4,13 @@ export class PostRepository implements IPostRepository {
     constructor(private pool: Pool) {
         console.log(`\x1b[32;1m🚀[PostRepository] Pool injected \x1b[0m`);
     }
-    async findById(id: number,withComments?:boolean): Promise<PostRow | undefined> {
+    async findById(id: number, withComments?: boolean): Promise<PostRow | undefined> {
         let query: string = 'SELECT posts.id, posts.created_at,posts.author_id,posts.content,posts.visibleFor,posts.photo,posts.video,posts.file,posts.gif,posts.taggedPeopleIds,posts.pinnedPlace,accounts.firstName,accounts.lastName FROM posts LEFT JOIN accounts ON accounts.id=posts.author_id WHERE posts.id=:id LIMIT 1';
         if (withComments) {
-          //TODO Subquery with commments
-          //   query = 'WITH post_commments AS (SELECT id, post_id,user_id,parent_id,content,created_at FROM comments GROUP BY post_id) SELECT posts.id, posts.created_at,posts.author_id,posts.content,posts.visibleFor,posts.photo,posts.video,posts.file,posts.gif,posts.taggedPeopleIds,posts.pinnedPlace,accounts.firstName,accounts.lastName FROM posts LEFT JOIN accounts'
+            query = `WITH post_comments AS (SELECT c.id AS commentId, c.user_id as userId, c.post_id as post_Id ,c.created_at as createdAt, c.content, CONCAT(' ', a.firstName, a.lastName) as fullName FROM comments c LEFT JOIN accounts a ON a.id  = c.user_id WHERE c.post_id=:id AND c.parent_id IS NULL), aggComments AS (SELECT JSON_ARRAYAGG(JSON_OBJECT('commentId', pc.commentId,'fullName', pc.fullName,'content', pc.content, 'createdAt', pc.createdAt)) as commentsArr FROM post_comments pc), post_reactions AS (SELECT rp.id,rp.author_id,rp.type,rp.post_id  FROM reactions_post rp WHERE rp.post_id =:id), post_reactions_grouped AS (SELECT pr.post_id, COUNT(*) as reaction_count, pr.type  FROM post_reactions pr GROUP BY pr.post_id,pr.type),aggPostReactions AS (SELECT JSON_OBJECTAGG(prg.type,prg.reaction_count) as reactionObject FROM post_reactions_grouped prg) SELECT p.id as postId, p.author_Id, p.content,p.created_at, p.visibleFor, CONCAT(' ', a.firstName,a.lastName) as fullName, agc.commentsArr as comments, apr.reactionObject as reactions FROM posts p LEFT JOIN accounts a ON a.id = p.author_Id LEFT JOIN aggComments agc ON 1=1 LEFT JOIN aggPostReactions apr ON 1=1 WHERE p.id=:id`;
         }
         const [[result]] = await this.pool.query<PostRow[]>(query, {id});
+        console.log(result)
         return result;
     }
     async findByAuthor(authorId: number): Promise<PostRow[]> {

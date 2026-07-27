@@ -37,7 +37,7 @@ export class PostController implements IPostController {
                 return false;
             }
             console.log(parseInt(params.id))
-            const result = await this.PostService.findById(user.id, parseInt(params['id']));
+            const result = await this.PostService.findById(user.id, parseInt(params['id']), true);
             if (result == null) {
                 next(new ErrorHandler('Failed to fetch posts', 404));
                 return false;

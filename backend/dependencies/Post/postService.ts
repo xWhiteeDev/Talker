@@ -7,8 +7,13 @@ export class PostService implements IPostService {
     constructor(private PostRepository: IPostRepository, private FriendsService: IFriendshipService, private accountService: IAccountService) {
         console.log(`\x1b[32;1m🚀[PostService] PostRepository injected \x1b[0m`);
     }
-    async findById(userId: number, id: number): Promise<PostRow | null> {
-        const existingPost: PostRow | undefined = await this.PostRepository.findById(id);
+    async findById(userId: number, id: number, withComments?: boolean): Promise<PostRow | null> {
+        let existingPost;
+        if (withComments) {
+            existingPost = await this.PostRepository.findById(id, true);
+        } else {
+            existingPost = await this.PostRepository.findById(id);
+        }
         if (!existingPost) throw new ErrorHandler('Post does not exist', 404);
 
         const postVisibility = existingPost.visibleFor;
