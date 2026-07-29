@@ -3,6 +3,7 @@ import type { OptionalList } from "./types";
 export default function OptionList({
   placeholderText,
   additionalStyle,
+  itemsList,
   onOptionChange,
 }: OptionalList) {
   return (
@@ -12,16 +13,12 @@ export default function OptionList({
         placeholder={placeholderText}
         style={additionalStyle}
         onChange={(e) => {
-          if (!onOptionChange) return
+          if (!onOptionChange) return;
           onOptionChange(e.currentTarget.value);
         }}
       />
       <datalist id="visibilityFor">
-        <option value="Friends" />
-        <option value="Public" />
-        <option value="Only me" />
-        <option value="Specified friends" />
-        <option value="Group" />
+        {itemsList && itemsList.map((v) => <option value={v} />)}
       </datalist>
     </div>
   );

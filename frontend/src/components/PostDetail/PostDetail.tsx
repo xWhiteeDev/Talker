@@ -7,6 +7,7 @@ import { useAPI } from "../../hooks/useAPI";
 import UserPostInfo from "../Post/extra/User/User";
 import Comment from "./comments/Comment";
 import EditableTextArea from "../EditableTextArea/EditableTextArea";
+import CustomText from "../Text/Text";
 export function PostDetail() {
   const { postid } = useParams();
   const [postDetails, setPostDetails] = useState<PostDetails>();
@@ -29,13 +30,15 @@ export function PostDetail() {
       postId: parseInt(postid),
       parentId: null,
       content: comment,
-    }).then(response => {
-      if (response?.success)  {
-        console.log('Comment added')
-      } else {
-        console.log('Comment adding fault')
-      }
-    }).catch(err=>console.error(`Unexpected error: ${err}`))
+    })
+      .then((response) => {
+        if (response?.success) {
+          console.log("Comment added");
+        } else {
+          console.log("Comment adding fault");
+        }
+      })
+      .catch((err) => console.error(`Unexpected error: ${err}`));
   }
 
   return (
@@ -46,7 +49,7 @@ export function PostDetail() {
       <div className={style.author}>
         {postDetails && (
           <UserPostInfo
-            authorName={postDetails.firstName + postDetails.lastName}
+            authorName={postDetails.fullName}
             avatar={null}
             visibility={postDetails.visibleFor}
             createdAt={postDetails.created_at}
@@ -85,6 +88,16 @@ export function PostDetail() {
             </span>
           </div>
         </div>
+        {postDetails &&
+          postDetails.comments  ?
+          postDetails.comments.map((v) => (
+            <Comment
+              authorName={v.fullName}
+              content={v.content}
+              createdAt={v.createdAt}
+              avatar={null}
+            />
+          )) : <CustomText text="Nobody wrote any comments"/>}
       </div>
     </div>
   );

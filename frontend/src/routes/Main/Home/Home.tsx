@@ -1,16 +1,18 @@
 import { useContext, useEffect, useState } from "react";
 import style from "./Home.module.css";
 import Logo from "../../../components/Logo/Logo";
-import Input from "../../../components/Input/Input";
-import { PostCreator } from "../../../components/PostCreator/PostCreator";
 import Button from "../../../components/Button/Button";
 import { useAPI } from "../../../hooks/useAPI";
 import { NotificationContext } from "../../../components/Notification/context/NotificationContext";
 import { usePosts } from "../../../hooks/usePosts";
 import Post from "../../../components/Post/Post";
+import EditableTextArea from "../../../components/EditableTextArea/EditableTextArea";
+import OptionList from "../../../components/OptionList/OptionList";
+
+import photo_ico from "../../../assets/icons/photo_ico.png";
+import gif from "../../../assets/icons/gif_ico.png";
 
 export default function Home() {
-  const [focusedInput, setInputFocused] = useState<boolean>(false);
   const [postText, setPostText] = useState<string | undefined>(undefined);
   const [visibility, setVisibility] = useState<string | undefined>(undefined);
   const { request } = useAPI();
@@ -47,7 +49,6 @@ export default function Home() {
         ctx?.setNotify({ type: "error", message: "Unknown error!" });
       }
     }
-    setInputFocused(false);
   }
 
   return (
@@ -62,65 +63,67 @@ export default function Home() {
       <div className={style.accountOptions}></div>
       <div className={style.feedContainer}>
         <div className={style.addPostContainer}>
-          {!focusedInput && (
-            <div className={style.addPost}>
-              <Button
-                text="+"
-                additionalStyle={{
-                  marginLeft: "2%",
-                  border: "none",
-                  fontSize: "2rem",
-                  width: "11%",
-                  textAlign: "center",
-                  aspectRatio: "1/1",
-                  background: "none",
-                  color: "#000000",
-                }}
+          <div className={style.addPost}>
+            {postText && postText.length > 0 ? (
+              <OptionList
+                placeholderText="Select visibility"
+                itemsList={["Public", "Friends", "Private"]}
               />
-              <Input
-                placeholderSize="1.2rem"
-                onFocus={() => setInputFocused(true)}
-                additionalStyle={{
-                  background: "none",
-                  border: "none",
-                  fontSize: "4rem",
-                  width: "100%",
-                  height: "100%",
-                }}
-                placeholder="Share something with whole world!"
-              />
-            </div>
-          )}
-        </div>
-        {focusedInput && (
-          <PostCreator
-            stateControllerFuction={setInputFocused}
-            onInput={(e) => {
-              setPostText(e);
-            }}
-            onVisibilityChange={(v) => {
-              setVisibility(v);
-            }}
-            onAdd={async () => await pushPost()}
-          />
-        )}
+            ) : null}
+            <EditableTextArea
+              placeholderColor="black"
+              placeholder={"+ Share something with world"}
+              placeholderFontWeight="600"
+              max={300}
+              onInput={(text) => setPostText(text)}
+              additionalStyle={{
+                padding: "2%",
+                width: "29.5vw",
+                maxWidth: "100%",
+                minHeight: "1vh",
+                color: "black",
+              }}
+            />
+            {postText && postText.length > 0 ? (
+              <div className={style.postTools}>
+                <span style={{ justifySelf: "center", alignSelf: "center" }}>
+                  {postText.length} / {300}
+                </span>
+                <div className={style.attachments}>
+                  <img src={photo_ico} width={33} alt="" />
+                  <img src={photo_ico} width={33} alt="" />
 
-        {!focusedInput &&
-          posts?.map((v) => {
-            return (
-              <Post
-                key={v.id}
-                avatar={null} //todo
-                authorName={v.firstName + " " + v.lastName}
-                content={v.content}
-                visibility={v.visiblefor}
-                createdAt={v.created_at}
-                reactions={v.reactions_object ?? {}}
-                activeReaction = {v.myReaction}
-                id={v.id}
-              />
-            );
-          })}
+                  <img src={photo_ico} width={33} alt="" />
+                  <img src={photo_ico} width={33} alt="" />
+                </div>
+                <Button
+                  text="Add post"
+                  additionalStyle={{
+                    width: "80%",
+                    justifySelf: "center",
+                    alignSelf: "center",
+                  }}
+                />
+              </div>
+            ) : null}
+          </div>
+        </div>
+
+        {posts?.map((v) => {
+          return (
+            <Post
+              key={v.id}
+              avatar={null} //todo
+              authorName={v.firstName + " " + v.lastName}
+              content={v.content}
+              visibility={v.visiblefor}
+              createdAt={v.created_at}
+              reactions={v.reactions_object ?? {}}
+              activeReaction={v.myReaction}
+              id={v.id}
+            />
+          );
+        })}
       </div>
     </>
   );

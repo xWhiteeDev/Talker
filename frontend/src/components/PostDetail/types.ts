@@ -1,16 +1,23 @@
 export interface PostDetails {
-
-    firstName: string;
-    lastName: string;
-
-    visibleFor: string;
-    content: string;
-    created_at: string;
-    photo?: string;
-    video?: string;
-    file?: string;
-    gif?: string;
-    taggedPlaceIds?: string[];
-    pinnedPlace?: string;
-
+  postId: number;
+  author_Id: number;
+  content: string;
+  created_at: string;
+  visibleFor: string;
+  fullName: string;
+  comments: PostDetailsComment[]
+  reactions: PostReactions;
+  myReaction: ReactionUnion;
 }
+interface PostDetailsComment {
+  content: string;
+  fullName: string;
+  commentId: number;
+  createdAt: string;
+}
+
+type ReactionUnion = 'love' | 'like' | 'wow' | 'sad' | 'angry';
+
+type PostReactions = {
+  [key in ReactionUnion]: number;
+};

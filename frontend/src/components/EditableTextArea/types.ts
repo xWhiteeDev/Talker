@@ -1,5 +1,6 @@
 export interface EditableTextArea {
     placeholder?: string;
+    max:number;
     placeholderFontSize?: string,
     placeholderFontWeight?: string,
     placeholderColor?: string;
