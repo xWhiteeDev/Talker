@@ -1,3 +1,4 @@
+
 import {ErrorHandler} from "../../handlers/errorHandler.js";
 import type {currentUser} from "../Account/types.js";
 import type {IPostController, IPostService, PostInsertDTO} from "./types.js";
@@ -36,7 +37,6 @@ export class PostController implements IPostController {
                 next(new ErrorHandler('ID param not provided', 400));
                 return false;
             }
-            console.log(parseInt(params.id))
             const result = await this.PostService.findById(user.id, parseInt(params['id']), true);
             if (result == null) {
                 next(new ErrorHandler('Failed to fetch posts', 404));

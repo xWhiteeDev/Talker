@@ -10,7 +10,7 @@ export class PostService implements IPostService {
     async findById(userId: number, id: number, withComments?: boolean): Promise<PostRow | null> {
         let existingPost;
         if (withComments) {
-            existingPost = await this.PostRepository.findById(id, true);
+            existingPost = await this.PostRepository.findById(id, userId,true);
         } else {
             existingPost = await this.PostRepository.findById(id);
         }
@@ -36,7 +36,6 @@ export class PostService implements IPostService {
     }
     async findLatestPosts(userId: number): Promise<PostRow[] | null> {
         const postsToFeed = await this.PostRepository.findAll(userId);
-        //TODO: Add pagination
         if (postsToFeed == null) {
             return null;
         }
