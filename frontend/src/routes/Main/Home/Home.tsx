@@ -1,16 +1,11 @@
 import { useContext, useEffect, useState } from "react";
 import style from "./Home.module.css";
 import Logo from "../../../components/Logo/Logo";
-import Button from "../../../components/Button/Button";
 import { useAPI } from "../../../hooks/useAPI";
 import { NotificationContext } from "../../../components/Notification/context/NotificationContext";
 import { usePosts } from "../../../hooks/usePosts";
 import Post from "../../../components/Post/Post";
-import EditableTextArea from "../../../components/EditableTextArea/EditableTextArea";
-import OptionList from "../../../components/OptionList/OptionList";
-
-import photo_ico from "../../../assets/icons/photo_ico.png";
-import gif from "../../../assets/icons/gif_ico.png";
+import { PostCreator } from "../../../components/PostCreator/PostCreator";
 
 export default function Home() {
   const [postText, setPostText] = useState<string | undefined>(undefined);
@@ -18,10 +13,13 @@ export default function Home() {
   const { request } = useAPI();
   const { refresh, posts } = usePosts();
   useEffect(() => {
-    refresh(); //todo
+    refresh();
   }, []);
   const ctx = useContext(NotificationContext);
   async function pushPost() {
+    if (postText && postText.length === 0) {
+      return false;
+    }
     if (!visibility || visibility.trim() === "") {
       ctx?.setNotify({ type: "error", message: "Select visibility!" });
       return false;
@@ -39,6 +37,7 @@ export default function Home() {
       if (res?.success) {
         ctx?.setNotify({ type: "success", message: "Post added!" });
         refresh();
+        setPostText(undefined);
       } else {
         throw new Error("Post cannot be added");
       }
@@ -63,50 +62,14 @@ export default function Home() {
       <div className={style.accountOptions}></div>
       <div className={style.feedContainer}>
         <div className={style.addPostContainer}>
-          <div className={style.addPost}>
-            {postText && postText.length > 0 ? (
-              <OptionList
-                placeholderText="Select visibility"
-                itemsList={["Public", "Friends", "Private"]}
-              />
-            ) : null}
-            <EditableTextArea
-              placeholderColor="black"
-              placeholder={"+ Share something with world"}
-              placeholderFontWeight="600"
-              max={300}
-              onInput={(text) => setPostText(text)}
-              additionalStyle={{
-                padding: "2%",
-                width: "29.5vw",
-                maxWidth: "100%",
-                minHeight: "1vh",
-                color: "black",
-              }}
-            />
-            {postText && postText.length > 0 ? (
-              <div className={style.postTools}>
-                <span style={{ justifySelf: "center", alignSelf: "center" }}>
-                  {postText.length} / {300}
-                </span>
-                <div className={style.attachments}>
-                  <img src={photo_ico} width={33} alt="" />
-                  <img src={photo_ico} width={33} alt="" />
-
-                  <img src={photo_ico} width={33} alt="" />
-                  <img src={photo_ico} width={33} alt="" />
-                </div>
-                <Button
-                  text="Add post"
-                  additionalStyle={{
-                    width: "80%",
-                    justifySelf: "center",
-                    alignSelf: "center",
-                  }}
-                />
-              </div>
-            ) : null}
-          </div>
+          <PostCreator
+            onWrite={(text: string) => setPostText(text)}
+            text={postText}
+            onOptionChange={(optionChange: string) =>
+              setVisibility(optionChange)
+            }
+            onConfirm={async () => await pushPost()}
+          />
         </div>
 
         {posts?.map((v) => {
