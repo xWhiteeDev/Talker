@@ -2,13 +2,13 @@
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
-    background-color: rgba(0, 0, 0, 0.116);
-    width: 53%;
+    box-shadow: 0px 2px 2px 1.2px #4a99b86e;
+    background-Color: rgba(14, 13, 13, 0.021);    width: 50%;
     height: auto;
     max-height: 65vh;
     border: 1px solid rgba(128, 128, 128, 0.315);
     gap: 1%;
-
+    border-radius: 10px;
 }
 
 
@@ -41,8 +41,8 @@
     grid-template-columns: 0.8fr 0.7fr 0.7fr;
     gap: 2%;
     min-height: 3vh;
-    height: 3vh;
-    border-top: 1px solid gray;
+    height: 4%;
+    border-top: 1px solid rgba(20, 20, 20, 0.26);
 }
 
 .interactions Button {
@@ -51,84 +51,3 @@
     font-weight: 600;
 }
 
-
-
-
-
-
-
-
-.expandedContainer {
-    position: fixed;
-    width: 45%;
-    height: 84%;
-    background-color: rgb(243, 243, 243);
-    padding: 1%;
-    z-index: 1;
-    top: 10%;
-    box-shadow: 0px 4px 15px 2px rgba(0, 0, 0, 0.24);
-}
-
-.expandedContentContainer {
-    display: flex;
-    align-items: center;
-    flex-direction: column;
-    width: 100%;
-    min-height: 10vh;
-    height: auto;
-    max-height: 65vh;
-    overflow-x: hidden;
-    overflow-y: hidden;
-    text-wrap: balance;
-    word-break: break-all;
-    overflow-wrap: break-word;
-    font-size: 1.1rem;
-}
-
-.expandedContent {
-    width: 98%;
-    max-height: 33vh;
-    word-break: break-word;
-    overflow-y: auto;
-}
-
-.expandedComments {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    height: 35vh;
-    max-height: 46vh;
-    overflow-wrap: anywhere;
-    overflow-y: auto;
-    gap: 0.2vh;
-    border-top: 1px solid gray;
-    /* background-color: red; */
-}
-
-.expandedCommentCreator {
-    display: flex;
-    flex-direction: column;
-    border-bottom: 2px solid rgba(128, 128, 128, 0.384);
-    width: 100%;
-    height: auto;
-    max-height: 22vh;
-    padding: 1%;
-    gap:0.6rem
-}
-.expandedCommentBar {
-    display: flex;
-    align-items: center;
-    height: 4vh;
-    gap: 3%;
-}
-.expandedComments::-webkit-scrollbar {
-    background: none;
-    background-color: rgba(5, 5, 5, 0.034);
-    width: 0.1vw;
-}
-
-.expandedComments::-webkit-scrollbar-thumb {
-    background: none;
-    background-color: rgba(5, 5, 5, 0.205);
-    width: 0.1vw;
-}
