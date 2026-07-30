@@ -2,16 +2,21 @@
     display: flex;
     justify-content: flex-start;
     align-items: center;
-    width: 2vw;
-    height: auto;
+    width: 3vw;
+    height: 3vh;
 }
 
 .container input {
     border: none;
     outline: none;
-    font-size: 0.7rem;
+    font-size: 0.8rem;
     font-weight: 600;
-    border: 1px solid rgba(0, 0, 0, 0.24);
+    height: 100%;
+    font-weight: 600;
+    box-shadow: 0px 2px 2px 1.2px #4a99b844;
+    background-Color: rgba(14, 13, 13, 0.03);
+    border: none;
+    padding: 5%;
 }
 
 .container input::placeholder {
