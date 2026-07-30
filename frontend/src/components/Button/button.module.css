@@ -1,8 +1,16 @@
+.global {
+
+    padding: 4%;
+    font-weight: 600;
+}
+
+
 .global:hover {
     cursor: pointer;
     filter: brightness(0.9);
 }
+
 .global:disabled {
     opacity: 0.4;
-    cursor:not-allowed;
+    cursor: not-allowed;
 }
