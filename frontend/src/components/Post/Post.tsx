@@ -1,5 +1,4 @@
 import style from "./Post.module.css";
-import unk_person from "../../assets/unk_person.png";
 import Button from "../Button/Button";
 import type { PostReaction, PostComponent, ReactionUnion } from "./types";
 import { useContext, useEffect, useRef, useState } from "react";
@@ -8,10 +7,8 @@ import { postReactionContext } from "./context/postReactionContext";
 import Reaction from "./Reaction";
 import { NotificationContext } from "../Notification/context/NotificationContext";
 import { ErrorHandler } from "../../lib/customError";
-import Comment from "../PostDetail/comments/Comment";
 import UserPostInfo from "./extra/User/User";
-import EditableTextArea from "../EditableTextArea/EditableTextArea";
-import {useNavigate, useParams} from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 
 const defaultPayload: PostReaction[] = [
   {
