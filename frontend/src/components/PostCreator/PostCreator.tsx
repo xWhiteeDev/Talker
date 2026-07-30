@@ -1,121 +1,89 @@
-import style from "./PostCreator.module.css";
 import Button from "../Button/Button";
 import EditableTextArea from "../EditableTextArea/EditableTextArea";
-import FileOption from "../FileOption/FileOption";
 import OptionList from "../OptionList/OptionList";
-import type { PostCreator } from "./types";
+import { AddFromGalleryIcon } from "../Svgicons/PostCreators/AddFromGalleryIcon";
+import { AddGifIcon } from "../Svgicons/PostCreators/AddGifIcon";
+import { AddPhotoIcon } from "../Svgicons/PostCreators/AddPhotoIcon";
+import { PinFriendsIcon } from "../Svgicons/PostCreators/PinFriendsIcon";
+import { PinPlaceIcon } from "../Svgicons/PostCreators/PinPlaceIcon";
+import style from "./PostCreator.module.css";
 
-const postClickableOptions = [
-  {
-    fileIcon: "photo_ico.png",
-    text: "Add photo",
-    key: 0,
-  },
-  {
-    fileIcon: "video_ico.png",
-    text: "Add video",
-    key: 1,
-  },
-  {
-    fileIcon: "file_ico.png",
-    text: "Attach file",
-    key: 2,
-  },
-  {
-    fileIcon: "place_ico.png",
-    text: "Pin place",
-    key: 3,
-  },
-  {
-    fileIcon: "friends_ico.png",
-    text: "Tag friend",
-    key: 4,
-  },
-  {
-    fileIcon: "gif_ico.png",
-    text: "Add gif",
-    key: 5,
-  },
-];
+interface PostCreatorProps {
+  onWrite?(text: string): void;
+  onConfirm?(): void;
+  onOptionChange?(option: string): void;
+  text: string | undefined;
+}
 
 export function PostCreator({
-  stateControllerFuction,
-  onInput,
-  onAdd,
-  onVisibilityChange,
-}: PostCreator) {
+  onWrite,
+  onConfirm,
+  onOptionChange,
+  text,
+}: PostCreatorProps) {
   return (
-    <div className={style.postCreator}>
-      <div className={style.closeXCreator}>
-        <Button
-          text="X"
-          onClick={() => stateControllerFuction(false)}
-          additionalStyle={{
-            position: "absolute",
-            right: "0",
-            background: "none",
-            border: "none",
-            fontWeight: "600",
-            width: "2vw",
-            fontSize: "1.4rem",
-            textAlign: "center",
-            aspectRatio: "1/1",
-          }}
-        />
-      </div>
-      <div className={style.header}>
-        <span>Create post</span>
-      </div>
-      <div className={style.options}>
+    <div className={style.addPost}>
+      {text && text.length > 0 ? (
         <OptionList
-          onOptionChange={(v) => {
-            if (!onVisibilityChange) return
-            onVisibilityChange(v);
-          }}
-          placeholderText="Who will see it?"
+          placeholderText="Select visibility"
+          itemsList={["Public", "Friends", "Private"]}
           additionalStyle={{
-            backgroundColor: "#524c4c00",
-            marginLeft: "2%",
-            width: "45%",
-            fontSize: "0.8rem",
-            height: "75%",
+            width: "7vw",
+            margin: "2%",
+            borderRadius: "10px",
           }}
+          onOptionChange={(v) => onOptionChange && onOptionChange(v)}
         />
-      </div>
-      <div className={style.inputArea}>
-        <EditableTextArea
-          placeholderColor="#1a191991"
-          placeholderFontSize="1.5rem"
-          placeholder="What's happening..."
-          additionalStyle={{
-            width: "100%",
-            fontSize: "1.4rem",
-            maxWidth: "100%",
-          }}
-          onInput={(e) => onInput(e)}
-        />
-      </div>
-      <div className={style.fileOptions}>
-        {postClickableOptions.map((v) => (
-          <FileOption
-            fileIcon={v.fileIcon}
-            key={v.key}
-            text={v.text}
-            additionalStyle={{ fontSize: "1.2rem" }}
-          />
-        ))}
-      </div>
-      <Button
-        text="+"
+      ) : null}
+      <EditableTextArea
+        placeholderColor="black"
+        placeholder={"+ Share something with world"}
+        placeholderFontWeight="600"
+        max={299}
+        onInput={(text) => onWrite && onWrite(text)}
         additionalStyle={{
-          width: "6.5%",
-          fontSize: "2.4rem",
-          aspectRatio: "1/1",
-          border: "none",
-          backgroundColor: "#ff000000",
+          padding: "2%",
+          width: "29.5vw",
+          maxWidth: "100%",
+          minHeight: "1vh",
+          color: "black",
         }}
-        onClick={() => onAdd()}
+        securedText={text}
       />
+      {text && text.length > 0 ? (
+        <div className={style.postTools}>
+          <div className={style.attachments}>
+            <PinFriendsIcon />
+            <PinPlaceIcon />
+
+            <AddPhotoIcon />
+            <AddFromGalleryIcon />
+            <AddGifIcon />
+          </div>
+          <span
+            className={style.textLengthCounter}
+            style={{ color: text.length > 299 ? "red" : "black" }}
+          >
+            {text.length} / {300}
+          </span>
+          <Button
+            text="Add post"
+            additionalStyle={{
+              width: "auto",
+              border: "none",
+              justifySelf: "center",
+              alignSelf: "center",
+              backgroundColor: " rgba(65, 199, 252, 0.432)",
+              boxShadow: "2px 1px 2px 1.2px #71a0ccb0",
+              color: "rgb(49, 49, 49)",
+              borderRadius: "10px",
+            }}
+            onClick={async () => {
+              if (onConfirm) onConfirm();
+            }}
+          />
+        </div>
+      ) : null}
     </div>
   );
 }
