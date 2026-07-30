@@ -6,5 +6,6 @@ export interface EditableTextArea {
     placeholderColor?: string;
     additionalStyle?: React.CSSProperties;
     onInput?(text:string): void;
+    securedText?:string
 
 }

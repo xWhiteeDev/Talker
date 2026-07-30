@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { EditableTextArea } from "./types";
 
 export default function EditableTextArea({
@@ -8,11 +8,24 @@ export default function EditableTextArea({
   placeholderColor,
   additionalStyle,
   max,
+  securedText,
   onInput,
 }: EditableTextArea) {
   const placeholderRef = useRef<HTMLDivElement | null>(null);
   const [focused, setFocused] = useState<boolean>(false);
   const [isEmpty, setIsEmpty] = useState<boolean>(true);
+
+  useEffect(() => {
+    if (
+      (securedText === "" || securedText == undefined) &&
+      placeholderRef.current
+    ) {
+      if (placeholderRef.current.textContent !== "") {
+        placeholderRef.current.textContent = "";
+        setIsEmpty(true);
+      }
+    }
+  }, [securedText]);
 
   const handleInput = () => {
     if (placeholderRef.current) {
@@ -23,11 +36,10 @@ export default function EditableTextArea({
   };
 
   return (
-    <div style={{ overflowY: "hidden" }}>
+    <div style={{ overflowY: "hidden", position:'relative' }}>
       {isEmpty && !focused && (
         <span
           style={{
-            display: "block",
             transform: "translate(5%,50%)",
             position: "absolute",
             pointerEvents: "none",
@@ -44,11 +56,21 @@ export default function EditableTextArea({
 
       <div
         ref={placeholderRef}
-        contentEditable="plaintext-only"
-        onBeforeInput={(e)=> {
-          if (placeholderRef.current &&  placeholderRef.current.textContent.length > max) {
+        contentEditable={
+          securedText
+            ? securedText !== undefined
+              ? "plaintext-only"
+              : undefined
+            : "plaintext-only"
+        }
+        content={securedText ?? undefined}
+        onBeforeInput={(e) => {
+          if (
+            placeholderRef.current &&
+            placeholderRef.current.textContent.length > max
+          ) {
             e.preventDefault();
-            return false
+            return false;
           }
         }}
         style={{
