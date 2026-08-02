@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useAPI } from "./useAPI";
-import type { PostRow } from "./types";
+import type {PostRow} from "../types/Posthook";
 
 
 export function usePosts() {
@@ -16,7 +16,7 @@ export function usePosts() {
         setPosts((prev) => {
           const existing = prev ?? [];
           const newPosts = result.data!.filter(
-            (p:PostRow) => !existing.some((e) => e.id === p.id),
+            (p:PostRow) => !existing.some((e) => e.postId === p.postId),
           );
           return [...existing, ...newPosts];
         });

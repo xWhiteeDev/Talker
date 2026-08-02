@@ -1,29 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { ErrorHandler } from "../lib/customError";
 import { useAPI } from "./useAPI";
-import type { PostReaction } from "../components/features/Feed/components/Post/types";
-interface ReactionCount {
-  [key: string]: number;
-}
-
-interface Comment {
-  content:string;
-  fullName:string;
-  commentId:number;
-  createdAt:string
-}
-
-interface PostRow {
-  postId: number;
-  author_Id: number;
-  content: string;
-  created_at: string;
-  visibleFor: string;
-  fullName: string;
-  comments: Comment[] | null;
-  reactions: ReactionCount;
-  myReaction: string | null;
-}
+import type {PostRow} from "../types/Posthook";
 
 export function usePost(postId: number) {
   const { request } = useAPI();
