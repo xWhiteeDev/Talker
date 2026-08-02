@@ -21,7 +21,7 @@ export function usePosts() {
         setPosts((prev) => {
           const existing = prev ?? [];
           const newPosts = result.data.filter((p: PostRow) =>
-            existing.some((e) => e.postId === p.postId),
+            !existing.some((e) => e.postId === p.postId),
           );
           return [...existing, ...newPosts];
         });
