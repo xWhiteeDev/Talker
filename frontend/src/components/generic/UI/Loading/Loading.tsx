@@ -6,7 +6,7 @@ export function Loading() {
     <div className={style.loadingScene}>
       <Logo additionalStyle={{ width: "46%", gridColumn: "2/3" }} />
       <CustomText
-        text="Loading post..."
+        text="Loading..."
         bottomText="Be patient"
         additionalStyle={{ fontSize: "1.2rem", textAlign: "center" }}
       />
