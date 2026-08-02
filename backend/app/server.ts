@@ -6,7 +6,7 @@ import cookieparser from 'cookie-parser';
 import {ErrorHandler} from '../handlers/errorHandler.js';
 import {authRouter} from '../routes/auth/authRoute.js';
 import {postRouter} from '../routes/post/postRoute.js';
-import {postReactionRouter} from '../routes/reaction/reactionRoute.js';
+import {commentReactionRouter, postReactionRouter} from '../routes/reaction/reactionRoute.js';
 import {commmentRouter} from '../routes/comment/commentRoute.js';
 dotEnv.config();
 const cfg = {
@@ -39,6 +39,7 @@ app.use('/api/auth', authRouter);
 app.use('/api/posts', postRouter);
 app.use('/api/postReactions', postReactionRouter);
 app.use('/api/comments', commmentRouter);
+app.use('/api/commentReactions', commentReactionRouter);
 
 app.use(globalMiddleware);
 
