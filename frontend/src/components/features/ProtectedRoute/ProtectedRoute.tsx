@@ -1,22 +1,32 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import {refreshToken} from "../../../lib/API/refreshToken";
+import { refreshToken } from "../../../lib/API/refreshToken";
+import { Loading } from "../../generic/UI/Loading/Loading";
 
-export default function ProtectedRoute({ children }:{children:React.ReactNode}) {
+type AuthorizationStatus = "Unauthorized" | "Authorized" | "Checking";
+
+export default function ProtectedRoute({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const nav = useNavigate();
+  const [status, setStatus] = useState<AuthorizationStatus>("Checking");
 
-  const [neededLogin, setNeededLogin] = useState<
-    { success: boolean; requiresLogin: boolean } | undefined
-  >(undefined);
   useEffect(() => {
-    refreshToken().then((res) => {
-      setNeededLogin(res);
-    });
+    refreshToken().then((result) =>
+      setStatus(result.requiresLogin ? "Unauthorized" : "Authorized"),
+    );
   }, []);
+
   useEffect(() => {
-    if (neededLogin?.requiresLogin) {
+    if (status === "Unauthorized") {
       nav("/auth/login");
     }
-  }, [neededLogin]);
-  return neededLogin?.requiresLogin ? <span>Oczekiwanie...</span> : children ;
+  }, [status]);
+  if (status === "Checking") {
+    return <Loading />;
+  }
+  if (status === "Unauthorized") return null;
+  return children;
 }
