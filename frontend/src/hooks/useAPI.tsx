@@ -1,13 +1,10 @@
 import { useNavigate } from "react-router-dom";
-import { emitServer } from "../lib/API/fetch";
-import type { EmitData, EmitMethod } from "../lib/API/types";
+import { emitServer } from "../lib/API/emitServer";
 import { ErrorHandler } from "../lib/customError";
-import { useContext } from "react";
-import { ServerErrorContext } from "../components/Error/errorContext";
+import type {EmitMethod, EmitData} from "../types/API";
 
 export function useAPI() {
   const nav = useNavigate();
-  const context = useContext(ServerErrorContext);
   async function request<T>(url: string, method: EmitMethod, data?: EmitData) {
     try {
       const result = await emitServer<T>(url, method, data);
@@ -18,18 +15,8 @@ export function useAPI() {
           nav("/auth/login");
           return;
         }
-        if (error.code == 403) {
-          nav("/home");
-          return;
-        }
-        if (error.code >= 500 && error.code < 600) {
-          context?.setServerError(true);
-          return;
-        }
         throw error
-      } else {
-        context?.setServerError(true);
-      }
+      } 
     }
   }
   return { request };
