@@ -2,10 +2,11 @@ import { useNavigate } from "react-router-dom";
 import { emitServer } from "../lib/API/emitServer";
 import { ErrorHandler } from "../lib/customError";
 import type {EmitMethod, EmitData} from "../types/API";
+import {useCallback} from "react";
 
 export function useAPI() {
   const nav = useNavigate();
-  async function request<T>(url: string, method: EmitMethod, data?: EmitData) {
+  const request = useCallback( async function request<T>(url: string, method: EmitMethod, data?: EmitData) {
     try {
       const result = await emitServer<T>(url, method, data);
       return result;
@@ -18,6 +19,7 @@ export function useAPI() {
         throw error
       } 
     }
-  }
+  },[nav])
+
   return { request };
 }
