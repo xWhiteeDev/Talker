@@ -9,13 +9,15 @@
     height: fit-content;
     margin-top: 5%;
     border: 1px solid rgba(128, 128, 128, 0.315);
-    gap: 0.7em;
+    gap: 0.1em;
     grid-column: 2/3;
     border-radius: 10px;
+    
 }
 
 .expandedUserContainer {
     padding: 2%;
+
 }
 
 .expandedContentContainer {
