@@ -1,42 +1,140 @@
-import type { ResultSetHeader, ExecuteValues, Pool } from "mysql2/promise";
-import type {
-  IPostRepository,
-  PostInsertDTO,
-  PostRow,
-  PostUpdateDTO,
-} from "./types.js";
+import type { ResultSetHeader, ExecuteValues, Pool } from 'mysql2/promise';
+import type { IPostRepository, PostInsertDTO, PostRow, PostUpdateDTO } from './types.js';
 export class PostRepository implements IPostRepository {
   constructor(private pool: Pool) {
     console.log(`\x1b[32;1m🚀[PostRepository] Pool injected \x1b[0m`);
   }
-  async findById(
-    id: number,
-    currentUserId?:number,
-    withDetails?: boolean,
-  ): Promise<PostRow | undefined> {
+  async findById(id: number, currentUserId?: number, withDetails?: boolean): Promise<PostRow | undefined> {
     let query: string =
-      "SELECT posts.id, posts.created_at,posts.author_id,posts.content,posts.visibleFor,posts.photo,posts.video,posts.file,posts.gif,posts.taggedPeopleIds,posts.pinnedPlace,accounts.firstName,accounts.lastName FROM posts LEFT JOIN accounts ON accounts.id=posts.author_id WHERE posts.id=:id LIMIT 1";
+      'SELECT posts.id, posts.created_at,posts.author_id,posts.content,posts.visibleFor,posts.photo,posts.video,posts.file,posts.gif,posts.taggedPeopleIds,posts.pinnedPlace,accounts.firstName,accounts.lastName FROM posts LEFT JOIN accounts ON accounts.id=posts.author_id WHERE posts.id=:id LIMIT 1';
     if (withDetails) {
-      query = `WITH post_comments AS (SELECT c.id AS commentId, c.user_id as userId, c.post_id as post_Id ,c.created_at as createdAt, c.content, CONCAT(' ', a.firstName, a.lastName) as fullName FROM comments c LEFT JOIN accounts a ON a.id  = c.user_id WHERE c.post_id=:id AND c.parent_id IS NULL), 
-            aggComments AS (SELECT JSON_ARRAYAGG(JSON_OBJECT('commentId', pc.commentId,'fullName', pc.fullName,'content', pc.content, 'createdAt', pc.createdAt)) as commentsArr FROM post_comments pc), 
-            post_reactions AS (SELECT rp.id,rp.author_id,rp.type,rp.post_id  FROM reactions_post rp WHERE rp.post_id =:id), 
-            post_reactions_grouped AS (SELECT pr.post_id, COUNT(*) as reaction_count, pr.type  FROM post_reactions pr GROUP BY pr.post_id,pr.type),
-            aggPostReactions AS (SELECT JSON_OBJECTAGG(prg.type,prg.reaction_count) as reactionObject FROM post_reactions_grouped prg),
-            userReaction AS (SELECT MAX(pr.type) as myReaction  FROM post_reactions pr WHERE pr.author_id =:currentUserId AND pr.post_id =:id)
-            SELECT p.id as postId, p.author_Id, p.content,p.created_at, p.visibleFor, CONCAT(' ', a.firstName,a.lastName) as fullName, agc.commentsArr as comments, apr.reactionObject as reactions, userReaction.myReaction as myReaction FROM posts p LEFT JOIN accounts a ON a.id = p.author_Id LEFT JOIN aggComments agc ON 1=1 LEFT JOIN aggPostReactions apr ON 1=1 LEFT JOIN userReaction ON 1=1 WHERE p.id=:id`;
+      query = `WITH 
+    post_comments AS (
+        SELECT 
+            c.id AS commentId, 
+            c.user_id AS userId, 
+            c.post_id AS post_Id, 
+            c.created_at AS createdAt, 
+            c.content, 
+            CONCAT(' ', a.firstName, a.lastName) AS fullName 
+        FROM comments c 
+        LEFT JOIN accounts a 
+            ON a.id = c.user_id 
+        WHERE c.post_id = :id 
+          AND c.parent_id IS NULL
+    ), 
+    comment_reactions AS (
+        SELECT
+            rc.comment_id AS commentId,
+            rc.type,
+            COUNT(*) as reaction_count
+        FROM reactions_comment rc
+        INNER JOIN post_comments pc 
+            ON pc.commentId = rc.comment_id 
+        GROUP BY rc.comment_id, rc.type
+    ),
+    aggCommentReactions AS (
+        SELECT 
+            commentId, 
+            JSON_OBJECTAGG(type, reaction_count) as reactionObject
+        FROM comment_reactions 
+        GROUP BY commentId
+    ),
+    commentUserReaction AS (
+      SELECT rc.comment_id AS commentId,
+        MAX(rc.type) AS myReaction FROM reactions_comment rc
+      INNER JOIN post_comments pc ON pc.commentId = rc.comment_id  
+      WHERE author_Id =:currentUserId AND comment_id= pc.commentId
+      GROUP BY rc.comment_id
+    ),
+    aggComments AS (
+        SELECT 
+            pc.post_Id,
+            JSON_ARRAYAGG(
+                JSON_OBJECT(
+                    'commentId', pc.commentId,
+                    'fullName', pc.fullName,
+                    'content', pc.content, 
+                    'createdAt', pc.createdAt,
+                    'reactions', acr.reactionObject,
+                    'userReaction', cur.myReaction
+                )
+            ) AS commentsArr 
+        FROM post_comments pc
+        LEFT JOIN aggCommentReactions acr 
+            ON acr.commentId = pc.commentId
+        LEFT JOIN commentUserReaction cur ON cur.commentId=pc.commentId
+        GROUP BY pc.post_Id
+    ),
+    post_reactions AS (
+        SELECT 
+            rp.id, 
+            rp.author_id, 
+            rp.type, 
+            rp.post_id  
+        FROM reactions_post rp 
+        WHERE rp.post_id = :id
+    ), 
+    post_reactions_grouped AS (
+        SELECT 
+            pr.post_id, 
+            COUNT(*) AS reaction_count, 
+            pr.type  
+        FROM post_reactions pr 
+        GROUP BY pr.post_id, pr.type
+    ),
+    aggPostReactions AS (
+        SELECT 
+            prg.post_id, 
+            JSON_OBJECTAGG(prg.type, prg.reaction_count) AS reactionObject 
+        FROM post_reactions_grouped prg
+        GROUP BY prg.post_id
+    ),
+    userReaction AS (
+        SELECT 
+            pr.post_id,
+            MAX(pr.type) AS myReaction  
+        FROM post_reactions pr 
+        WHERE pr.author_id = :currentUserId 
+          AND pr.post_id = :id
+        GROUP BY pr.post_id
+    )
+SELECT 
+    p.id AS postId, 
+    p.author_Id, 
+    p.content, 
+    p.created_at, 
+    p.visibleFor, 
+    CONCAT(' ', a.firstName, a.lastName) AS fullName, 
+    COALESCE(agc.commentsArr, JSON_ARRAY()) AS comments, 
+    apr.reactionObject AS reactions, 
+    ur.myReaction AS myReaction 
+FROM posts p 
+LEFT JOIN accounts a 
+    ON a.id = p.author_Id 
+LEFT JOIN aggComments agc 
+    ON agc.post_Id = p.id 
+LEFT JOIN aggPostReactions apr 
+    ON apr.post_id = p.id 
+LEFT JOIN userReaction ur 
+    ON ur.post_id = p.id 
+WHERE p.id = :id;`;
     }
-    const [[result]] = await this.pool.query<PostRow[]>(query, { id, currentUserId:currentUserId });
+    const [[result]] = await this.pool.query<PostRow[]>(query, {
+      id,
+      currentUserId: currentUserId,
+    });
     console.log(result);
     return result;
   }
   async findByAuthor(authorId: number): Promise<PostRow[]> {
-    const query: string = "SELECT * FROM posts WHERE authorId=:authorId";
+    const query: string = 'SELECT * FROM posts WHERE authorId=:authorId';
     const [result] = await this.pool.query<PostRow[]>(query, { authorId });
     return result;
   }
   async insert(dto: PostInsertDTO): Promise<boolean> {
     const query: string =
-      "INSERT INTO posts (author_Id, content, visibleFor,photo,video,file,gif,taggedPeopleIds,pinnedPlace) VALUES (:authorId, :content, :visibleFor, :photo, :video, :file, :gif, :taggedPeopleIds, :pinnedPlace)";
+      'INSERT INTO posts (author_Id, content, visibleFor,photo,video,file,gif,taggedPeopleIds,pinnedPlace) VALUES (:authorId, :content, :visibleFor, :photo, :video, :file, :gif, :taggedPeopleIds, :pinnedPlace)';
     const [result] = await this.pool.execute<ResultSetHeader>(query, {
       authorId: dto.authorId,
       content: dto.content,
@@ -52,14 +150,14 @@ export class PostRepository implements IPostRepository {
   }
   async update(id: number, dto: PostUpdateDTO): Promise<boolean> {
     const allowedKeysToUpdate: (keyof PostUpdateDTO)[] = [
-      "content",
-      "visibleFor",
-      "photo",
-      "video",
-      "file",
-      "gif",
-      "taggedPeopleIds",
-      "pinnedPlace",
+      'content',
+      'visibleFor',
+      'photo',
+      'video',
+      'file',
+      'gif',
+      'taggedPeopleIds',
+      'pinnedPlace',
     ] as const;
     let key: keyof PostUpdateDTO;
     const updateKeys: string[] = [];
@@ -69,24 +167,21 @@ export class PostRepository implements IPostRepository {
       if (dto[key] == undefined) continue;
       const fullKeyName: string = `${key}=:${key}`;
       updateKeys.push(fullKeyName);
-      if (typeof dto[key] == "object") {
+      if (typeof dto[key] == 'object') {
         updateParams[key] = JSON.stringify(dto[key]);
       } else {
         updateParams[key] = dto[key];
       }
     }
     if (Object.keys(updateParams).length == 0) return false;
-    updateParams["id"] = id;
-    const connectedQueryValues: string = updateKeys.join(",");
+    updateParams['id'] = id;
+    const connectedQueryValues: string = updateKeys.join(',');
     const fullLiteralQueryString: string = `UPDATE posts SET ${connectedQueryValues} WHERE id=:id LIMIT 1`;
-    const [result] = await this.pool.execute<ResultSetHeader>(
-      fullLiteralQueryString,
-      updateParams as ExecuteValues,
-    );
+    const [result] = await this.pool.execute<ResultSetHeader>(fullLiteralQueryString, updateParams as ExecuteValues);
     return result.affectedRows > 0;
   }
   async delete(id: number): Promise<boolean> {
-    const query: string = "DELETE FROM posts WHERE id=:id LIMIT 1";
+    const query: string = 'DELETE FROM posts WHERE id=:id LIMIT 1';
     const [result] = await this.pool.execute<ResultSetHeader>(query, { id });
     return result.affectedRows > 0;
   }
