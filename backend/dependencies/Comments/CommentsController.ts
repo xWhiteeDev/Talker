@@ -2,9 +2,10 @@ import type {Request, Response, NextFunction} from "express";
 import type {CommentBody, CommentInsertDTO, ICommentsController, ICommentsService} from "./types.js";
 import type {currentUser} from "../Account/types.js";
 import {ErrorHandler} from "../../handlers/errorHandler.js";
+import type {IPostService} from "../Post/types.js";
 
 export class CommentsController implements ICommentsController {
-    constructor(private CommentsService: ICommentsService) {
+    constructor(private CommentsService: ICommentsService,private postService:IPostService) {
 
     }
     
@@ -16,13 +17,17 @@ export class CommentsController implements ICommentsController {
             next();
             return false;
         }
+        const canSeeThisPost = await this.postService.findById(user.id,data.postId)
+        if (!canSeeThisPost) {
+            next(new ErrorHandler('Access denied', 400));
+            return false
+        }
         const payload: CommentInsertDTO = {
             post_id: data.postId,
             user_id: user.id,
             parent_id: data.parentId,
             content: data.content
         };
-        console.log(payload)
         try {
             const result = await this.CommentsService.insertComment(payload);
             if (!result) {
