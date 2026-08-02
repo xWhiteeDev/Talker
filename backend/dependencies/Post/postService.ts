@@ -28,9 +28,7 @@ export class PostService implements IPostService {
 
             if (!relationBetweenUsers) return null;
             return existingPost;
-        } else if (postVisibility === 'private' && existingPost.authorId === userId) {
-            return existingPost;
-        }
+        } 
         return null;
 
     }
