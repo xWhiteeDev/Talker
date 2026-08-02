@@ -27,7 +27,7 @@ export const ExpandedPost = () => {
   let { postid } = useParams();
   const [commentText, setCommentText] = useState<string | undefined>(undefined);
 
-  const { err, loading, postPacketData } = usePost(+postid);
+  const { err, loading, postPacketData, refetch } = usePost(+postid!);
   const { request } = useAPI();
   const nav = useNavigate();
   const ctx = useContext(customNotificationCtx);
@@ -35,13 +35,14 @@ export const ExpandedPost = () => {
   async function addComment() {
     try {
       const result = await request("/api/comments", "POST", {
-        postId: +postid,
+        postId: +postid!,
         parentId: null,
         content: commentText,
       });
       if (!result || !result.success) {
         throw new ErrorHandler(`Adding commment fault for ${postid} `, 500);
       }
+      await refetch();
     } catch (error) {
       if (error instanceof ErrorHandler) {
         if (ctx) {
@@ -121,12 +122,16 @@ export const ExpandedPost = () => {
               ) : (
                 postPacketData.comments.map((v) => (
                   <PostComment
-                  key={v.commentId}
+                    key={v.commentId}
                     avatar={null}
                     authorName={v.fullName}
                     content={v.content}
                     onFocus={() => nav(`comments/${v.commentId}`)}
                     createdAt={new Date(v.createdAt).toLocaleString()}
+                    postId={+postid}
+                    commentId={v.commentId}
+                    commentReactions={v.reactions}
+                    userReaction={v.userReaction}
                   />
                 ))
               )}
@@ -154,7 +159,6 @@ const PostReactions = ({
   const { unifiedReactions, toggle } = useReaction(
     defaultReactions,
     reactions ?? {},
-    postId,
     myReaction,
   );
   const reactionNames = Object.keys(unifiedReactions.counts) as ReactionUnion[];
@@ -165,7 +169,7 @@ const PostReactions = ({
       name={v as ReactionUnion}
       count={unifiedReactions.counts[v as ReactionUnion]}
       isActive={unifiedReactions.activeReaction === v}
-      onReactionAdd={toggle}
+      onReactionAdd={() => toggle(v, "POST", postId)}
     />
   ));
 };
