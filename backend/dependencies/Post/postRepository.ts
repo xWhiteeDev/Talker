@@ -14,7 +14,7 @@ export class PostRepository implements IPostRepository {
             c.id AS commentId, 
             c.user_id AS userId, 
             c.post_id AS post_Id, 
-            c.created_at AS createdAt, 
+            DATE_FORMAT(c.created_at, '%Y-%m-%d %H:%i') AS createdAt, 
             c.content, 
             CONCAT(' ', a.firstName, a.lastName) AS fullName 
         FROM comments c 
@@ -103,7 +103,7 @@ SELECT
     p.id AS postId, 
     p.author_Id, 
     p.content, 
-    p.created_at, 
+    DATE_FORMAT(p.created_at, '%Y-%m-%d %H:%i') as created_at, 
     p.visibleFor, 
     CONCAT(' ', a.firstName, a.lastName) AS fullName, 
     COALESCE(agc.commentsArr, JSON_ARRAY()) AS comments, 
@@ -185,8 +185,12 @@ WHERE p.id = :id;`;
     return result.affectedRows > 0;
   }
   async findAll(userId: number): Promise<PostRow[]> {
-    const query: string = `WITH post_reactions AS (SELECT post_id,type,COUNT(type) as reaction_count FROM reactions_post GROUP BY post_id, type), reactions AS (SELECT post_id, JSON_OBJECTAGG(post_reactions.type,post_reactions.reaction_count) AS reactions_object FROM post_reactions GROUP BY post_id) SELECT posts.*, accounts.firstName,accounts.lastName,reactions.reactions_object ,MAX(CASE WHEN reactions_post.author_id = :userId THEN reactions_post.type END) AS myReaction FROM posts JOIN accounts ON posts.author_Id = accounts.id LEFT JOIN reactions_post ON reactions_post.post_id=posts.id LEFT JOIN reactions ON reactions.post_id = posts.id WHERE (visibleFor='public' OR (visibleFor='friends' AND posts.author_id IN (SELECT CASE WHEN userId=:userId THEN friendId ELSE userId END FROM friendships WHERE (userId=:userId OR friendId=:userId) AND status='accepted'))) GROUP BY posts.id ORDER BY posts.id DESC`;
+    const query: string = `WITH post_reactions AS (SELECT post_id,type,COUNT(type) as reaction_count FROM reactions_post GROUP BY post_id, type), 
+    reactions AS (SELECT post_id, JSON_OBJECTAGG(post_reactions.type,post_reactions.reaction_count) 
+    AS reactions_object FROM post_reactions GROUP BY post_id) 
+    SELECT posts.* ,DATE_FORMAT(posts.created_at, '%Y-%m-%d %H:%i') as created_at, accounts.firstName,accounts.lastName,reactions.reactions_object ,MAX(CASE WHEN reactions_post.author_id = :userId THEN reactions_post.type END) AS myReaction FROM posts JOIN accounts ON posts.author_Id = accounts.id LEFT JOIN reactions_post ON reactions_post.post_id=posts.id LEFT JOIN reactions ON reactions.post_id = posts.id WHERE (visibleFor='public' OR (visibleFor='friends' AND posts.author_id IN (SELECT CASE WHEN userId=:userId THEN friendId ELSE userId END FROM friendships WHERE (userId=:userId OR friendId=:userId) AND status='accepted'))) GROUP BY posts.id ORDER BY posts.id DESC`;
     const [result] = await this.pool.query<PostRow[]>(query, { userId });
+    console.log(result)
     return result;
   }
 }
