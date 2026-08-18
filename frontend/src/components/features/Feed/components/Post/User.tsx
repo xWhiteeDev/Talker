@@ -19,7 +19,7 @@ export default function UserPostInfo(user: UserPostInfoProps) {
           {user.authorName}
         </span>
         <span>{user.visibility}</span>
-        <span>{new Date(user.createdAt).toLocaleString()}</span>
+        <span>{user.createdAt}</span>
       </div>
     </div>
   );

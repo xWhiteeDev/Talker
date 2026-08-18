@@ -44,10 +44,10 @@ export function PostComment({
       <div className={style.postCommentReactions}>
         {Object.keys(unifiedReactions.counts).map((v) => (
           <Reaction
-            name={v}
-            count={unifiedReactions.counts[v]}
+            name={v as ReactionUnion}
+            count={unifiedReactions.counts[v as ReactionUnion]}
             isActive={v == unifiedReactions.activeReaction}
-            onReactionAdd={(name) => toggle(name, 'COMMENT', postId, commentId)}
+            onReactionAdd={(name) => toggle(name as ReactionUnion, 'COMMENT', postId, commentId)}
           />
         ))}
       </div>
@@ -69,7 +69,7 @@ export default function UserInfo(user: UserPostInfoProps) {
       </div>
       <div className={style.postInfo}>
         <span style={{ fontWeight: '600' }}>{user.authorName}</span>
-        <span>{new Date(user.createdAt).toLocaleString()}</span>
+        <span>{user.createdAt}</span>
       </div>
     </div>
   );

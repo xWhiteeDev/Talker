@@ -24,7 +24,7 @@ const defaultReactions: Record<ReactionUnion, number> = {
 };
 
 export const ExpandedPost = () => {
-  let { postid } = useParams();
+  const { postid } = useParams();
   const [commentText, setCommentText] = useState<string | undefined>(undefined);
 
   const { err, loading, postPacketData, refetch } = usePost(+postid!);
@@ -127,7 +127,7 @@ export const ExpandedPost = () => {
                     authorName={v.fullName}
                     content={v.content}
                     onFocus={() => nav(`comments/${v.commentId}`)}
-                    createdAt={new Date(v.createdAt).toLocaleString()}
+                    createdAt={v.createdAt}
                     postId={+postid}
                     commentId={v.commentId}
                     commentReactions={v.reactions}
