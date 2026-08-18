@@ -124,7 +124,6 @@ WHERE p.id = :id;`;
       id,
       currentUserId: currentUserId,
     });
-    console.log(result);
     return result;
   }
   async findByAuthor(authorId: number): Promise<PostRow[]> {
