@@ -1,8 +1,6 @@
-import { useContext, useEffect, useRef, useState } from 'react';
+import {  useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ErrorHandler } from '../../../../../lib/customError';
 import type { ReactionUnion } from '../../../../../types/VisualUnions';
-import { customNotificationCtx } from '../../../../../context/customNotificationContext';
 import Button from '../../../../generic/UI/Button/Button';
 import Reaction from '../Reaction/Reaction';
 import UserPostInfo from './User';
@@ -34,23 +32,6 @@ export default function Post({ authorName, visibility, createdAt, content, id }:
   const postContent = useRef<HTMLDivElement>(null);
   const navigation = useNavigate();
   const { postPacketData } = usePost(id);
-  const notificationContext = useContext(customNotificationCtx);
-  console.log();
-
-  function handleServerError(error: unknown) {
-    //TODO: In future diversify this function to separated file.
-    if (error instanceof ErrorHandler) {
-      notificationContext?.setNotify({
-        type: 'error',
-        message: error.message,
-      });
-    } else {
-      notificationContext?.setNotify({
-        type: 'error',
-        message: 'Unknown server error',
-      });
-    }
-  }
 
   return (
     postPacketData && (
@@ -111,7 +92,7 @@ const PostReactions = ({ reactions, myReaction, postId }: ServerReactionsProps) 
       name={v as ReactionUnion}
       count={unifiedReactions.counts[v as ReactionUnion]}
       isActive={unifiedReactions.activeReaction === v}
-      onReactionAdd={(name) => toggle(name, 'POST', postId)}
+      onReactionAdd={(name) => toggle(name as ReactionUnion, 'POST', postId)}
     />
   ));
 };
