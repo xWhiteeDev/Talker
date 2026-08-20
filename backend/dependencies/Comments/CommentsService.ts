@@ -1,5 +1,5 @@
 import {ErrorHandler} from "../../handlers/errorHandler.js";
-import type {CommentInsertDTO, CommentRow, ICommentsRepository, ICommentsService} from "./types.js";
+import type {CommentInsertDTO, CommentRow, FoundComment, ICommentsRepository, ICommentsService} from "./types.js";
 
 export class CommentsService implements ICommentsService {
     constructor(private CommentsRepository: ICommentsRepository) {
@@ -19,7 +19,7 @@ export class CommentsService implements ICommentsService {
         }
         return result;
     }
-    async findCommentByCommentId(commentId: number): Promise<CommentRow> {
+    async findCommentByCommentId(commentId: number): Promise<FoundComment> {
         const result = await this.CommentsRepository.findById(commentId);
         if (!result) {
             throw new ErrorHandler('Comments not found', 400);
