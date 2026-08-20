@@ -4,7 +4,6 @@ import Logo from "../../generic/UI/Logo/Logo";
 import { useAPI } from "../../../hooks/useAPI";
 import { customNotificationCtx } from "../../../context/customNotificationContext";
 import { usePosts } from "../../../hooks/usePosts";
-import { useNavigate } from "react-router-dom";
 import Post from "../Feed/components/Post/Post";
 import { PostCreator } from "../Feed/components/PostCreator/PostCreator";
 import { Loading } from "../../generic/UI/Loading/Loading";
