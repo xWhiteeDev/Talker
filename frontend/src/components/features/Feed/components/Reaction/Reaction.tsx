@@ -1,7 +1,7 @@
 import type {ReactionUnion} from "../../../../../types/VisualUnions";
 import style from "./Reaction.module.css";
 
- interface ReactionComponent {
+ interface ReactionProps {
     name: ReactionUnion;
     count: number;
     isActive: boolean;
@@ -20,8 +20,8 @@ export default function Reaction({
   name,
   count,
   isActive,
-  onReactionAdd,
-}: ReactionComponent) {
+  onReactionAdd
+}: ReactionProps) {
   return (
     <div
       className={style.reaction}
