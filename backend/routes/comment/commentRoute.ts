@@ -8,3 +8,7 @@ export const commmentRouter = express.Router();
 commmentRouter.post('/', isAccessTokenActive(), async (req, res, next) => {
     await commmentsController.insertComment(req, res, next);
 });
+
+commmentRouter.get('/:id', isAccessTokenActive(), async (req, res, next) => {
+    await commmentsController.findByPostId(req,res,next)
+});
