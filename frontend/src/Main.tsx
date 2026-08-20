@@ -13,8 +13,8 @@ import ProtectedRoute from "./components/features/ProtectedRoute/ProtectedRoute.
 import AuthorizationProtectedRoute from "./components/features/ProtectedRoute/AuthorizationProtectedRoute.tsx";
 import "./Main.css";
 import type { NotificationHookProps } from "./types/NotificationHook";
-import { ExpandedPost } from "./components/features/Feed/components/Post/ExpandedPost/ExpandedPost.tsx";
-import { ExpandedComment } from "./components/features/Feed/components/Post/Comments/ExpandedComment/ExpandedComment.tsx";
+import LargePost from "./components/features/Feed/components/Post/Large/LargePost.tsx";
+import { LargeActivityComment } from "./components/features/Feed/components/Comment/Large/LargeActivityComment.tsx";
 
 const root = document.getElementById("root");
 const routes = createBrowserRouter([
@@ -34,13 +34,13 @@ const routes = createBrowserRouter([
         path: "/post/:postid",
         element: (
           <ProtectedRoute>
-            <ExpandedPost />
+            <LargePost />
           </ProtectedRoute>
         ),
         children: [
           {
             path: "comments/:commentid",
-            element: <ExpandedComment />,
+            element: <LargeActivityComment />,
           },
         ],
       },
