@@ -1,13 +1,12 @@
-import {  useRef } from 'react';
+import { useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import type { ReactionUnion } from '../../../../../types/VisualUnions';
 import Button from '../../../../generic/UI/Button/Button';
-import Reaction from '../Reaction/Reaction';
-import UserPostInfo from './User';
-
 import style from './Post.module.css';
-import { useReaction } from '../../../../../hooks/useReaction';
 import { usePost } from '../../../../../hooks/usePost';
+import ActivityReactions from '../ActivityReactions/ActivityReactions';
+import UserActivityInfo from '../UserActivityInfo/UserActivityInfo';
+import type { ReactionUnion } from '../../../../../types/VisualUnions';
+
 interface PostComponent {
   avatar: string | null;
   authorName: string;
@@ -19,14 +18,6 @@ interface PostComponent {
   id: number;
 }
 
-const defaultReactions: Record<ReactionUnion, number> = {
-  love: 0,
-  like: 0,
-  wow: 0,
-  wrr: 0,
-  sad: 0,
-};
-
 export default function Post({ authorName, visibility, createdAt, content, id }: PostComponent) {
   const postId = useRef<number>(id);
   const postContent = useRef<HTMLDivElement>(null);
@@ -36,7 +27,7 @@ export default function Post({ authorName, visibility, createdAt, content, id }:
   return (
     postPacketData && (
       <div className={style.container}>
-        <UserPostInfo avatar={null} visibility={visibility} authorName={authorName} createdAt={createdAt} />
+        <UserActivityInfo avatar={null} visibility={visibility} authorName={authorName} createdAt={createdAt} />
         <div className={style.contentContainer} onClick={() => navigation(`/post/${postId.current}`)}>
           <div className={style.content} ref={postContent}>
             <span>{content}</span>
@@ -63,10 +54,11 @@ export default function Post({ authorName, visibility, createdAt, content, id }:
         </div>
         <div className={style.interactions}>
           <div style={{ width: '100%', display: 'flex', height: '100%' }}>
-            <PostReactions
+            <ActivityReactions
               reactions={postPacketData.reactions as Record<ReactionUnion, number>}
               myReaction={postPacketData.myReaction as ReactionUnion}
-              postId={postId.current}
+              activityType='POST'
+              activityId={postId.current}
             />
           </div>
           <Button additionalStyle={{ background: 'none', border: 'none' }} text="Add comment" />
@@ -76,23 +68,3 @@ export default function Post({ authorName, visibility, createdAt, content, id }:
     )
   );
 }
-interface ServerReactionsProps {
-  reactions: Record<ReactionUnion, number>;
-  myReaction: ReactionUnion;
-  postId: number;
-}
-
-const PostReactions = ({ reactions, myReaction, postId }: ServerReactionsProps) => {
-  const { unifiedReactions, toggle } = useReaction(defaultReactions, reactions ?? {}, myReaction);
-  const reactionNames = Object.keys(unifiedReactions.counts) as ReactionUnion[];
-
-  return reactionNames.map((v) => (
-    <Reaction
-      key={v}
-      name={v as ReactionUnion}
-      count={unifiedReactions.counts[v as ReactionUnion]}
-      isActive={unifiedReactions.activeReaction === v}
-      onReactionAdd={(name) => toggle(name as ReactionUnion, 'POST', postId)}
-    />
-  ));
-};
