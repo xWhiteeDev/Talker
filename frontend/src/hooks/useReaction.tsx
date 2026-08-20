@@ -4,8 +4,16 @@ import { useAPI } from './useAPI';
 import { customNotificationCtx } from '../context/customNotificationContext';
 import { ErrorHandler } from '../lib/customError';
 
+
+const defaultReactions: Record<ReactionUnion, number> = {
+  love: 0,
+  like: 0,
+  wow: 0,
+  wrr: 0,
+  sad: 0,
+};
+
 export function useReaction(
-  initialReactions: Record<ReactionUnion, number>,
   serverReactions: Partial<Record<ReactionUnion, number>>,
   userReaction?: ReactionUnion,
 ) {
@@ -13,7 +21,7 @@ export function useReaction(
     counts: Record<ReactionUnion, number>;
     activeReaction: ReactionUnion | undefined;
   }>({
-    counts: { ...initialReactions, ...serverReactions },
+    counts: { ...defaultReactions, ...serverReactions },
     activeReaction: userReaction ?? undefined,
   });
   const notiCtx = useContext(customNotificationCtx);
@@ -21,7 +29,7 @@ export function useReaction(
 
   const toggle = useCallback(
     async function toggle(newReactionName: ReactionUnion, column: ReactionHookUnionType, postId: number, commentId?: number) {
-      let hookData = {
+      const hookData = {
         endpoint: '',
         data: {},
       };
