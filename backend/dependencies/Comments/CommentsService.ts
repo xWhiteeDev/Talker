@@ -19,8 +19,8 @@ export class CommentsService implements ICommentsService {
         }
         return result;
     }
-    async findCommentByCommentId(commentId: number): Promise<FoundComment> {
-        const result = await this.CommentsRepository.findById(commentId);
+    async findCommentByCommentId(userId:number,commentId: number): Promise<FoundComment> {
+        const result = await this.CommentsRepository.findById(userId,commentId);
         if (!result) {
             throw new ErrorHandler('Comments not found', 400);
         }
