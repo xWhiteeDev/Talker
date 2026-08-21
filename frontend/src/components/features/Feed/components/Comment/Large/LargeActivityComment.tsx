@@ -8,6 +8,7 @@ import UserActivityInfo from '../../UserActivityInfo/UserActivityInfo';
 import CommentCreator from '../../CommentCreator/CommentCreator';
 import ActivityReactions from '../../ActivityReactions/ActivityReactions';
 import { ActivityComment } from '../ActivityComment';
+import type { ReactionUnion } from '../../../../../../types/VisualUnions';
 
 interface ActivityComments {
   postId: number;
@@ -17,6 +18,8 @@ interface ActivityComments {
   content: string;
   createdAt: string;
   fullName: string;
+  reactions: Record<ReactionUnion, number>;
+  myReaction:ReactionUnion;
   childComments: ActivityComments[];
 }
 
@@ -76,7 +79,9 @@ export function LargeActivityComment() {
         </div>
         <div className={style.contentContainer}>{commentData.content}</div>
         <div className={style.reactionsContainer}>
-          <ActivityReactions />
+          {commentid && postid && (
+            <ActivityReactions reactions={commentData.reactions} postId={+postid} commentId={+commentid} activityType="COMMENT" myReaction={commentData.myReaction} />
+          )}
         </div>
 
         <div className={style.commentCreatorContanier}>
@@ -96,8 +101,8 @@ export function LargeActivityComment() {
                 content={v.content}
                 commentId={v.id}
                 postId={v.postId}
-                userReaction={'like'}
-                commentReactions={{}}
+                userReaction={v.myReaction}
+                commentReactions={v.reactions}
                 onFocus={() => nav(`/post/${v.postId}/comments/${v.id}`)}
               />
             ))}
