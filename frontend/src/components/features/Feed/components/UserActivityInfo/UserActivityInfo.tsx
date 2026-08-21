@@ -17,7 +17,7 @@ export default function UserActivityInfo({ avatar, authorName, createdAt, visibi
       <div className={style.postInfo}>
         <span style={{ fontWeight: '600' }}>{authorName}</span>
         {visibility && <span>{visibility}</span>}
-        <span>{new Date(createdAt).toLocaleString()}</span>
+        <span>{createdAt}</span>
       </div>
     </div>
   );
