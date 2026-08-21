@@ -3,15 +3,14 @@ import Button from '../../../../../generic/UI/Button/Button';
 import style from './LargePost.module.css';
 import { usePost } from '../../../../../../hooks/usePost';
 import CustomText from '../../../../../generic/UI/Text/Text';
-import type { ReactionUnion } from '../../../../../../types/VisualUnions';
 import { Loading } from '../../../../../generic/UI/Loading/Loading';
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useAPI } from '../../../../../../hooks/useAPI';
 import { ErrorHandler } from '../../../../../../lib/customError';
 import { customNotificationCtx } from '../../../../../../context/customNotificationContext';
 import UserActivityInfo from '../../UserActivityInfo/UserActivityInfo';
 import ActivityReactions from '../../ActivityReactions/ActivityReactions';
-import  CommentCreator from '../../CommentCreator/CommentCreator';
+import CommentCreator from '../../CommentCreator/CommentCreator';
 import { ActivityComment } from '../../Comment/ActivityComment';
 
 export default function LargePost() {
@@ -23,6 +22,11 @@ export default function LargePost() {
   const nav = useNavigate();
   const ctx = useContext(customNotificationCtx);
   const isShowingComment = useMatch('/post/:postid/comments/:commentid');
+
+  useEffect(() => {
+    refetch()
+  }, [isShowingComment,refetch]);
+
   async function addComment() {
     try {
       const result = await request('/api/comments', 'POST', {
@@ -78,16 +82,16 @@ export default function LargePost() {
                 avatar={null}
                 visibility={postPacketData.visibleFor}
                 authorName={postPacketData.fullName}
-                createdAt={postPacketData.created_at}
+                createdAt={postPacketData.createdAt}
               />
             </div>
             <div className={style.expandedContentContainer}>{postPacketData.content}</div>
             <div className={style.expandedReactions}>
               <ActivityReactions
-                activityId={+postid}
-                activityType='POST'
-                reactions={postPacketData.reactions as Record<ReactionUnion, number>}
-                myReaction={postPacketData.myReaction as ReactionUnion}
+                postId={+postid}
+                activityType="POST"
+                reactions={postPacketData.reactions}
+                myReaction={postPacketData.myReaction}
               />
             </div>
             <div className={style.expandedCommentsContainer}>
