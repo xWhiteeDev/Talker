@@ -6,10 +6,11 @@ interface ActivityReactionsProps {
   reactions: Record<ReactionUnion, number>;
   myReaction: ReactionUnion;
   activityType: 'COMMENT' | 'POST';
-  activityId: number;
+  postId: number;
+  commentId?:number
 }
 
-export default function ActivityReactions({ reactions, myReaction, activityType, activityId }: ActivityReactionsProps) {
+export default function ActivityReactions({ reactions, myReaction, activityType, postId,commentId }: ActivityReactionsProps) {
   const { unifiedReactions, toggle } = useReaction(reactions ?? {}, myReaction);
   const reactionNames = Object.keys(unifiedReactions.counts) as ReactionUnion[];
 
@@ -19,7 +20,7 @@ export default function ActivityReactions({ reactions, myReaction, activityType,
       name={v as ReactionUnion}
       count={unifiedReactions.counts[v as ReactionUnion]}
       isActive={unifiedReactions.activeReaction === v}
-      onReactionAdd={(name) => toggle(name as ReactionUnion, activityType, activityId)}
+      onReactionAdd={(name) => toggle(name as ReactionUnion, activityType, postId,commentId)}
     />
   ));
 }
