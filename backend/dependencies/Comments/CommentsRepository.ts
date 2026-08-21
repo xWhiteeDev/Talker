@@ -13,7 +13,7 @@ export class CommentsRepository implements ICommentsRepository {
     const [result] = await this.pool.query<CommentRow[]>(query, { userId, postId });
     return result.length > 0 ? result : null;
   }
-  async findById(commentId: number): Promise<FoundComment | undefined> {
+  async findById(userId:number,commentId: number): Promise<FoundComment | undefined> {
     const query: string = `WITH child_comments AS (
     SELECT
         c.post_id as postId,
@@ -28,28 +28,44 @@ export class CommentsRepository implements ICommentsRepository {
 ),
 child_reactions AS (
     SELECT
-        rc.commentId,
+        rc.comment_id,
         rc.type,
         COUNT(*) as reactions_count
     FROM reactions_comment as rc
-    INNER JOIN child_comments as cc ON cc.id = rc.commentId
-    GROUP BY rc.commentId, rc.type
+    INNER JOIN child_comments as cc ON cc.id = rc.comment_id
+    GROUP BY rc.comment_id, rc.type
 ),
 child_reactions_agg AS (
     SELECT
-        cr.commentId,
+        cr.comment_id,
         JSON_OBJECTAGG(cr.type, reactions_count) as reactions
     FROM child_reactions as cr
-    GROUP BY cr.commentId
+    GROUP BY cr.comment_id
+),
+current_reactions AS (
+     SELECT
+        rc.comment_id,
+        rc.type,
+        COUNT(*) as reactions_count
+    FROM reactions_comment as rc
+    WHERE rc.comment_id=:commentId
+    GROUP BY rc.comment_id, rc.type 
+),
+    current_reactions_agg AS (
+    SELECT cr.comment_id,JSON_OBJECTAGG(cr.type, reactions_count) as reactions
+    FROM current_reactions as cr
+    GROUP BY cr.comment_id
 )
 SELECT
     c.post_id as postId,
-    c.id as id,
+    c.id ,
     c.user_id as userId,
     c.parent_id as parentId,
     c.content,
-    c.created_at as createdAt,
+    DATE_FORMAT(c.created_at, '%Y-%m-%d %H:%i') as createdAt,
     CONCAT(a.firstName, " ", a.lastName) as fullName,
+    curra.reactions,
+    (SELECT MAX(rc.type) FROM reactions_comment as rc WHERE rc.author_id =:userId AND rc.comment_id =:commentId GROUP BY rc.comment_id) as myReaction,
     COALESCE((
         SELECT JSON_ARRAYAGG(
             JSON_OBJECT(
@@ -57,18 +73,20 @@ SELECT
                 "postId", cc.postId,
                 "content", cc.content,
                 "userId", cc.userId,
-                "createdAt", cc.createdAt,
-                "fullName", cc.fullName
+                "createdAt", DATE_FORMAT(cc.createdAt, '%Y-%m-%d %H:%i'),
+                "fullName", cc.fullName,
+                "reactions", (SELECT cra.reactions FROM child_reactions_agg as cra WHERE cra.comment_id = cc.id ),
+                "myReaction", (SELECT MAX(rc.type) FROM reactions_comment as rc WHERE rc.author_id =:userId AND rc.comment_id =cc.id GROUP BY rc.comment_id)
             )
         )
         FROM child_comments as cc
-    ), JSON_ARRAY()) as childComments,
-FROM comments as c
+    ), JSON_ARRAY()) as childComments
+    FROM comments as c
 LEFT JOIN accounts as a ON a.id = c.user_id
-LEFT JOIN child_reactions_agg as cra ON cra.commentId = :c.id
+LEFT JOIN current_reactions_agg as curra ON curra.comment_id=c.id
 WHERE c.id = :commentId
-LIMIT 1` //TODO
-    const [[result]] = await this.pool.query<FoundComment[]>(query, { commentId });
+LIMIT 1`;
+    const [[result]] = await this.pool.query<FoundComment[]>(query, {userId, commentId });
     return result;
   }
   async findByParentId(parentId: number): Promise<CommentRow[] | null> {
