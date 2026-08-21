@@ -15,12 +15,12 @@ export interface Comment {
 
 export interface PostRow {
   postId: number;
-  author_Id: number;
+  userId: number;
   content: string;
-  created_at: string;
+  createdAt: string;
   visibleFor: string;
   fullName: string;
   comments: Comment[] | null;
-  reactions: ReactionCount;
-  myReaction: string | null;
+  reactions:  Record<ReactionUnion, number>;
+  myReaction: ReactionUnion;
 }
