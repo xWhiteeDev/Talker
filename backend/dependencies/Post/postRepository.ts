@@ -55,7 +55,7 @@ export class PostRepository implements IPostRepository {
                     'commentId', pc.commentId,
                     'fullName', pc.fullName,
                     'content', pc.content, 
-                    'createdAt', pc.createdAt,
+                    'createdAt', DATE_FORMAT(pc.createdAt, '%Y-%m-%d %H:%i'),
                     'reactions', acr.reactionObject,
                     'userReaction', cur.myReaction
                 )
@@ -101,9 +101,9 @@ export class PostRepository implements IPostRepository {
     )
 SELECT 
     p.id AS postId, 
-    p.author_Id, 
+    p.author_Id as userId , 
     p.content, 
-    DATE_FORMAT(p.created_at, '%Y-%m-%d %H:%i') as created_at, 
+    DATE_FORMAT(p.created_at, '%Y-%m-%d %H:%i') as createdAt, 
     p.visibleFor, 
     CONCAT(' ', a.firstName, a.lastName) AS fullName, 
     COALESCE(agc.commentsArr, JSON_ARRAY()) AS comments, 
@@ -124,6 +124,7 @@ WHERE p.id = :id;`;
       id,
       currentUserId: currentUserId,
     });
+    console.log(result)
     return result;
   }
   async findByAuthor(authorId: number): Promise<PostRow[]> {
