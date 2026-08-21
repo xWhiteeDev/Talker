@@ -5,7 +5,7 @@ import type {Request,Response,NextFunction} from "express";
 export interface ICommentsRepository {
     findByPost(postId: number): Promise<CommentRow[] | null>;
     findByUserId(userId: number, postId: number): Promise<CommentRow[] | null>;
-    findById(commentId: number): Promise<FoundComment | undefined>;
+    findById(userId:number,commentId: number): Promise<FoundComment | undefined>;
     findByParentId(parentId: number): Promise<CommentRow[] | null>;
     insertDocument(dto: CommentInsertDTO): Promise<boolean>;
     updateContent(commentId: number, newContent: string): Promise<boolean>;
@@ -15,7 +15,7 @@ export interface ICommentsRepository {
 export interface ICommentsService {
     findCommentsByPost(postId: number): Promise<CommentRow[] | null>;
     findUserCommentsByPostId(userId: number, postId: number): Promise<CommentRow[] | null>;
-    findCommentByCommentId(commentId: number): Promise<FoundComment>;
+    findCommentByCommentId(userId:number,commentId: number): Promise<FoundComment>;
     findCommentsByParentId(parentId: number): Promise<CommentRow[] | null>;
     insertComment(dto: CommentInsertDTO): Promise<boolean>;
     updateCommentContent(commentId: number, newContent: string): Promise<boolean>;
