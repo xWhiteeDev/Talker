@@ -6,7 +6,7 @@ import type {PostRow} from "../types/Posthook";
 export function usePost(postId: number) {
   const { request } = useAPI();
   const [loading, setLoading] = useState(true);
-  const [err, setErr] = useState<any>(undefined);
+  const [err, setErr] = useState<unknown>(undefined);
   const [postPacketData, setPostPacketData] = useState<PostRow | undefined>(
     undefined,
   );

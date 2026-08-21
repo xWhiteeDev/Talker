@@ -13,8 +13,8 @@ interface PostComponent {
   visibility: string;
   createdAt: string;
   content: string;
-  reactions: Record<string, number>;
-  activeReaction: string;
+  reactions: Record<ReactionUnion, number>;
+  activeReaction: ReactionUnion;
   id: number;
 }
 
@@ -55,10 +55,10 @@ export default function Post({ authorName, visibility, createdAt, content, id }:
         <div className={style.interactions}>
           <div style={{ width: '100%', display: 'flex', height: '100%' }}>
             <ActivityReactions
-              reactions={postPacketData.reactions as Record<ReactionUnion, number>}
-              myReaction={postPacketData.myReaction as ReactionUnion}
+              reactions={postPacketData.reactions}
+              myReaction={postPacketData.myReaction}
               activityType='POST'
-              activityId={postId.current}
+              postId={postId.current}
             />
           </div>
           <Button additionalStyle={{ background: 'none', border: 'none' }} text="Add comment" />
