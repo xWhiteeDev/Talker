@@ -57,7 +57,8 @@ export class PostRepository implements IPostRepository {
                     'content', pc.content, 
                     'createdAt', DATE_FORMAT(pc.createdAt, '%Y-%m-%d %H:%i'),
                     'reactions', acr.reactionObject,
-                    'userReaction', cur.myReaction
+                    'userReaction', cur.myReaction,
+                    'commentsCount', (SELECT COUNT(*) FROM comments as c WHERE c.parent_id = pc.commentId)
                 )
             ) AS commentsArr 
         FROM post_comments pc
