@@ -60,7 +60,7 @@ export class PostController implements IPostController {
             const payload: PostInsertDTO = {
                 authorId: user.id,
                 content: data.content,
-                visibleFor: data.visibleFor,
+                visible_for: data.visible_for,
             };
             const insertingResult = await this.PostService.insertPost(payload);
             if (!insertingResult) {
