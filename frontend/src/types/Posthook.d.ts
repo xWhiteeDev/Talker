@@ -11,16 +11,23 @@ export interface Comment {
   createdAt: string;
   reactions: Record<ReactionUnion, number>;
   userReaction: ReactionUnion;
+  commentsCount: number;
 }
 
 export interface PostRow {
-  postId: number;
-  userId: number;
-  content: string;
+  id: number;
   createdAt: string;
+  authorId: number;
+  content: string;
   visibleFor: string;
   fullName: string;
-  comments: Comment[] | null;
-  reactions:  Record<ReactionUnion, number>;
+  reactions: Record<ReactionUnion, number>;
   myReaction: ReactionUnion;
+  commentsCount: number;
+  photo: string | null;
+  video: string | null;
+  file: string | null;
+  gif: string | null;
+  taggedUsers: string | null;
+  pinnedPlace: string | null;
 }
