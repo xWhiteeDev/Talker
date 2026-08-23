@@ -139,3 +139,8 @@
     scroll-behavior: smooth;
     gap: 2%;
 }
+.posts {
+    display: flex;
+    justify-content: center;
+    width: 50%;
+}
