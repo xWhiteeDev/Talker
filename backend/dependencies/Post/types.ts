@@ -27,13 +27,13 @@ export interface PostRow extends RowDataPacket {
     author: string;
     authorId: number;
     content: string;
-    visibleFor: Visibility;
+    visible_for: Visibility;
     created_at: string;
     photo?: string[];
     video?: string[];
     file?: string[];
     gif?: string[];
-    taggedPeopleIds?: string[];
+    tagged_users?: string[];
     pinedPlace?: string;
     firstName:string;
     lastName:string
@@ -43,13 +43,13 @@ export interface PostRow extends RowDataPacket {
 export type PostInsertDTO = {
     authorId: number;
     content: string;
-    visibleFor: Visibility;
+    visible_for: Visibility;
     photo?: string[];
     video?: string[];
     file?: string[];
     gif?: string[];
-    taggedPeopleIds?: string[];
-    pinnedPlace?: string;
+    tagged_users?: string[];
+    pinned_place?: string;
 }; 
 export interface PostUpdateDTO extends Omit<PostInsertDTO, 'author' | 'authorId'> { }
 
