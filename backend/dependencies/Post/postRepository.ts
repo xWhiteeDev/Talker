@@ -6,7 +6,7 @@ export class PostRepository implements IPostRepository {
   }
   async findById(id: number, currentUserId?: number, withDetails?: boolean): Promise<PostRow | undefined> {
     let query: string =
-      'SELECT posts.id, posts.created_at,posts.author_id,posts.content,posts.visibleFor,posts.photo,posts.video,posts.file,posts.gif,posts.taggedPeopleIds,posts.pinnedPlace,accounts.firstName,accounts.lastName FROM posts LEFT JOIN accounts ON accounts.id=posts.author_id WHERE posts.id=:id LIMIT 1';
+      'SELECT posts.id, posts.created_at,posts.author_id,posts.content,posts.visible_for,posts.photo,posts.video,posts.file,posts.gif,posts.tagged_users,posts.pinned_place,accounts.firstName,accounts.lastName FROM posts LEFT JOIN accounts ON accounts.id=posts.author_id WHERE posts.id=:id LIMIT 1';
     if (withDetails) {
       query = `WITH 
     post_comments AS (
@@ -16,7 +16,7 @@ export class PostRepository implements IPostRepository {
             c.post_id AS post_Id, 
             DATE_FORMAT(c.created_at, '%Y-%m-%d %H:%i') AS createdAt, 
             c.content, 
-            CONCAT(' ', a.firstName, a.lastName) AS fullName 
+            CONCAT( a.firstName, " " ,a.lastName) AS fullName 
         FROM comments c 
         LEFT JOIN accounts a 
             ON a.id = c.user_id 
@@ -52,12 +52,12 @@ export class PostRepository implements IPostRepository {
             pc.post_Id,
             JSON_ARRAYAGG(
                 JSON_OBJECT(
-                    'commentId', pc.commentId,
+                    'id', pc.commentId,
                     'fullName', pc.fullName,
                     'content', pc.content, 
                     'createdAt', DATE_FORMAT(pc.createdAt, '%Y-%m-%d %H:%i'),
                     'reactions', acr.reactionObject,
-                    'userReaction', cur.myReaction,
+                    'myReaction', cur.myReaction,
                     'commentsCount', (SELECT COUNT(*) FROM comments as c WHERE c.parent_id = pc.commentId)
                 )
             ) AS commentsArr 
@@ -101,12 +101,12 @@ export class PostRepository implements IPostRepository {
         GROUP BY pr.post_id
     )
 SELECT 
-    p.id AS postId, 
-    p.author_Id as userId , 
+    p.id, 
+    p.author_Id as authorId , 
     p.content, 
     DATE_FORMAT(p.created_at, '%Y-%m-%d %H:%i') as createdAt, 
-    p.visibleFor, 
-    CONCAT(' ', a.firstName, a.lastName) AS fullName, 
+    p.visible_for as visibleFor, 
+    CONCAT(a.firstName," ", a.lastName) AS fullName, 
     COALESCE(agc.commentsArr, JSON_ARRAY()) AS comments, 
     apr.reactionObject AS reactions, 
     ur.myReaction AS myReaction 
@@ -135,30 +135,30 @@ WHERE p.id = :id;`;
   }
   async insert(dto: PostInsertDTO): Promise<boolean> {
     const query: string =
-      'INSERT INTO posts (author_Id, content, visibleFor,photo,video,file,gif,taggedPeopleIds,pinnedPlace) VALUES (:authorId, :content, :visibleFor, :photo, :video, :file, :gif, :taggedPeopleIds, :pinnedPlace)';
+      'INSERT INTO posts (author_Id, content, visible_for,photo,video,file,gif,tagged_users,pinned_place) VALUES (:authorId, :content, :visible_for, :photo, :video, :file, :gif, :tagged_users, :pinned_place)';
     const [result] = await this.pool.execute<ResultSetHeader>(query, {
       authorId: dto.authorId,
       content: dto.content,
-      visibleFor: dto.visibleFor,
+      visible_for: dto.visible_for,
       photo: JSON.stringify(dto.photo) ?? null,
       video: JSON.stringify(dto.video) ?? null,
       file: JSON.stringify(dto.file) ?? null,
       gif: JSON.stringify(dto.gif) ?? null,
-      taggedPeopleIds: JSON.stringify(dto.taggedPeopleIds) ?? null,
-      pinnedPlace: dto.pinnedPlace ?? null,
+      tagged_users: JSON.stringify(dto.tagged_users) ?? null,
+      pinned_place: dto.pinned_place ?? null,
     });
     return result.affectedRows > 0;
   }
   async update(id: number, dto: PostUpdateDTO): Promise<boolean> {
     const allowedKeysToUpdate: (keyof PostUpdateDTO)[] = [
       'content',
-      'visibleFor',
+      'visible_for',
       'photo',
       'video',
       'file',
       'gif',
-      'taggedPeopleIds',
-      'pinnedPlace',
+      'tagged_users',
+      'pinned_place',
     ] as const;
     let key: keyof PostUpdateDTO;
     const updateKeys: string[] = [];
@@ -187,11 +187,64 @@ WHERE p.id = :id;`;
     return result.affectedRows > 0;
   }
   async findAll(userId: number): Promise<PostRow[]> {
-    const query: string = `WITH post_reactions AS (SELECT post_id,type,COUNT(type) as reaction_count FROM reactions_post GROUP BY post_id, type), 
-    reactions AS (SELECT post_id, JSON_OBJECTAGG(post_reactions.type,post_reactions.reaction_count) 
-    AS reactions_object FROM post_reactions GROUP BY post_id) 
-    SELECT posts.* ,DATE_FORMAT(posts.created_at, '%Y-%m-%d %H:%i') as created_at, accounts.firstName,accounts.lastName,reactions.reactions_object ,MAX(CASE WHEN reactions_post.author_id = :userId THEN reactions_post.type END) AS myReaction FROM posts JOIN accounts ON posts.author_Id = accounts.id LEFT JOIN reactions_post ON reactions_post.post_id=posts.id LEFT JOIN reactions ON reactions.post_id = posts.id WHERE (visibleFor='public' OR (visibleFor='friends' AND posts.author_id IN (SELECT CASE WHEN userId=:userId THEN friendId ELSE userId END FROM friendships WHERE (userId=:userId OR friendId=:userId) AND status='accepted'))) GROUP BY posts.id ORDER BY posts.id DESC`;
-    const [result] = await this.pool.query<PostRow[]>(query, { userId });
+    const query: string = `
+  WITH post_reactions AS (
+    SELECT 
+      post_id,
+      type,
+      COUNT(type) AS reactionCount 
+    FROM reactions_post 
+    GROUP BY post_id, type
+  ), 
+  agg_reactions AS (
+    SELECT 
+      post_id, 
+      JSON_OBJECTAGG(post_reactions.type, post_reactions.reactionCount) AS reactions 
+    FROM post_reactions 
+    GROUP BY post_id
+  )
+  SELECT 
+    posts.id AS id,
+    DATE_FORMAT(posts.created_at, '%Y-%m-%d %H:%i') as createdAt, 
+    posts.author_id AS authorId,
+    posts.content AS content,
+    posts.visible_for AS visibleFor,
+    CONCAT(accounts.firstName, " ", accounts.lastName) as fullName,
+    agg_reactions.reactions AS reactions, 
+    MAX(CASE WHEN reactions_post.author_id = :userId THEN reactions_post.type END) AS myReaction,
+    (SELECT COUNT(*) FROM comments AS c WHERE c.post_id=posts.id) AS commentsCount,
+    posts.photo AS photo,
+    posts.video AS video,
+    posts.file AS file,
+    posts.gif AS gif,
+    posts.tagged_users AS taggedUsers,
+    posts.pinned_place AS pinnedPlace
+  FROM posts 
+  JOIN accounts 
+    ON posts.author_id = accounts.id 
+  LEFT JOIN reactions_post 
+    ON reactions_post.post_id = posts.id 
+  LEFT JOIN agg_reactions 
+    ON agg_reactions.post_id = posts.id 
+  WHERE (
+    posts.visible_for = 'public' 
+    OR (
+      posts.visible_for = 'friends' 
+      AND posts.author_id IN (
+        SELECT 
+          CASE WHEN userId = :userId THEN friendId ELSE userId END 
+        FROM friendships 
+        WHERE (userId = :userId OR friendId = :userId) 
+          AND status = 'accepted'
+      )
+    )
+  ) 
+  GROUP BY posts.id 
+  ORDER BY posts.id DESC
+`;
+
+
+const [result] = await this.pool.query<PostRow[]>(query, { userId });
     console.log(result)
     return result;
   }
