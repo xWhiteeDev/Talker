@@ -76,11 +76,13 @@ SELECT
                 "createdAt", DATE_FORMAT(cc.createdAt, '%Y-%m-%d %H:%i'),
                 "fullName", cc.fullName,
                 "reactions", (SELECT cra.reactions FROM child_reactions_agg as cra WHERE cra.comment_id = cc.id ),
-                "myReaction", (SELECT MAX(rc.type) FROM reactions_comment as rc WHERE rc.author_id =:userId AND rc.comment_id =cc.id GROUP BY rc.comment_id)
+                "myReaction", (SELECT MAX(rc.type) FROM reactions_comment as rc WHERE rc.author_id =:userId AND rc.comment_id =cc.id GROUP BY rc.comment_id),
+                "commentsCount", (SELECT COUNT(*) FROM comments AS c WHERE c.parent_id=cc.id)
+
             )
         )
         FROM child_comments as cc
-    ), JSON_ARRAY()) as childComments
+    ), JSON_ARRAY()) as comments
     FROM comments as c
 LEFT JOIN accounts as a ON a.id = c.user_id
 LEFT JOIN current_reactions_agg as curra ON curra.comment_id=c.id
