@@ -1,0 +1,38 @@
+.container {
+    font-size: 1.4rem;
+    padding: 1%;
+    cursor: pointer;
+    transition: all 0.1s ease-in;
+}
+
+
+.elements {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 1vh;
+    padding: 1%;
+    width: max-content;
+}
+
+.elements:hover {
+    transform: scale(1.1);
+    opacity: 0.6;
+}
+
+.container span {
+    font-weight: 100;
+    color: rgb(22, 22, 22);
+}
+
+.container span strong {
+    font-weight: 600;
+}
+
+.icon {
+    height: 2.5vh;
+    aspect-ratio: 1/1;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+}
