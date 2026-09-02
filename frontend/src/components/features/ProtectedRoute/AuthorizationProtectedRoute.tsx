@@ -1,23 +1,21 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import {emitServer} from "../../../lib/API/emitServer";
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { emitServer } from '../../../lib/API/emitServer';
 
 interface AuthorizationProtectedRouteProps {
-    children:React.ReactNode
+  children: React.ReactNode;
 }
 
-export default function AuthorizationProtectedRoute({
-  children,
-}: AuthorizationProtectedRouteProps) {
+export default function AuthorizationProtectedRoute({ children }: AuthorizationProtectedRouteProps) {
   const nav = useNavigate();
-  const [isAuthorised, setAuthorised] = useState<unknown>(undefined);
+  const [isAuthorised, setAuthorised] = useState<boolean>(false);
   useEffect(() => {
-    emitServer("/api/auth/isAuth", "GET").then((data) => setAuthorised(!!data));
+    emitServer('/api/auth/isAuth', 'GET').then((data) => {});
   }, []);
-  useEffect(() => {
-    if (isAuthorised) {
-      nav("/home");
-    }
-  }, [isAuthorised]);
+  // useEffect(() => {
+  //   if (isAuthorised === true) {
+  //     nav("/");
+  //   }
+  // }, [isAuthorised]);
   return isAuthorised ? <span>Redirecting...</span> : children;
 }
