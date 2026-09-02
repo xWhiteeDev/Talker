@@ -1,9 +1,9 @@
 
 import {ErrorHandler} from "../../handlers/errorHandler.js";
 import type {currentUser} from "../Account/types.js";
-import type {IPostController, IPostService, PostInsertDTO} from "./types.js";
+import type { IPostService, PostInsertDTO} from "./types.js";
 import type {Request, Response, NextFunction} from 'express';
-export class PostController implements IPostController {
+export class PostController {
     constructor(private PostService: IPostService) { }
 
     async fetchLatestPosts(req: Request, res: Response, next: NextFunction) {
