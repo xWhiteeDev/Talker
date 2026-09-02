@@ -8,6 +8,7 @@ export interface IAccountRepository {
     update(data: IAccountUpdateDTO): Promise<boolean>;
     delete(email: string): Promise<boolean>;
     isExist(email: string): Promise<boolean>;
+    findByCriteria(firstString?:string,lastString?:string ):Promise<IAccountRow[] | null>
 }
 
 export interface IAccountService {
@@ -17,9 +18,13 @@ export interface IAccountService {
     updateUser(document: IAccountUpdateDTO): Promise<boolean>;
     deleteUser(email: string): Promise<boolean>;
     isUserExist(email: string): Promise<boolean>;
+    findUserByCriteria(firstString?:string,lastString?:string ):Promise<IAccountRow[] | null>
 }
 export interface IAccountRow extends RowDataPacket {
     id: number;
+    firstName:string;
+    lastName:string;
+    birthdayDate:string;
     created_at: string;
     email: string;
     password: string;

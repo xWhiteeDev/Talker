@@ -57,4 +57,8 @@ export class AccountService implements IAccountService {
         const result = await this.accountRepository.delete(email);
         return result;
     }
+    async findUserByCriteria(firstString?:string, lastString?:string) {
+        const result = await this.accountRepository.findByCriteria(firstString,lastString)
+        return result
+    }
 }
