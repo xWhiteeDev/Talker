@@ -67,7 +67,7 @@ authRouter.post('/login', isDataValid(loginCfg), async (req, res, next) => {
     await authController.signIn(req, res, next);
 });
 authRouter.post('/refresh', isRefreshTokenValid(), async (req, res, next) => {
-    authController.refreshToken(req, res, next);
+    authController.createNewToken(req, res, next);
 });
 authRouter.get('/isAuth', isAccessTokenActive(), (req: Request, res, next) => {
     res.status(200).json({success: true, data: {user: req.currentUser}});
