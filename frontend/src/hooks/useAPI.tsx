@@ -14,6 +14,7 @@ export function useAPI() {
       if (error instanceof ErrorHandler) {
         if (error.code == 401) {
           nav("/auth/login");
+          
           return;
         }
         throw error
