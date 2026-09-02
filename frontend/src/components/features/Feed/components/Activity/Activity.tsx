@@ -2,6 +2,7 @@ import style from './Activity.module.css';
 import type { ReactionUnion } from '../../../../../types/VisualUnions';
 import UserActivityInfo from '../UserActivityInfo/UserActivityInfo';
 import ActivityReactions from '../ActivityReactions/ActivityReactions';
+import {memo} from 'react';
 
 interface ActivityProps {
   avatar: string | null;
@@ -17,7 +18,7 @@ interface ActivityProps {
   type:'POST' | 'COMMENT'
 }
 
-export function Activity({
+export const Activity = memo(function Activity({
   type,
   avatar,
   authorName,
@@ -49,10 +50,10 @@ export function Activity({
       </div>
       <div className={style.activityCommentCount} onClick={() => onFocus()}>
         <span>
-          Komentarze: <b>{subCommentsCount}</b>
+          Comments: <b>{subCommentsCount}</b>
         </span>
       </div>
     </div>
   );
-}
-// TODO!!
+})
+
