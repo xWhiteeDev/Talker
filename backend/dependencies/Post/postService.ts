@@ -16,7 +16,7 @@ export class PostService implements IPostService {
         }
         if (!existingPost) throw new ErrorHandler('Post does not exist', 404);
 
-        const postVisibility = existingPost.visible_for;
+        const postVisibility = existingPost["visible_for"];
         if (postVisibility == 'Public') {
             return existingPost;
 

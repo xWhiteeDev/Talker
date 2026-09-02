@@ -119,17 +119,59 @@ LEFT JOIN aggPostReactions apr
     ON apr.post_id = p.id 
 LEFT JOIN userReaction ur 
     ON ur.post_id = p.id 
-WHERE p.id = :id;`;
+WHERE p.id = :id`;
     }
     const [[result]] = await this.pool.query<PostRow[]>(query, {
       id,
       currentUserId: currentUserId,
     });
-    console.log(result)
     return result;
   }
   async findByAuthor(authorId: number): Promise<PostRow[]> {
-    const query: string = 'SELECT * FROM posts WHERE authorId=:authorId';
+    const query: string = `WITH post_reactions AS (
+    SELECT 
+      post_id,
+      type,
+      COUNT(type) AS reactionCount 
+    FROM reactions_post 
+    GROUP BY post_id, type
+  ), 
+  agg_reactions AS (
+    SELECT 
+      post_id, 
+      JSON_OBJECTAGG(post_reactions.type, post_reactions.reactionCount) AS reactions 
+    FROM post_reactions 
+    GROUP BY post_id
+  )
+  SELECT 
+    posts.id AS id,
+    DATE_FORMAT(posts.created_at, '%Y-%m-%d %H:%i') as createdAt, 
+    posts.author_id AS authorId,
+    posts.content AS content,
+    posts.visible_for AS visibleFor,
+    CONCAT(accounts.firstName, " ", accounts.lastName) as fullName,
+    agg_reactions.reactions AS reactions, 
+    MAX(CASE WHEN reactions_post.author_id = :authorId THEN reactions_post.type END) AS myReaction,
+    (SELECT COUNT(*) FROM comments AS c WHERE c.post_id=posts.id) AS commentsCount,
+    posts.photo AS photo,
+    posts.video AS video,
+    posts.file AS file,
+    posts.gif AS gif,
+    posts.tagged_users AS taggedUsers,
+    posts.pinned_place AS pinnedPlace
+  FROM posts 
+  JOIN accounts 
+    ON posts.author_id = accounts.id 
+  LEFT JOIN reactions_post 
+    ON reactions_post.post_id = posts.id 
+  LEFT JOIN agg_reactions 
+    ON agg_reactions.post_id = posts.id 
+  WHERE (
+    posts.author_id =:authorId 
+  ) 
+  GROUP BY posts.id 
+  ORDER BY posts.id DESC
+ `;
     const [result] = await this.pool.query<PostRow[]>(query, { authorId });
     return result;
   }
@@ -243,9 +285,7 @@ WHERE p.id = :id;`;
   ORDER BY posts.id DESC
 `;
 
-
-const [result] = await this.pool.query<PostRow[]>(query, { userId });
-    console.log(result)
+    const [result] = await this.pool.query<PostRow[]>(query, { userId });
     return result;
   }
 }
