@@ -51,7 +51,6 @@ export default function EditableTextArea({
       {isEmpty && !focused && (
         <span
           style={{
-            transform: "translate(5%,50%)",
             position: "absolute",
             pointerEvents: "none",
             color: placeholderColor,
@@ -59,6 +58,8 @@ export default function EditableTextArea({
             fontWeight: placeholderFontWeight,
             userSelect: "none",
             whiteSpace: "nowrap",
+                      ...additionalStyle,
+
           }}
         >
           {placeholder}
