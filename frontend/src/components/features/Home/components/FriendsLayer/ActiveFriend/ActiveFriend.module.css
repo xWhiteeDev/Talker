@@ -1,0 +1,36 @@
+.container {
+    width: 93%;
+    height: 6%;
+    cursor: pointer;
+}
+
+.user {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 5vh;
+    padding: 1vh;
+    border-radius: 7px;
+    gap: 1vh;
+    background-color: rgba(2, 2, 2, 0.034);
+}
+
+.avatar {
+    background-image: url(../../../../../../assets/unk_person.png);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    height: 4vh;
+    aspect-ratio: 1/1;
+    border-radius: 50%;
+}
+
+.active {
+    background-color: rgba(13, 190, 22, 0.452);
+    box-shadow: 0px 0px 3px 2px  rgba(13, 190, 22, 0.096);
+    height: 1vh;
+    aspect-ratio: 1/1;
+    border-radius: 50%;
+    animation: activeblink 1s linear 0.2s infinite both;
+}
+
