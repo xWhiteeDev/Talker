@@ -5,9 +5,7 @@ export async function refreshToken() {
         if (res.status === 401 && data.message == 'Unauthorised') {
             return { success: false, requiresLogin: true }
         }
-
         return { success: false, requiresLogin: false }
     }
-
     return { success: true, requiresLogin: false }
 }
