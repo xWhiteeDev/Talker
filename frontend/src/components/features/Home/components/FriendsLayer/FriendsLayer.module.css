@@ -1,0 +1,29 @@
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    border-left: 1px solid gray;
+}
+
+.friendsWindow {
+    box-shadow: -4px 10px 2px 2px rgba(0, 0, 0, 0.11);
+    background-color: rgba(177, 177, 177, 0.075);
+    border-radius: 7px;
+    width: 93%;
+    height: 75%;
+}
+
+.categoryHeader {
+    padding: 1%;
+    font-weight: 600;
+}
+
+.friendsList {
+    display: flex;
+    flex-direction: column;
+    gap: 3%;
+    overflow-y: auto;
+    height: calc(100% - 50px)
+}
