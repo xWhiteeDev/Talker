@@ -31,8 +31,9 @@ export function LargeActivity() {
   const { request } = useAPI();
   const [activityData, setActivityData] = useState<ActivityElements | undefined>(undefined);
   const [commentText, setCommentText] = useState<string>();
-  const ctx = useContext(customNotificationCtx);
+  const notificationContext = useContext(customNotificationCtx);
   const nav = useNavigate();
+
   async function addComment() {
     try {
       const result = await request('/api/comments', 'POST', {
@@ -45,14 +46,14 @@ export function LargeActivity() {
       }
     } catch (error) {
       if (error instanceof ErrorHandler) {
-        if (ctx) {
-          ctx.setNotify({ type: 'error', message: error.message });
+        if (notificationContext) {
+          notificationContext.setNotify({ type: 'error', message: error.message });
         } else {
           console.error(error);
         }
       } else {
-        if (ctx) {
-          ctx.setNotify({ type: 'error', message: 'Unknown server error!' });
+        if (notificationContext) {
+          notificationContext.setNotify({ type: 'error', message: 'Unknown server error!' });
         } else {
           console.error(error);
         }
@@ -68,7 +69,6 @@ export function LargeActivity() {
         }
         if (res.data) {
           setActivityData(res.data);
-          console.log(res.data);
         }
       })
       .catch((err) => {
