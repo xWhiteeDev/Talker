@@ -62,9 +62,8 @@ export class AuthController implements IAuthController {
         }
         return true;
     }
-    refreshToken(req: Request, res: Response, next: NextFunction) {
+    createNewToken(req: Request, res: Response, next: NextFunction) {
         if (!req.currentUser) {
-
             throw new ErrorHandler('Unauthorised!!!', 401, true);
         }
         const {id} = req.currentUser;
