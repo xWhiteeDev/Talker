@@ -36,29 +36,17 @@ export default function Profile() {
   const nav = useNavigate();
   const { id } = useParams();
   useEffect(() => {
-    if (!id) {
-      (async () => {
-        const result = await request<IProfile>('/api/profile/me', 'GET');
-        if (!result || (result && !result.success) || !result.data) {
-          nav('/');
-          console.error('Failed to fetch your profile!');
-          return;
-        }
-        setProfile(result.data);
-      })();
-      return;
-    } else {
-      (async () => {
-        const result = await request<IProfile>(`/api/profile/${+id}`, 'GET');
-        if (!result || (result && !result.success) || !result.data) {
-          nav('/');
-          console.error('Failed to fetch that profile!');
-          return;
-        }
-        setProfile(result.data);
-      })();
-    }
-  });
+    const endpoint: string = id ?? 'me';
+    (async () => {
+      const result = await request<IProfile>(`/api/profile/${endpoint}`, 'GET');
+      if (!result || (result && !result.success) || !result.data) {
+        nav('/');
+        console.error('Failed to fetch profile!');
+        return;
+      }
+      setProfile(result.data);
+    })();
+  }, [id, nav, request]);
   return (
     profile && (
       <div className={style.container}>
