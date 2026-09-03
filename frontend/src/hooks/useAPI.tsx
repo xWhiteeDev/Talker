@@ -1,26 +1,46 @@
-import { useNavigate } from "react-router-dom";
-import { emitServer } from "../lib/API/emitServer";
-import { ErrorHandler } from "../lib/customError";
-import type {EmitMethod, EmitData} from "../types/API";
-import {useCallback} from "react";
+import { useNavigate } from 'react-router-dom';
+import { emitServer } from '../lib/API/emitServer';
+import { ErrorHandler } from '../lib/customError';
+import type { EmitMethod, EmitData, EmitResult } from '../types/API';
+import { useCallback, useRef } from 'react';
+import { refreshToken } from '../lib/API/refreshToken';
 
 export function useAPI() {
   const nav = useNavigate();
-  const request = useCallback( async function request<T>(url: string, method: EmitMethod, data?: EmitData) {
-    try {
-      const result = await emitServer<T>(url, method, data);
-      return result;
-    } catch (error) {
-      if (error instanceof ErrorHandler) {
-        if (error.code == 401) {
-          nav("/auth/login");
-          
-          return;
+  const retry = useRef<boolean>(false);
+  const request = useCallback(
+    async function request<T>(url: string, method: EmitMethod, data?: EmitData):Promise<EmitResult<T> | undefined> {
+      try {
+        const result = await emitServer<T>(url, method, data);
+        return result;
+      } catch (error) {
+        if (error instanceof ErrorHandler) {
+          if (error.code == 401) {
+            if (retry.current === true) {
+              nav('/auth/login');
+              return;
+            }
+            retry.current = true;
+            const refreshedNewToken = await refreshToken();
+            if (!refreshedNewToken.success && refreshedNewToken.requiresLogin) {
+              nav('/auth/login');
+              return;
+            }
+            if (!refreshedNewToken.success && !refreshedNewToken.requiresLogin) {
+              throw new ErrorHandler('API Server fault', 500);
+            }
+            if (refreshedNewToken.success) {
+              const res = await request<T>(url, method, data);
+              retry.current = false
+              return res
+            }
+          }
+          throw error;
         }
-        throw error
-      } 
-    }
-  },[nav])
+      }
+    },
+    [nav],
+  );
 
   return { request };
 }
