@@ -19,7 +19,7 @@ export class PostReactionController {
     };
     const canSeeThisPost = await this.postService.findById(
       user.id,
-      reactionBody.postId,
+      reactionBody.postId
     );
     if (!canSeeThisPost) {
       next(new ErrorHandler("Access denied", 400));
