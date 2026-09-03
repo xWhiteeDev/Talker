@@ -1,79 +1,79 @@
-import {ErrorHandler} from "../../handlers/errorHandler.js";
-import type {IAccountService} from "../Account/types.js";
-import type {IFriendshipService} from "../Friendship/types.js";
-import type {PostRow, PostInsertDTO, PostUpdateDTO, IPostService, IPostRepository} from "./types.js";
+import { ErrorHandler } from '../../handlers/errorHandler.js';
+import type { IAccountService } from '../Account/types.js';
+import type { IFriendshipService } from '../Friendship/types.js';
+import type { PostRow, PostInsertDTO, PostUpdateDTO, IPostService, IPostRepository } from './types.js';
 
 export class PostService implements IPostService {
-    constructor(private PostRepository: IPostRepository, private FriendsService: IFriendshipService, private accountService: IAccountService) {
-        console.log(`\x1b[32;1m🚀[PostService] PostRepository injected \x1b[0m`);
+  constructor(
+    private PostRepository: IPostRepository,
+    private FriendsService: IFriendshipService,
+    private accountService: IAccountService,
+  ) {
+    console.log(`\x1b[32;1m🚀[PostService] PostRepository injected \x1b[0m`);
+  }
+  async findById(userId: number, id: number, withComments?: boolean): Promise<PostRow | null> {
+    let existingPost;
+    if (withComments) {
+      existingPost = await this.PostRepository.findById(id, userId, true);
+    } else {
+      existingPost = await this.PostRepository.findById(id, userId);
     }
-    async findById(userId: number, id: number, withComments?: boolean): Promise<PostRow | null> {
-        let existingPost;
-        if (withComments) {
-            existingPost = await this.PostRepository.findById(id, userId,true);
-        } else {
-            existingPost = await this.PostRepository.findById(id);
-        }
-        if (!existingPost) throw new ErrorHandler('Post does not exist', 404);
+    if (!existingPost) throw new ErrorHandler('Post does not exist', 404);
 
-        const postVisibility = existingPost["visible_for"];
-        if (postVisibility == 'Public') {
-            return existingPost;
-
-        } else if (existingPost.authorId === userId) {
-            return existingPost;
-        }
-        else if (postVisibility === 'friends') {
-            const relationBetweenUsers = await this.FriendsService.findRelationBetween(userId, existingPost.authorId);
-
-            if (!relationBetweenUsers) return null;
-            return existingPost;
-        } 
-        return null;
-
+    const postVisibility = existingPost.visible_for;
+    if (postVisibility === 'Public') {
+      return existingPost;
     }
-    async findLatestPosts(userId: number): Promise<PostRow[] | null> {
-        const postsToFeed = await this.PostRepository.findAll(userId);
-        if (postsToFeed == null) {
-            return null;
-        }
-        return postsToFeed;
-
+    if (existingPost.authorId === userId) {
+      return existingPost;
     }
-    async findByAuthor(userId: number, authorId: number): Promise<PostRow[] | null> {
-        if (userId !== authorId) throw new ErrorHandler('Access denied', 403);
-        const existingPost = await this.PostRepository.findByAuthor(authorId);
-        return existingPost;
+    if (postVisibility === 'Friends') {
+      const relationBetweenUsers = await this.FriendsService.findRelationBetween(userId, existingPost.authorId);
+      if (!relationBetweenUsers) return null;
+      return existingPost;
     }
-    async insertPost(dto: PostInsertDTO): Promise<boolean> {
-        const authorAccount = await this.accountService.findUserById(dto.authorId);
-        if (!authorAccount) {
-            throw new ErrorHandler('User not exist', 400);
-        }
-        const result = await this.PostRepository.insert(dto);
-        if (!result) {
-            throw new ErrorHandler('Operation failed', 400);
-        }
-        return result;
+    return null;
+  }
+  async findLatestPosts(userId: number): Promise<PostRow[] | null> {
+    const postsToFeed = await this.PostRepository.findAll(userId);
+    if (postsToFeed == null) {
+      return null;
     }
-    async updatePost(userId: number, id: number, dto: PostUpdateDTO): Promise<boolean> {
-        const existingPost: PostRow | undefined = await this.PostRepository.findById(id);
-        if (!existingPost) throw new ErrorHandler('Post does not exist', 404);
-        if (userId !== existingPost.authorId) throw new ErrorHandler('Access denied', 403);
-        const result = await this.PostRepository.update(id, dto);
-        if (!result) {
-            throw new ErrorHandler('Operation failed', 400);
-        }
-        return result;
+    return postsToFeed;
+  }
+  async findByAuthor(userId: number, authorId: number): Promise<PostRow[] | null> {
+    const existingPost = await this.PostRepository.findByAuthor(userId, authorId);
+    return existingPost;
+  }
+  async insertPost(dto: PostInsertDTO): Promise<boolean> {
+    const authorAccount = await this.accountService.findUserById(dto.authorId);
+    if (!authorAccount) {
+      throw new ErrorHandler('User not exist', 400);
     }
-    async deletePost(userId: number, id: number): Promise<boolean> {
-        const existingPost: PostRow | undefined = await this.PostRepository.findById(id);
-        if (!existingPost) throw new ErrorHandler('Post does not exist', 404);
-        if (userId !== existingPost.authorId) throw new ErrorHandler('Access denied', 403);
-        const result = await this.PostRepository.delete(id);
-        if (!result) {
-            throw new ErrorHandler('Operation failed', 400);
-        }
-        return result;
+    const result = await this.PostRepository.insert(dto);
+    if (!result) {
+      throw new ErrorHandler('Operation failed', 400);
     }
+    return result;
+  }
+  async updatePost(userId: number, id: number, dto: PostUpdateDTO): Promise<boolean> {
+    const existingPost: PostRow | undefined = await this.PostRepository.findById(id);
+    if (!existingPost) throw new ErrorHandler('Post does not exist', 404);
+    if (userId !== existingPost.authorId) throw new ErrorHandler('Access denied', 403);
+    const result = await this.PostRepository.update(id, dto);
+    if (!result) {
+      throw new ErrorHandler('Operation failed', 400);
+    }
+    return result;
+  }
+  async deletePost(userId: number, id: number): Promise<boolean> {
+    const existingPost: PostRow | undefined = await this.PostRepository.findById(id);
+    if (!existingPost) throw new ErrorHandler('Post does not exist', 404);
+    if (userId !== existingPost.authorId) throw new ErrorHandler('Access denied', 403);
+    const result = await this.PostRepository.delete(id);
+    if (!result) {
+      throw new ErrorHandler('Operation failed', 400);
+    }
+    return result;
+  }
 }
