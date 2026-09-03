@@ -29,6 +29,7 @@ export class CommentsController implements ICommentsController {
       parent_id: data.parentId,
       content: data.content,
     };
+
     try {
       const result = await this.CommentsService.insertComment(payload);
       if (!result) {
@@ -43,10 +44,10 @@ export class CommentsController implements ICommentsController {
     }
   }
   async findByPostId(req: Request, res: Response, next: NextFunction) {
-    const user:currentUser = req.currentUser;
+    const user: currentUser = req.currentUser;
     if (!user) {
       next(new ErrorHandler('User not assigned', 403));
-      return false
+      return false;
     }
     let commentid = req.params['id'];
     if (!commentid) {
@@ -54,13 +55,13 @@ export class CommentsController implements ICommentsController {
       return false;
     }
     try {
-      const result = await this.CommentsService.findCommentByCommentId(user.id,+commentid);
+      const result = await this.CommentsService.findCommentByCommentId(user.id, +commentid);
       if (!result) {
         next(new ErrorHandler('Failed to find comment', 400));
         return false;
       }
-      res.status(201).json({success:true,data:result});
-      return true
+      res.status(201).json({ success: true, data: result });
+      return true;
     } catch (error) {
       next(error);
       return false;
