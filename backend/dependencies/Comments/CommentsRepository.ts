@@ -13,7 +13,7 @@ export class CommentsRepository implements ICommentsRepository {
     const [result] = await this.pool.query<CommentRow[]>(query, { userId, postId });
     return result.length > 0 ? result : null;
   }
-  async findById(userId:number,commentId: number): Promise<FoundComment | undefined> {
+  async findById(userId: number, commentId: number): Promise<FoundComment | undefined> {
     const query: string = `WITH child_comments AS (
     SELECT
         c.post_id as postId,
@@ -88,7 +88,7 @@ LEFT JOIN accounts as a ON a.id = c.user_id
 LEFT JOIN current_reactions_agg as curra ON curra.comment_id=c.id
 WHERE c.id = :commentId
 LIMIT 1`;
-    const [[result]] = await this.pool.query<FoundComment[]>(query, {userId, commentId });
+    const [[result]] = await this.pool.query<FoundComment[]>(query, { userId, commentId });
     return result;
   }
   async findByParentId(parentId: number): Promise<CommentRow[] | null> {
@@ -105,8 +105,10 @@ LIMIT 1`;
       if (!allowedKeys.includes(key)) continue;
       queryKeys.push(key);
       queryParams[key] = dto[key];
+      if (!queryParams[key]) {
+        queryParams[key] = null;
+      }
     }
-
     const query = `INSERT INTO comments (${queryKeys.join(',')}) VALUES(${queryKeys.map((v) => `:${v}`).join(',')})`;
     const [result] = await this.pool.execute<ResultSetHeader>(query, { ...queryParams });
     return result.affectedRows > 0;
