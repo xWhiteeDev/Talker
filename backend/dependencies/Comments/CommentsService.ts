@@ -37,7 +37,6 @@ export class CommentsService implements ICommentsService {
         const result = await this.CommentsRepository.insertDocument(dto);
         if (!result) {
             throw new ErrorHandler('Operation failed', 400);
-
         }
         return result;
     }
