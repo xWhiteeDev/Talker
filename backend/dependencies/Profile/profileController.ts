@@ -29,7 +29,7 @@ class ProfileController implements IProfileController {
         next(new ErrorHandler('Failed to get user property.', 400));
         return false;
       }
-      const profileData = await this.profileService.getMe(user.id);
+      const profileData = await this.profileService.get(user.id,user.id);
       res.status(200).json({ success: true, data: profileData });
       return true;
     } catch (error) {
