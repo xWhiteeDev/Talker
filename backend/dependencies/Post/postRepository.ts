@@ -4,12 +4,55 @@ export class PostRepository implements IPostRepository {
   constructor(private pool: Pool) {
     console.log(`\x1b[32;1m🚀[PostRepository] Pool injected \x1b[0m`);
   }
-  async findById(id: number, currentUserId?: number, withDetails?: boolean): Promise<PostRow | undefined> {
-    let query: string =
-      'SELECT posts.id, posts.created_at,posts.author_id,posts.content,posts.visible_for,posts.photo,posts.video,posts.file,posts.gif,posts.tagged_users,posts.pinned_place,accounts.firstName,accounts.lastName FROM posts LEFT JOIN accounts ON accounts.id=posts.author_id WHERE posts.id=:id LIMIT 1';
+  async findById(id: number, currentUserId: number, withDetails?: boolean): Promise<PostRow | undefined> {
+let query: string = `
+  SELECT 
+    posts.id, 
+    posts.created_at, 
+    posts.author_id, 
+    posts.content, 
+    posts.visible_for, 
+    posts.photo, 
+    posts.video, 
+    posts.file, 
+    posts.gif, 
+    posts.tagged_users, 
+    posts.pinned_place, 
+    CONCAT(a.firstName, " ", a.lastName) AS fullName
+  FROM posts 
+  LEFT JOIN accounts AS a 
+    ON a.id = posts.author_id 
+  WHERE 
+    posts.id = :id 
+    AND (
+      posts.visible_for = 'Public' 
+      OR (
+        posts.visible_for = 'Friends' 
+        AND EXISTS (
+          SELECT 1 
+          FROM friendships 
+          WHERE (
+            userId = :currentUserId 
+            AND friendId = posts.author_id  
+            AND status = 'accepted'
+          ) 
+          OR (
+            userId = posts.author_id 
+            AND friendId = :currentUserId 
+            AND status = 'accepted'
+          )
+        )
+      ) 
+      OR (
+        posts.visible_for = 'Private' 
+        AND posts.author_id = :currentUserId
+      )
+    )
+  LIMIT 1
+`;
     if (withDetails) {
       query = `WITH 
-    post_comments AS (
+        post_comments AS (
         SELECT 
             c.id AS commentId, 
             c.user_id AS userId, 
@@ -105,7 +148,7 @@ SELECT
     p.author_Id as authorId , 
     p.content, 
     DATE_FORMAT(p.created_at, '%Y-%m-%d %H:%i') as createdAt, 
-    p.visible_for as visibleFor, 
+    p.visible_for, 
     CONCAT(a.firstName," ", a.lastName) AS fullName, 
     COALESCE(agc.commentsArr, JSON_ARRAY()) AS comments, 
     apr.reactionObject AS reactions, 
@@ -123,12 +166,12 @@ WHERE p.id = :id`;
     }
     const [[result]] = await this.pool.query<PostRow[]>(query, {
       id,
-      currentUserId: currentUserId,
+      currentUserId,
     });
     return result;
   }
-  async findByAuthor(authorId: number): Promise<PostRow[]> {
-    const query: string = `WITH post_reactions AS (
+  async findByAuthor(userId: number, targetId: number): Promise<PostRow[]> {
+    const myProfileQuery = `WITH post_reactions AS (
     SELECT 
       post_id,
       type,
@@ -151,7 +194,50 @@ WHERE p.id = :id`;
     posts.visible_for AS visibleFor,
     CONCAT(accounts.firstName, " ", accounts.lastName) as fullName,
     agg_reactions.reactions AS reactions, 
-    MAX(CASE WHEN reactions_post.author_id = :authorId THEN reactions_post.type END) AS myReaction,
+    MAX(CASE WHEN reactions_post.author_id = :userId THEN reactions_post.type END) AS myReaction,
+    (SELECT COUNT(*) FROM comments AS c WHERE c.post_id=posts.id) AS commentsCount,
+    posts.photo AS photo,
+    posts.video AS video,
+    posts.file AS file,
+    posts.gif AS gif,
+    posts.tagged_users AS taggedUsers,
+    posts.pinned_place AS pinnedPlace
+  FROM posts 
+  JOIN accounts 
+    ON posts.author_id = accounts.id 
+  LEFT JOIN reactions_post 
+    ON reactions_post.post_id = posts.id 
+  LEFT JOIN agg_reactions 
+    ON agg_reactions.post_id = posts.id 
+  WHERE posts.author_id =:userId
+  GROUP BY posts.id 
+  ORDER BY posts.id DESC
+ `;
+
+    const someoneProfileQuery: string = `WITH post_reactions AS (
+    SELECT 
+      post_id,
+      type,
+      COUNT(type) AS reactionCount 
+    FROM reactions_post 
+    GROUP BY post_id, type
+  ), 
+  agg_reactions AS (
+    SELECT 
+      post_id, 
+      JSON_OBJECTAGG(post_reactions.type, post_reactions.reactionCount) AS reactions 
+    FROM post_reactions 
+    GROUP BY post_id
+  )
+  SELECT 
+    posts.id AS id,
+    DATE_FORMAT(posts.created_at, '%Y-%m-%d %H:%i') as createdAt, 
+    posts.author_id AS authorId,
+    posts.content AS content,
+    posts.visible_for AS visibleFor,
+    CONCAT(accounts.firstName, " ", accounts.lastName) as fullName,
+    agg_reactions.reactions AS reactions, 
+    MAX(CASE WHEN reactions_post.author_id = :userId THEN reactions_post.type END) AS myReaction,
     (SELECT COUNT(*) FROM comments AS c WHERE c.post_id=posts.id) AS commentsCount,
     posts.photo AS photo,
     posts.video AS video,
@@ -167,12 +253,27 @@ WHERE p.id = :id`;
   LEFT JOIN agg_reactions 
     ON agg_reactions.post_id = posts.id 
   WHERE (
-    posts.author_id =:authorId 
+   ( posts.visible_for = 'Public' AND posts.author_id=:targetId) OR (posts.visible_for = 'Friends' AND posts.author_id=:targetId AND EXISTS(
+    SELECT 1 FROM friendships WHERE ((userId=:userId AND friendId=:targetId AND status='accepted') OR (userId=:targetId AND friendId=:userId AND status='accepted'))
+    ))
   ) 
   GROUP BY posts.id 
   ORDER BY posts.id DESC
  `;
-    const [result] = await this.pool.query<PostRow[]>(query, { authorId });
+    const queryParams = {
+      queries: {
+        someone: someoneProfileQuery,
+        my: myProfileQuery,
+      },
+      params: {
+        someone: { userId, targetId },
+        my: { userId },
+      },
+    };
+
+    const type = userId === targetId ? 'my' : 'someone';
+
+    const [result] = await this.pool.query<PostRow[]>(queryParams.queries[type], queryParams.params[type]);
     return result;
   }
   async insert(dto: PostInsertDTO): Promise<boolean> {
@@ -269,9 +370,9 @@ WHERE p.id = :id`;
   LEFT JOIN agg_reactions 
     ON agg_reactions.post_id = posts.id 
   WHERE (
-    posts.visible_for = 'public' 
+    posts.visible_for = 'Public' 
     OR (
-      posts.visible_for = 'friends' 
+      posts.visible_for = 'Friends' 
       AND posts.author_id IN (
         SELECT 
           CASE WHEN userId = :userId THEN friendId ELSE userId END 
