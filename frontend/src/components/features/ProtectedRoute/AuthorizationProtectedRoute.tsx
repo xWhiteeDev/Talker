@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { emitServer } from '../../../lib/API/emitServer';
+import {AuthContext} from '../../../context/authContext';
 
 interface AuthorizationProtectedRouteProps {
   children: React.ReactNode;
@@ -8,14 +8,11 @@ interface AuthorizationProtectedRouteProps {
 
 export default function AuthorizationProtectedRoute({ children }: AuthorizationProtectedRouteProps) {
   const nav = useNavigate();
-  const [isAuthorised, setAuthorised] = useState<boolean>(false);
+  const authContext = useContext(AuthContext)
   useEffect(() => {
-    emitServer('/api/auth/isAuth', 'GET').then((data) => {});
-  }, []);
-  // useEffect(() => {
-  //   if (isAuthorised === true) {
-  //     nav("/");
-  //   }
-  // }, [isAuthorised]);
-  return isAuthorised ? <span>Redirecting...</span> : children;
+    if (authContext?.loggedIn === true) {
+      nav("/"); //TODO: NOT FINISHED!!
+    }
+  }, [authContext?.loggedIn]);
+  return authContext?.loggedIn ? <span>Redirecting...</span> : children;
 }
