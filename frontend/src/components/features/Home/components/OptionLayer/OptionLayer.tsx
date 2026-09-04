@@ -1,26 +1,21 @@
+import { useContext } from 'react';
+import { AuthContext } from '../../../../../context/authContext';
 import Button from '../../../../generic/UI/Button/Button';
 import MenuOption from '../../../../generic/UI/MenuOption/MenuOption';
 import style from './OptionLayer.module.css';
-import type {IOptionList} from './types';
-
+import type { IOptionList } from './types';
 
 interface OptionLayerProps {
-  items:IOptionList[]
+  items: IOptionList[];
 }
 
-export default function OptionLayer({items}:OptionLayerProps) {
+export default function OptionLayer({ items }: OptionLayerProps) {
+  const authContext = useContext(AuthContext);
   return (
     <div className={style.container}>
       <div className={style.options}>
         {items.map((v, i) => {
-          return (
-            <MenuOption
-              key={v.name + i}
-              text={v.name}
-              icon={v.icon}
-              onClick={v.onClick}
-            />
-          );
+          return <MenuOption key={v.name + i} text={v.name} icon={v.icon} onClick={v.onClick} />;
         })}
       </div>
       <div className={style.userContainer}>
@@ -28,7 +23,7 @@ export default function OptionLayer({items}:OptionLayerProps) {
           <div className={style.userAvatar}></div>
           <div className={style.usernameAndRole}>
             <div className={style.username}>
-              <strong>Jacob</strong> Unknown
+              {(authContext && authContext.user)  &&<strong>{authContext.user.username}</strong>}
             </div>
             <span style={{ color: '#9f56a8', fontSize: '1.1rem' }}>
               <strong>CEO</strong>
@@ -49,4 +44,3 @@ export default function OptionLayer({items}:OptionLayerProps) {
     </div>
   );
 }
- 
