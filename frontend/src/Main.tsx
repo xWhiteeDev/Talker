@@ -1,6 +1,6 @@
 import { createRoot } from 'react-dom/client';
 import App from './App.tsx';
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { createBrowserRouter, redirect, RouterProvider, useNavigate } from 'react-router-dom';
 import Auth from './components/features/Auth/components/AuthLayout.tsx';
 import { useState } from 'react';
 import CustomNotification from './components/generic/UI/Notification/CustomNotification.tsx';
@@ -15,6 +15,8 @@ import './Main.css';
 import type { NotificationHookProps } from './types/NotificationHook';
 import { LargeActivity } from './components/features/Feed/components/Activity/Large/LargeActivity.tsx';
 import Profile from './components/features/Feed/components/profile/Profile.tsx';
+import { AuthContext } from './context/authContext.ts';
+import type {IUser} from './types/User';
 
 const root = document.getElementById('root');
 const routes = createBrowserRouter([
@@ -48,7 +50,7 @@ const routes = createBrowserRouter([
             path: 'profile/me',
             element: <Profile />,
           },
-            {
+          {
             path: 'profile/:id',
             element: <Profile />,
           },
@@ -82,7 +84,9 @@ const routes = createBrowserRouter([
 
 function Main() {
   const [notification, setNotification] = useState<NotificationHookProps | null>();
-
+  const [loggedIn, setLoggedIn] = useState<boolean>(false);
+  const [user, setUser] = useState<IUser | undefined>(undefined);
+  
   function setNotify(notiContext: NotificationHookProps) {
     if (notification) {
       setNotification(() => null);
@@ -92,11 +96,24 @@ function Main() {
       setNotification(null);
     }, 4000);
   }
+  function login(userData: IUser) {
+    setLoggedIn(true);
+    setUser(userData);
+    return !!userData
+  }
+  function logout() {
+    setLoggedIn(false);
+    setUser(undefined);
+    return true
+  }
+
   return (
-    <customNotificationCtx.Provider value={{ setNotify }}>
-      {<RouterProvider router={routes} />}
-      {notification && <CustomNotification type={notification.type} message={notification.message} />}
-    </customNotificationCtx.Provider>
+    <AuthContext.Provider value={{ login, logout, loggedIn, user }}>
+      <customNotificationCtx.Provider value={{ setNotify }}>
+        {<RouterProvider router={routes} />}
+        {notification && <CustomNotification type={notification.type} message={notification.message} />}
+      </customNotificationCtx.Provider>
+    </AuthContext.Provider>
   );
 }
 
