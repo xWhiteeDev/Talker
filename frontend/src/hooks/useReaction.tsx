@@ -1,9 +1,8 @@
-import { useCallback, useContext, useState } from 'react';
+import { useCallback, useState } from 'react';
 import type { ReactionHookUnionType, ReactionUnion } from '../types/VisualUnions';
 import { useAPI } from './useAPI';
-import { customNotificationCtx } from '../context/customNotificationContext';
 import { ErrorHandler } from '../lib/customError';
-
+import useNotify from './useNotify';
 
 const defaultReactions: Record<ReactionUnion, number> = {
   love: 0,
@@ -13,10 +12,7 @@ const defaultReactions: Record<ReactionUnion, number> = {
   sad: 0,
 };
 
-export function useReaction(
-  serverReactions: Partial<Record<ReactionUnion, number>>,
-  userReaction?: ReactionUnion,
-) {
+export function useReaction(serverReactions: Partial<Record<ReactionUnion, number>>, userReaction?: ReactionUnion) {
   const [unifiedReactions, setUnifiedReactions] = useState<{
     counts: Record<ReactionUnion, number>;
     activeReaction: ReactionUnion | undefined;
@@ -24,9 +20,8 @@ export function useReaction(
     counts: { ...defaultReactions, ...serverReactions },
     activeReaction: userReaction ?? undefined,
   });
-  const notiCtx = useContext(customNotificationCtx);
   const { request } = useAPI();
-
+  const { setNotification } = useNotify();
   const toggle = useCallback(
     async function toggle(newReactionName: ReactionUnion, column: ReactionHookUnionType, postId: number, commentId?: number) {
       const hookData = {
@@ -75,17 +70,10 @@ export function useReaction(
         if (error instanceof ErrorHandler || error instanceof Error) {
           errorMessage = error.message;
         }
-        if (notiCtx) {
-          notiCtx.setNotify({
-            type: 'error',
-            message: errorMessage,
-          });
-        } else {
-          console.error(error);
-        }
+        setNotification('error', errorMessage);
       }
     },
-    [request, notiCtx],
+    [request],
   );
   return { unifiedReactions, toggle };
 }
