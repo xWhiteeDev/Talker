@@ -1,16 +1,14 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import style from './LargeActivity.module.css';
 import { useAPI } from '../../../../../../hooks/useAPI';
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ErrorHandler } from '../../../../../../lib/customError';
-import { customNotificationCtx } from '../../../../../../context/customNotificationContext';
 import UserActivityInfo from '../../UserActivityInfo/UserActivityInfo';
 import CommentCreator from '../../CommentCreator/CommentCreator';
 import ActivityReactions from '../../ActivityReactions/ActivityReactions';
 import { Activity } from '../Activity';
 import type { ReactionUnion } from '../../../../../../types/VisualUnions';
-
-
+import useNotify from '../../../../../../hooks/useNotify';
 
 interface ActivityElements {
   postId: number;
@@ -22,7 +20,7 @@ interface ActivityElements {
   fullName: string;
   reactions: Record<ReactionUnion, number>;
   myReaction: ReactionUnion;
-  commentsCount:number
+  commentsCount: number;
   comments: ActivityElements[];
 }
 
@@ -31,7 +29,7 @@ export function LargeActivity() {
   const { request } = useAPI();
   const [activityData, setActivityData] = useState<ActivityElements | undefined>(undefined);
   const [commentText, setCommentText] = useState<string>();
-  const notificationContext = useContext(customNotificationCtx);
+  const { setNotification } = useNotify();
   const nav = useNavigate();
 
   async function addComment() {
@@ -46,17 +44,9 @@ export function LargeActivity() {
       }
     } catch (error) {
       if (error instanceof ErrorHandler) {
-        if (notificationContext) {
-          notificationContext.setNotify({ type: 'error', message: error.message });
-        } else {
-          console.error(error);
-        }
+        setNotification('error', error.message);
       } else {
-        if (notificationContext) {
-          notificationContext.setNotify({ type: 'error', message: 'Unknown server error!' });
-        } else {
-          console.error(error);
-        }
+        setNotification('error', 'Unknown server error!');
       }
     }
   }
@@ -79,7 +69,9 @@ export function LargeActivity() {
     activityData && (
       <div className={style.container}>
         <div className={style.goBack}>
-          <span onClick={()=>nav(-1)} style={{cursor:'pointer'}}>X</span>
+          <span onClick={() => nav(-1)} style={{ cursor: 'pointer' }}>
+            X
+          </span>
         </div>
         <div className={style.userInfoContainer}>
           {activityData && (
@@ -88,7 +80,7 @@ export function LargeActivity() {
         </div>
         <div className={style.contentContainer}>{activityData.content}</div>
         <div className={style.reactionsContainer}>
-          { postid && (
+          {postid && (
             <ActivityReactions
               reactions={activityData.reactions}
               postId={+postid}
@@ -106,10 +98,11 @@ export function LargeActivity() {
           />
         </div>
         <div className={style.childComments}>
-           {activityData && postid &&
+          {activityData &&
+            postid &&
             activityData.comments.map((v) => (
               <Activity
-              key={v.id}
+                key={v.id}
                 type="COMMENT"
                 avatar={null}
                 authorName={v.fullName}
