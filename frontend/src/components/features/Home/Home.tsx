@@ -1,8 +1,7 @@
-import { useContext, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import style from './Home.module.css';
 import Logo from '../../generic/UI/Logo/Logo';
 import { useAPI } from '../../../hooks/useAPI';
-import { customNotificationCtx } from '../../../context/customNotificationContext';
 import { usePosts } from '../../../hooks/usePosts';
 import { PostCreator } from '../Feed/components/PostCreator/PostCreator';
 import { Loading } from '../../generic/UI/Loading/Loading';
@@ -12,6 +11,7 @@ import OptionLayer from './components/OptionLayer/OptionLayer';
 import FriendsLayer from './components/FriendsLayer/FriendsLayer';
 import SearchLayer from './components/SearchLayer/SearchLayer';
 import type { IOptionList } from './components/OptionLayer/types';
+import useNotify from '../../../hooks/useNotify';
 
 export default function Home() {
   const [postText, setPostText] = useState<string | undefined>(undefined);
@@ -65,18 +65,17 @@ export default function Home() {
       await refresh();
     })();
   }, [refresh]);
- 
-  const ctx = useContext(customNotificationCtx);
+  const { setNotification } = useNotify();
   async function pushPost() {
     if (postText && postText.length === 0) {
       return false;
     }
     if (!visibility || visibility.trim() === '') {
-      ctx?.setNotify({ type: 'error', message: 'Select visibility!' });
+      setNotification('error', 'Select visibility!');
       return false;
     }
     if (!postText || postText.trim() === '' || postText.length < 4) {
-      ctx?.setNotify({ type: 'error', message: 'Write more text!' });
+      setNotification('error', 'Write more text!');
       return false;
     }
     const payload = {
@@ -86,7 +85,7 @@ export default function Home() {
     try {
       const res = await request<boolean>('/api/posts', 'POST', payload);
       if (res?.success) {
-        ctx?.setNotify({ type: 'success', message: 'Post added!' });
+        setNotification('success', 'Post added!');
         await refresh();
         setPostText(undefined);
       } else {
@@ -94,9 +93,9 @@ export default function Home() {
       }
     } catch (error) {
       if (error instanceof Error) {
-        ctx?.setNotify({ type: 'error', message: error.message });
+        setNotification('error', error.message);
       } else {
-        ctx?.setNotify({ type: 'error', message: 'Unknown error!' });
+        setNotification('error', 'Unknown error!');
       }
     }
   }
