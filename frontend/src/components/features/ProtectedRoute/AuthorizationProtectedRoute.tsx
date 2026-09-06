@@ -1,6 +1,7 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {AuthContext} from '../../../context/authContext';
+import { AuthContext } from '../../../context/authContext';
+import { refreshToken } from '../../../lib/API/refreshToken';
 
 interface AuthorizationProtectedRouteProps {
   children: React.ReactNode;
@@ -8,11 +9,15 @@ interface AuthorizationProtectedRouteProps {
 
 export default function AuthorizationProtectedRoute({ children }: AuthorizationProtectedRouteProps) {
   const nav = useNavigate();
-  const authContext = useContext(AuthContext)
+  const authContext = useContext(AuthContext);
   useEffect(() => {
-    if (authContext?.loggedIn === true) {
-      nav("/"); //TODO: NOT FINISHED!!
-    }
-  }, [authContext?.loggedIn]);
+    (async () => {
+      const authorizationResult = await refreshToken();
+      if (authorizationResult.success && !authorizationResult.requiresLogin) {
+        nav('/');
+        return;
+      }
+    })();
+  }, [nav]);
   return authContext?.loggedIn ? <span>Redirecting...</span> : children;
 }
