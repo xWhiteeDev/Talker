@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import style from "./input.module.css";
-import type {CSSPropertiesWithVars} from "../../../../types/CSSPropertiesWithVars";
+import type {ICSSVarProps} from "../../../../types/components/ICSSVarProps";
 import {fetchImage} from "../../../../services/fetchImageService";
 
 interface InputProps {
@@ -87,7 +87,7 @@ export default function Input({
           "--placeholderSize": placeholderSize,
           height: '50%',
           width: "85%",
-        } as CSSPropertiesWithVars}
+        } as ICSSVarProps}
         onFocus={(e) => onFocus?.(e)}
       />
     </div>
