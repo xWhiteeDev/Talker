@@ -1,27 +1,23 @@
 import { emitServer } from '../../../../lib/API/emitServer';
 import { ErrorHandler } from '../../../../lib/customError';
 import { validate } from '../../../../services/validationService';
-import type { GlobalConfiguration, ValidationFunctions } from '../../../../types/Validator';
-import type { CustomNotificationContext, IAuthContext } from '../../../../types/Context';
-import type { IUser } from '../../../../types/User';
-import type { NavigateFunction } from 'react-router-dom';
+import type { IGlobalConfiguration, IValidationFunctions } from '../../../../types/services/IValidator';
+import type { IBasicUserInfo } from '../../../../types/components/IUser';
+import type { TNotificationType } from '../../../../types/components/IComponentsUnion';
 
 interface AuthorizationInfo {
   transmisionEndpoint: string;
-  successContent?: string;
-  validationConfiguration: GlobalConfiguration;
-  validationFunctions: ValidationFunctions;
+  validationConfiguration: IGlobalConfiguration;
+  validationFunctions: IValidationFunctions;
 }
 
 export async function handleSubmitAuthForm(
   event: React.SubmitEvent<HTMLFormElement>,
-  notificationContext: CustomNotificationContext,
-  authorizationContext: IAuthContext,
-  nav: NavigateFunction,
-
+  notifcationFunction: (type: TNotificationType, message: string) => void,
   authorizationInfo: AuthorizationInfo,
 ) {
   event.preventDefault();
+
   const formData = new FormData(event.currentTarget);
   const objectifiedFormData = Object.fromEntries(formData);
   const validationResult = validate(
@@ -30,39 +26,22 @@ export async function handleSubmitAuthForm(
     authorizationInfo.validationFunctions,
   );
   if (!validationResult) {
-    notificationContext.setNotify({
-      type: 'error',
-      message: 'Validation failed!',
-    });
+    notifcationFunction('error', 'Validation failed!');
     return false;
   }
   const transmisionUrl = `/api/auth/${authorizationInfo.transmisionEndpoint}`;
   try {
-    const res = await emitServer<IUser>(transmisionUrl, 'POST', objectifiedFormData);
+    const res = await emitServer<IBasicUserInfo>(transmisionUrl, 'POST', objectifiedFormData);
     if (!res || (res && !res.success)) {
-      nav('/auth/login');
-      return
+      throw new ErrorHandler('Failed to authorize', 400);
     }
-    const loginResult = authorizationContext.login(res.data);
-    if (loginResult) {
-      nav('/');
-    } else {
-      nav('/auth/login');
-    }
-    console.log(authorizationContext.user)
+    return { success: res.success, data: res.data };
   } catch (error) {
     if (error instanceof ErrorHandler) {
-      notificationContext.setNotify({
-        type: 'error',
-        message: error.message,
-      });
+      notifcationFunction('error', error.message);
     } else {
-      notificationContext.setNotify({
-        type: 'error',
-        message: 'Unknown server error',
-      });
+      notifcationFunction('error', 'Unknown server error');
     }
     return false;
   }
-  return true;
 }
