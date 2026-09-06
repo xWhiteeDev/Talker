@@ -67,9 +67,6 @@ export default function Home() {
   }, [refresh]);
   const { setNotification } = useNotify();
   async function pushPost() {
-    if (postText && postText.length === 0) {
-      return false;
-    }
     if (!visibility || visibility.trim() === '') {
       setNotification('error', 'Select visibility!');
       return false;
