@@ -8,7 +8,7 @@ import style from "./Reaction.module.css";
     onReactionAdd(name: string): void;
 
 }
- const reactionsEmoji: Record<ReactioTReactionUnionnUnion, string> = {
+ const reactionsEmoji: Record<TReactionUnion, string> = {
   love: "❤️",
   like: "👍",
   wow: "😮",
