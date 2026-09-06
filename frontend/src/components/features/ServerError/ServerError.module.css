@@ -1,0 +1,45 @@
+.container {
+    display: grid;
+    grid-template-columns: 0.4fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    background-color: rgba(134, 89, 89, 0.13);
+    width: 100%;
+    height: 100%;
+    grid-row: 1/3;
+    grid-column: 1/4;
+
+}
+
+.icon {
+    justify-items: center;
+    align-items: center;
+    background-position: center;
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+.text {
+    display: flex;
+    flex-direction: column;
+    justify-self: center;
+    text-align: center;
+    grid-column: 1/2;
+}
+
+.communicate {
+    text-shadow: 2px 8px 2px rgba(0, 0, 0, 0.192);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 2rem;
+    grid-column: 2/3;
+    grid-row: 1/2;
+}
+
+.buttoncontainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}

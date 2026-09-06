@@ -1,6 +1,6 @@
 import { createRoot } from 'react-dom/client';
 import App from './App.tsx';
-import { createBrowserRouter,  RouterProvider  } from 'react-router-dom';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import Auth from './components/features/Auth/components/AuthLayout.tsx';
 import { useState } from 'react';
 import CustomNotification from './components/generic/UI/Notification/CustomNotification.tsx';
@@ -16,7 +16,8 @@ import type { INotificationHookProps } from './types/hooks/INotificationHook';
 import { LargeActivity } from './components/features/Feed/components/Activity/Large/LargeActivity.tsx';
 import Profile from './components/features/Feed/components/profile/Profile.tsx';
 import { AuthContext } from './context/authContext.ts';
-import type {IBasicUserInfo} from './types/components/IUser';
+import type { IBasicUserInfo } from './types/components/IUser';
+import ServerError from './components/features/ServerError/ServerError.tsx';
 
 const root = document.getElementById('root');
 const routes = createBrowserRouter([
@@ -24,6 +25,10 @@ const routes = createBrowserRouter([
     path: '/',
     element: <App />,
     children: [
+      {
+        path: '/error/server',
+        element: <ServerError />,
+      },
       {
         path: '/',
         element: (
@@ -58,6 +63,7 @@ const routes = createBrowserRouter([
       },
     ],
   },
+
   {
     path: '/auth',
     element: <Auth />,
@@ -86,7 +92,7 @@ function Main() {
   const [notification, setNotification] = useState<INotificationHookProps | null>();
   const [loggedIn, setLoggedIn] = useState<boolean>(false);
   const [user, setUser] = useState<IBasicUserInfo | undefined>(undefined);
-  
+
   function setNotify(notiContext: INotificationHookProps) {
     if (notification) {
       setNotification(() => null);
@@ -99,12 +105,12 @@ function Main() {
   function login(userData: IBasicUserInfo) {
     setLoggedIn(true);
     setUser(userData);
-    return !!userData
+    return !!userData;
   }
   function logout() {
     setLoggedIn(false);
     setUser(undefined);
-    return true
+    return true;
   }
 
   return (
@@ -118,4 +124,4 @@ function Main() {
 }
 
 createRoot(root!).render(<Main />);
-export default Main
+export default Main;
