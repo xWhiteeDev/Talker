@@ -9,12 +9,18 @@ import Input from '../../../../../generic/UI/Input/Input.tsx';
 import { handleSubmitAuthForm } from '../../../modules/authService.ts';
 import { registerValidationConfig } from '../../../assets/configuration.ts';
 import { validatorFunctions } from '../../../../../../services/validationMethods.ts';
-import { customNotificationCtx } from '../../../../../../context/customNotificationContext.ts';
+import useNotify from '../../../../../../hooks/useNotify.tsx';
 import { AuthContext } from '../../../../../../context/authContext.ts';
+
+const loginPacketData = {
+  transmisionEndpoint: 'login',
+  validationConfiguration: registerValidationConfig,
+  validationFunctions: validatorFunctions,
+};
 
 export default function Login() {
   const nav = useNavigate();
-  const notificationCtx = useContext(customNotificationCtx);
+  const { setNotification } = useNotify();
   const authCtx = useContext(AuthContext);
   return (
     <div className={style.sidebar}>
@@ -28,11 +34,15 @@ export default function Login() {
       <div className={style.section}>
         <form
           onSubmit={async (event) => {
-            await handleSubmitAuthForm(event, notificationCtx, authCtx, nav, {
-              transmisionEndpoint: 'login',
-              validationConfiguration: registerValidationConfig,
-              validationFunctions: validatorFunctions,
-            });
+            const authorizationResult = await handleSubmitAuthForm(event, setNotification, loginPacketData);
+            if (authorizationResult) {
+              if (authCtx) {
+                if (authorizationResult.success && authorizationResult.data) {
+                  authCtx.login(authorizationResult.data);
+                  await nav('/');
+                }
+              }
+            }
           }}
         >
           <CustomText text="Fill authorization fields" additionalStyle={{ fontWeight: '600', fontSize: '1.2rem' }} />
