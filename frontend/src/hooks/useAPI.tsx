@@ -1,17 +1,17 @@
 import { useNavigate } from 'react-router-dom';
 import { emitServer } from '../lib/API/emitServer';
 import { ErrorHandler } from '../lib/customError';
-import type { EmitMethod, EmitData, EmitResult } from '../types/API';
+import type { TEmitMethod, TEmitData, TEmitResult } from '../types/hooks/IAPI';
 import { useCallback, useContext, useRef } from 'react';
 import { refreshToken } from '../lib/API/refreshToken';
-import {AuthContext} from '../context/authContext';
+import { AuthContext } from '../context/authContext';
 
 export function useAPI() {
   const nav = useNavigate();
   const retry = useRef<boolean>(false);
-  const authContext = useContext(AuthContext)
+  const authContext = useContext(AuthContext);
   const request = useCallback(
-    async function request<T>(url: string, method: EmitMethod, data?: EmitData):Promise<EmitResult<T> | undefined> {
+    async function request<T>(url: string, method: TEmitMethod, data?: TEmitData): Promise<TEmitResult<T> | undefined> {
       try {
         const result = await emitServer<T>(url, method, data);
         return result;
@@ -20,14 +20,14 @@ export function useAPI() {
           if (error.code == 401) {
             if (retry.current === true) {
               nav('/auth/login');
-              authContext?.logout()
+              authContext?.logout();
               return;
             }
             retry.current = true;
             const refreshedNewToken = await refreshToken();
             if (!refreshedNewToken.success && refreshedNewToken.requiresLogin) {
               nav('/auth/login');
-              authContext?.logout()
+              authContext?.logout();
               return;
             }
             if (!refreshedNewToken.success && !refreshedNewToken.requiresLogin) {
@@ -35,8 +35,8 @@ export function useAPI() {
             }
             if (refreshedNewToken.success) {
               const res = await request<T>(url, method, data);
-              retry.current = false
-              return res
+              retry.current = false;
+              return res;
             }
           }
           throw error;
