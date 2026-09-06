@@ -7,7 +7,7 @@ import UserActivityInfo from '../../UserActivityInfo/UserActivityInfo';
 import CommentCreator from '../../CommentCreator/CommentCreator';
 import ActivityReactions from '../../ActivityReactions/ActivityReactions';
 import { Activity } from '../Activity';
-import type { ReactionUnion } from '../../../../../../types/VisualUnions';
+import type { TReactionUnion } from '../../../../../../types/components/IComponentsUnion';
 import useNotify from '../../../../../../hooks/useNotify';
 
 interface ActivityElements {
@@ -18,8 +18,8 @@ interface ActivityElements {
   content: string;
   createdAt: string;
   fullName: string;
-  reactions: Record<ReactionUnion, number>;
-  myReaction: ReactionUnion;
+  reactions: Record<TReactionUnion, number>;
+  myReaction: TReactionUnion;
   commentsCount: number;
   comments: ActivityElements[];
 }
@@ -52,18 +52,15 @@ export function LargeActivity() {
   }
   useEffect(() => {
     const query: string = commentid === undefined && postid ? `/api/posts/${postid}` : `/api/comments/${commentid}`;
-    request<ActivityElements>(query, 'GET')
-      .then((res) => {
-        if (!res || !res.success) {
-          throw new ErrorHandler('Failed to fetch comment', 400);
-        }
-        if (res.data) {
-          setActivityData(res.data);
-        }
-      })
-      .catch((err) => {
-        console.error(err);
-      });
+    (async () => {
+      const res = await request<ActivityElements>(query, 'GET');
+      if (!res || !res.success) {
+        throw new ErrorHandler('Failed to fetch comment', 400);
+      }
+      if (res.data) {
+        setActivityData(res.data);
+      }
+    })();
   }, [commentid, request]);
   return (
     activityData && (

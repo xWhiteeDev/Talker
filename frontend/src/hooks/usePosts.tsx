@@ -1,11 +1,11 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useAPI } from './useAPI';
-import type { PostRow } from '../types/Posthook';
 import { ErrorHandler } from '../lib/customError';
 import useNotify from './useNotify';
+import type { IPostShape } from '../types/hooks/IPostHook';
 
 export function usePosts() {
-  const [posts, setPosts] = useState<PostRow[] | undefined>(undefined);
+  const [posts, setPosts] = useState<IPostShape[] | undefined>(undefined);
   const [isLoading, setLoading] = useState<boolean>(true);
   const { request } = useAPI();
   const { setNotification } = useNotify();
@@ -13,14 +13,14 @@ export function usePosts() {
     async function refresh() {
       setLoading(true);
       try {
-        const result = await request<PostRow[]>('/api/posts', 'GET');
+        const result = await request<IPostShape[]>('/api/posts', 'GET');
         if (!result?.success || !result.data) {
           throw new ErrorHandler('Loading posts failure', 500);
         }
+        const postPacket = result.data;
         setPosts((prev) => {
           const existing = prev ?? [];
-          if (!result.data) return
-          const newPosts = result.data.filter((p: PostRow) => !existing.some((e) => e.id === p.id));
+          const newPosts = postPacket.filter((p: IPostShape) => !existing.some((e) => e.id === p.id));
           return [...existing, ...newPosts];
         });
       } catch (error) {
@@ -35,6 +35,11 @@ export function usePosts() {
     },
     [request],
   );
+  useEffect(() => {
+    (async () => {
+      await refresh();
+    })();
+  }, [refresh]);
 
   return { request, refresh, posts, isLoading };
 }
