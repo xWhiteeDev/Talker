@@ -5,13 +5,20 @@ import type { TEmitMethod, TEmitData, TEmitResult } from '../types/hooks/IAPI';
 import { useCallback, useContext, useRef } from 'react';
 import { refreshToken } from '../lib/API/refreshToken';
 import { AuthContext } from '../context/authContext';
+import useNotify from './useNotify';
 
 export function useAPI() {
   const nav = useNavigate();
   const retry = useRef<boolean>(false);
   const authContext = useContext(AuthContext);
+  const { setNotification } = useNotify();
   const request = useCallback(
-    async function request<T>(url: string, method: TEmitMethod, data?: TEmitData): Promise<TEmitResult<T> | undefined> {
+    async function request<T>(
+      url: string,
+      method: TEmitMethod,
+      data?: TEmitData,
+      isCritical?: boolean,
+    ): Promise<TEmitResult<T> | undefined> {
       try {
         const result = await emitServer<T>(url, method, data);
         return result;
@@ -38,6 +45,19 @@ export function useAPI() {
               retry.current = false;
               return res;
             }
+          }
+          if (error.code == 403) {
+            nav('/');
+            console.error('Forbidden 403');
+            throw new ErrorHandler(error.message, 403);
+          }
+          if (error.code >= 500 && !isCritical) {
+            setNotification('error', error.message);
+            throw new ErrorHandler(error.message, error.code);
+          }
+          if (error.code >= 500 && isCritical) {
+            nav('/server/error');
+            throw new ErrorHandler(error.message, error.code);
           }
           throw error;
         }
