@@ -4,7 +4,7 @@ import { refreshToken } from '../../../lib/API/refreshToken';
 import { Loading } from '../../generic/UI/Loading/Loading';
 import { AuthContext } from '../../../context/authContext';
 import { useAPI } from '../../../hooks/useAPI';
-import type {IUser} from '../../../types/User';
+import type { IBasicUserInfo } from '../../../types/components/IUser';
 
 type AuthorizationStatus = 'Unauthorized' | 'Authorized' | 'Checking';
 
@@ -27,12 +27,12 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
     }
     if (status == 'Authorized') {
       (async () => {
-        const result = await request<IUser>('/api/auth/isAuth', 'GET');
-        if (!result || (result && !result.success)) {
+        const result = await request<IBasicUserInfo>('/api/auth/isAuth', 'GET');
+        if (!result || (result && !result.success) || !result.data) {
           authContext?.logout();
           return;
         }
-        authContext?.login(result.data)
+        authContext?.login(result.data);
       })();
     }
   }, [status]);
