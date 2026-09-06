@@ -19,9 +19,13 @@ class SearchController implements ISearchController {
         return false;
       }
       const [firstString, lastString] = params.split(' ');
+      if (!firstString || !lastString) {
+        res.status(401).json({ success: false, data: undefined });
+        return false;
+      }
       const result = await this.searchService.get(firstString, lastString);
       if (result && result.length === 0) {
-        res.status(201).json({ success: true, data: undefined });
+        res.status(201).json({ success: false, data: undefined });
         return false;
       }
       res.status(201).json({ success: true, data: result });
