@@ -1,24 +1,18 @@
 import { useNavigate } from 'react-router-dom';
 import style from './Searchbar.module.css';
+import type { ISearchResult } from '../../../../types/components/ISearch';
 
 interface SearchbarProps {
   onSubmit(text: string): void;
   onInput(text: string): void;
   text: string;
-  results: IResult[];
+  results: ISearchResult[] | undefined;
 }
-interface IResult {
-  avatar: string;
-  fullName: string;
-  id: number;
-  onClick(): void;
-  moreSpecifiedInfo?: string | undefined;
-}
-interface ResultProps {
+interface SearchResultProps {
   name: string;
-  moreImportantInfo?: string;
   avatarUrl: string;
   onClick(): void;
+  moreImportantInfo?: string;
 }
 export default function Searchbar({ text, onInput, onSubmit, results }: SearchbarProps) {
   const nav = useNavigate();
@@ -33,7 +27,7 @@ export default function Searchbar({ text, onInput, onSubmit, results }: Searchba
           className={style.oneLineSearchInput}
           required
           onKeyDown={(keyEvent) => {
-            if (keyEvent.key == 'Enter') {
+            if (keyEvent.key === 'Enter') {
               if (text.length == 0) {
                 return;
               }
@@ -44,7 +38,7 @@ export default function Searchbar({ text, onInput, onSubmit, results }: Searchba
           min={0}
         />
       </div>
-      {results.length > 0 && (
+      {results && results.length > 0 && (
         <div className={style.results}>
           {results &&
             results.map((v, i) => (
@@ -53,7 +47,7 @@ export default function Searchbar({ text, onInput, onSubmit, results }: Searchba
                 name={v.fullName}
                 avatarUrl={v.avatar}
                 moreImportantInfo={v.moreSpecifiedInfo}
-                onClick={()=>nav(`/profile/${v.id}`)}
+                onClick={() => nav(`/profile/${v.id}`)}
               />
             ))}
         </div>
@@ -62,7 +56,7 @@ export default function Searchbar({ text, onInput, onSubmit, results }: Searchba
   );
 }
 
-const SearchResult = ({ name, moreImportantInfo, avatarUrl,  onClick }: ResultProps) => {
+const SearchResult = ({ name, moreImportantInfo, avatarUrl, onClick }: SearchResultProps) => {
   return (
     <div className={style.exampleresult} onClick={onClick}>
       <div className={style.avatar} style={{ backgroundImage: avatarUrl }}></div>
