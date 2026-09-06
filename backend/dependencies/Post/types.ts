@@ -46,6 +46,8 @@ export type PostInsertDTO = {
   tagged_users?: string[];
   pinned_place?: string;
 };
-export interface PostUpdateDTO extends Omit<PostInsertDTO, 'author' | 'authorId'> {}
+export interface PostUpdateDTO extends Omit<PostInsertDTO, 'author' | 'authorId'> {
+  id:number
+}
 
 type Visibility = 'Public' | 'Friends' | 'Private';
