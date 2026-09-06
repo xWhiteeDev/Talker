@@ -1,4 +1,4 @@
-export interface IUser {
+export interface IBasicUserInfo {
   birthDate: string;
   email: string;
   id: string;

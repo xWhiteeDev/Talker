@@ -1,10 +1,10 @@
 import type { ReactionUnion } from './VisualUnions';
 
-export interface ReactionCount {
+export interface IReactionCount {
   [key: string]: number;
 }
 
-export interface Comment {
+export interface ICommentShape {
   content: string;
   fullName: string;
   commentId: number;
@@ -14,7 +14,7 @@ export interface Comment {
   commentsCount: number;
 }
 
-export interface PostRow {
+export interface IPostShape {
   id: number;
   createdAt: string;
   authorId: number;
