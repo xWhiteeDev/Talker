@@ -1,6 +1,6 @@
-import type {GlobalConfiguration} from "../../../../types/Validator";
+import type {IGlobalConfiguration} from "../../../../types/services/IValidator";
 
-export const registerValidationConfig: GlobalConfiguration = {
+export const registerValidationConfig: IGlobalConfiguration = {
     password: {
         length:
         {
@@ -26,7 +26,7 @@ export const registerValidationConfig: GlobalConfiguration = {
         minimalAge: 14
     }
 };
-export const loginValidationConfig: GlobalConfiguration = {
+export const loginValidationConfig: IGlobalConfiguration = {
     email: {
         length: {
             min: 5,

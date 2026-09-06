@@ -1,10 +1,10 @@
 import { useCallback, useState } from 'react';
-import type { ReactionHookUnionType, ReactionUnion } from '../types/VisualUnions';
+import type { TReactionHookUnionType, TReactionUnion } from '../types/components/IComponentsUnion';
 import { useAPI } from './useAPI';
 import { ErrorHandler } from '../lib/customError';
 import useNotify from './useNotify';
 
-const defaultReactions: Record<ReactionUnion, number> = {
+const defaultReactions: Record<TReactionUnion, number> = {
   love: 0,
   like: 0,
   wow: 0,
@@ -12,10 +12,10 @@ const defaultReactions: Record<ReactionUnion, number> = {
   sad: 0,
 };
 
-export function useReaction(serverReactions: Partial<Record<ReactionUnion, number>>, userReaction?: ReactionUnion) {
+export function useReaction(serverReactions: Partial<Record<TReactionUnion, number>>, userReaction?: TReactionUnion) {
   const [unifiedReactions, setUnifiedReactions] = useState<{
-    counts: Record<ReactionUnion, number>;
-    activeReaction: ReactionUnion | undefined;
+    counts: Record<TReactionUnion, number>;
+    activeReaction: TReactionUnion | undefined;
   }>({
     counts: { ...defaultReactions, ...serverReactions },
     activeReaction: userReaction ?? undefined,
@@ -23,7 +23,7 @@ export function useReaction(serverReactions: Partial<Record<ReactionUnion, numbe
   const { request } = useAPI();
   const { setNotification } = useNotify();
   const toggle = useCallback(
-    async function toggle(newReactionName: ReactionUnion, column: ReactionHookUnionType, postId: number, commentId?: number) {
+    async function toggle(newReactionName: TReactionUnion, column: TReactionHookUnionType, postId: number, commentId?: number) {
       const hookData = {
         endpoint: '',
         data: {},

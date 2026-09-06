@@ -1,14 +1,14 @@
-import type {ReactionUnion} from "../../../../../types/VisualUnions";
+import type {TReactionUnion} from "../../../../../types/components/IComponentsUnion";
 import style from "./Reaction.module.css";
 
  interface ReactionProps {
-    name: ReactionUnion;
+    name: TReactionUnion;
     count: number;
     isActive: boolean;
     onReactionAdd(name: string): void;
 
 }
- const reactionsEmoji: Record<ReactionUnion, string> = {
+ const reactionsEmoji: Record<ReactioTReactionUnionnUnion, string> = {
   love: "❤️",
   like: "👍",
   wow: "😮",

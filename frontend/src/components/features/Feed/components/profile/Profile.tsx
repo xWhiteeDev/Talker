@@ -3,7 +3,7 @@ import style from './Profile.module.css';
 import { useAPI } from '../../../../../hooks/useAPI';
 import Tab from './Tab/Tab';
 import { Activity } from '../Activity/Activity';
-import type { ReactionUnion } from '../../../../../types/VisualUnions';
+import type { TReactionUnion } from '../../../../../types/components/IComponentsUnion';
 import { useNavigate, useParams } from 'react-router-dom';
 interface IProfile {
   fullName: string;
@@ -19,8 +19,8 @@ interface IContent {
   content: string;
   visibleFor: 'Public' | 'Friends' | 'Private';
   fullName: string;
-  reactions: Record<ReactionUnion, number>;
-  myReaction: ReactionUnion;
+  reactions: Record<TReactionUnion, number>;
+  myReaction: TReactionUnion;
   commentsCount: number;
   photo: string | null;
   video: string | null;

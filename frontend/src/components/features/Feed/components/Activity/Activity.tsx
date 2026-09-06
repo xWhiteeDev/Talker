@@ -1,5 +1,5 @@
 import style from './Activity.module.css';
-import type { ReactionUnion } from '../../../../../types/VisualUnions';
+import type { TReactionUnion } from '../../../../../types/components/IComponentsUnion';
 import UserActivityInfo from '../UserActivityInfo/UserActivityInfo';
 import ActivityReactions from '../ActivityReactions/ActivityReactions';
 import {memo} from 'react';
@@ -10,8 +10,8 @@ interface ActivityProps {
   content: string;
   createdAt: string;
   postId: number;
-  userReaction: ReactionUnion;
-  commentReactions: Record<ReactionUnion, number>;
+  userReaction: TReactionUnion;
+  commentReactions: Record<TReactionUnion, number>;
   subCommentsCount: number;
   onFocus(): void;
   commentId?: number;
@@ -28,7 +28,7 @@ export const Activity = memo(function Activity({
   postId,
   commentReactions,
   userReaction,
-  subCommentsCount, //TODO
+  subCommentsCount,
   onFocus,
 }: ActivityProps) {
   return (

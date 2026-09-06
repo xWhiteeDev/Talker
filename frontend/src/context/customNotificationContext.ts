@@ -1,4 +1,4 @@
 import { createContext } from "react";
-import type {CustomNotificationContext} from "../types/Context";
+import type {ICustomNotificationContext} from "../types/context/IContext";
 
-export const CustomNotificationCtx= createContext<CustomNotificationContext | undefined>(undefined);
+export const CustomNotificationCtx= createContext<ICustomNotificationContext | undefined>(undefined);
