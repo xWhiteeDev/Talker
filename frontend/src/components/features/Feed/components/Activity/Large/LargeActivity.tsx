@@ -8,7 +8,6 @@ import CommentCreator from '../../CommentCreator/CommentCreator';
 import ActivityReactions from '../../ActivityReactions/ActivityReactions';
 import { Activity } from '../Activity';
 import type { TReactionUnion } from '../../../../../../types/components/IComponentsUnion';
-import useNotify from '../../../../../../hooks/useNotify';
 
 interface ActivityElements {
   postId: number;
@@ -29,25 +28,16 @@ export function LargeActivity() {
   const { request } = useAPI();
   const [activityData, setActivityData] = useState<ActivityElements | undefined>(undefined);
   const [commentText, setCommentText] = useState<string>();
-  const { setNotification } = useNotify();
   const nav = useNavigate();
 
   async function addComment() {
-    try {
-      const result = await request('/api/comments', 'POST', {
-        postId: +postid!,
-        parentId: commentid,
-        content: commentText,
-      });
-      if (!result || !result.success) {
-        throw new ErrorHandler(`Adding commment fault for ${commentid} `, 500);
-      }
-    } catch (error) {
-      if (error instanceof ErrorHandler) {
-        setNotification('error', error.message);
-      } else {
-        setNotification('error', 'Unknown server error!');
-      }
+    const result = await request('/api/comments', 'POST', {
+      postId: +postid!,
+      parentId: commentid,
+      content: commentText,
+    });
+    if (!result || !result.success) {
+      throw new ErrorHandler(`Adding commment fault for ${commentid} `, 500);
     }
   }
   useEffect(() => {
