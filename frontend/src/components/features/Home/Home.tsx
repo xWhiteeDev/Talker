@@ -12,6 +12,7 @@ import FriendsLayer from './components/FriendsLayer/FriendsLayer';
 import SearchLayer from './components/SearchLayer/SearchLayer';
 import type { IOptionList } from './components/OptionLayer/types';
 import useNotify from '../../../hooks/useNotify';
+import { ErrorHandler } from '../../../lib/customError';
 
 export default function Home() {
   const [postText, setPostText] = useState<string | undefined>(undefined);
@@ -39,7 +40,7 @@ export default function Home() {
           homeClickCount.current = 0;
         } else {
           optionReference.current?.scrollTo(0, 0);
-          if (timeoutId) return;
+          if (timeoutId) return
           timeoutId.current = setTimeout(() => {
             homeClickCount.current = 0;
           }, 3000);
@@ -79,21 +80,13 @@ export default function Home() {
       visible_for: visibility,
       content: postText,
     };
-    try {
-      const res = await request<boolean>('/api/posts', 'POST', payload);
-      if (res?.success) {
-        setNotification('success', 'Post added!');
-        await refresh();
-        setPostText(undefined);
-      } else {
-        throw new Error('Post cannot be added');
-      }
-    } catch (error) {
-      if (error instanceof Error) {
-        setNotification('error', error.message);
-      } else {
-        setNotification('error', 'Unknown error!');
-      }
+    const res = await request<boolean>('/api/posts', 'POST', payload);
+    if (res?.success) {
+      setNotification('success', 'Post added!');
+      await refresh();
+      setPostText(undefined);
+    } else {
+      throw new ErrorHandler('Post cannot be added', 400);
     }
   }
 
