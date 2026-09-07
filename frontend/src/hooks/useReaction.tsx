@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react';
 import type { TReactionHookUnionType, TReactionUnion } from '../types/components/IComponentsUnion';
 import { useAPI } from './useAPI';
 import { ErrorHandler } from '../lib/customError';
+import useNotify from './useNotify';
 
 const defaultReactions: Record<TReactionUnion, number> = {
   love: 0,
@@ -20,50 +21,59 @@ export function useReaction(serverReactions: Partial<Record<TReactionUnion, numb
     activeReaction: userReaction ?? undefined,
   });
   const { request } = useAPI();
+  const { setNotification } = useNotify();
   const toggle = useCallback(
     async function toggle(newReactionName: TReactionUnion, column: TReactionHookUnionType, postId: number, commentId?: number) {
       const hookData = {
         endpoint: '',
         data: {},
       };
-      if (column === 'POST') {
-        hookData.endpoint = '/api/postReactions/';
-        hookData.data = { type: newReactionName, postId: postId };
-      } else if (column === 'COMMENT') {
-        hookData.endpoint = '/api/commentReactions/';
-        hookData.data = {
-          type: newReactionName,
-          postId: postId,
-          commentId: commentId,
-        };
-      }
-      const result = await request<boolean>(hookData.endpoint, 'POST', hookData.data);
-      if (!result || !result.success) {
-        throw new ErrorHandler(`Reaction request failed for ${column}`, 500);
-      }
-      setUnifiedReactions((prev) => {
-        const next = { ...prev };
-        const reactionCounts = { ...prev.counts };
-        if (next.activeReaction) {
-          if (next.activeReaction == newReactionName) {
-            reactionCounts[next.activeReaction] -= 1;
-            next.activeReaction = undefined;
-            return {
-              counts: reactionCounts,
-              activeReaction: undefined,
-            };
-          }
-          reactionCounts[next.activeReaction] -= 1;
+      try {
+        if (column === 'POST') {
+          hookData.endpoint = '/api/postReactions/';
+          hookData.data = { type: newReactionName, postId: postId };
+        } else if (column === 'COMMENT') {
+          hookData.endpoint = '/api/commentReactions/';
+          hookData.data = {
+            type: newReactionName,
+            postId: postId,
+            commentId: commentId,
+          };
         }
-        reactionCounts[newReactionName] += 1;
-        next.activeReaction = newReactionName;
-        return {
-          counts: reactionCounts,
-          activeReaction: next.activeReaction,
-        };
-      });
+        const result = await request<boolean>(hookData.endpoint, 'POST', hookData.data);
+        if (!result || !result.success) {
+          throw new ErrorHandler(`Reaction request failed for ${column}`, 500);
+        }
+        setUnifiedReactions((prev) => {
+          const next = { ...prev };
+          const reactionCounts = { ...prev.counts };
+          if (next.activeReaction) {
+            if (next.activeReaction == newReactionName) {
+              reactionCounts[next.activeReaction] -= 1;
+              next.activeReaction = undefined;
+              return {
+                counts: reactionCounts,
+                activeReaction: undefined,
+              };
+            }
+            reactionCounts[next.activeReaction] -= 1;
+          }
+          reactionCounts[newReactionName] += 1;
+          next.activeReaction = newReactionName;
+          return {
+            counts: reactionCounts,
+            activeReaction: next.activeReaction,
+          };
+        });
+      } catch (error) {
+        let errorMessage: string = 'Reaction adding problem. Try again later.';
+        if (error instanceof ErrorHandler || error instanceof Error) {
+          errorMessage = error.message;
+        }
+        setNotification('error', errorMessage);
+      }
     },
-    [request],
+    [request,setNotification],
   );
   return { unifiedReactions, toggle };
 }

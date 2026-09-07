@@ -2,11 +2,13 @@ import { useCallback, useEffect, useState } from 'react';
 import { useAPI } from './useAPI';
 import { ErrorHandler } from '../lib/customError';
 import type { IPostShape } from '../types/hooks/IPostHook';
+import useNotify from './useNotify';
 
 export function usePosts() {
   const [posts, setPosts] = useState<IPostShape[] | undefined>(undefined);
   const [isLoading, setLoading] = useState<boolean>(true);
   const { request } = useAPI();
+  const { setNotification } = useNotify();
   const refresh = useCallback(
     async function refresh() {
       setLoading(true);
@@ -21,6 +23,14 @@ export function usePosts() {
           const newPosts = postPacket.filter((p: IPostShape) => !existing.some((e) => e.id === p.id));
           return [...existing, ...newPosts];
         });
+      } catch (error) {
+        if (error instanceof ErrorHandler) {
+          setNotification('error', error.message);
+          throw new ErrorHandler(error.message, error.code);
+        } else {
+          setNotification('error', 'Unknown message caught on post loading');
+          throw error;
+        }
       } finally {
         setLoading(false);
       }
