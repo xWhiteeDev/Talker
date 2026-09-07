@@ -16,12 +16,12 @@ export interface IGlobalConfiguration {
 
 export interface IValidationFunctions {
   trim: TTrimFunction;
-  length: TTrimFunction;
+  length: TLengthFunction;
   regex: TRegexFunction;
   minimalAge: TMinimalAgeFunction;
 }
 
-export type TLengthFunction = (value: string, rules: IConfiguration) => boolean;
+export type TLengthFunction = (value: string, rules: IConfigurationLength) => boolean;
 export type TTrimFunction = (value: string, rules: boolean) => boolean;
 export type TRegexFunction = (value: string, rules: RegExp) => boolean;
 export type TMinimalAgeFunction = (date: string, rules: number) => boolean;
