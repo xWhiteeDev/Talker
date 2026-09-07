@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import style from './MenuOption.module.css';
 import { fetchImage } from '../../../../services/fetchImageService';
+import { ErrorHandler } from '../../../../lib/customError';
+import useNotify from '../../../../hooks/useNotify';
 interface MenuOptionProps {
   text: string;
   onClick?: () => void;
@@ -12,14 +14,24 @@ export default function MenuOption({ text, onClick, icon }: MenuOptionProps) {
   const words = text.split(' ');
   const firstWord = words[0];
   const restWord = words.slice(1).join(' ');
+  const { setNotification } = useNotify();
   useEffect(() => {
-    if (icon)
-      fetchImage(`${icon}.svg`)
-        .then((res) => {
-          setIconString(res);
-        })
-        .catch((err) => console.error('Failed to load icon for MenuOption!', icon));
-  }, []);
+    (async () => {
+      try {
+        const res = await fetchImage(`${icon}.svg`);
+        if (!res) {
+          throw new ErrorHandler('Failed to load icon for MenuOption', 400);
+        }
+        setIconString(res);
+      } catch (err) {
+        if (err instanceof ErrorHandler) {
+          setNotification('error', err.message);
+        } else {
+          setNotification('error', 'Unknown error in MenuOption');
+        }
+      }
+    })();
+  }, [icon, setNotification]);
 
   return (
     <div className={style.container}>
