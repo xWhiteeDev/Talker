@@ -42,4 +42,9 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    transition: 4s linear all;
+}
+
+.buttoncontainer :hover {
+    opacity: 0.5;
 }
