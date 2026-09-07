@@ -51,13 +51,13 @@ export function useAPI() {
             console.error('Forbidden 403');
             throw new ErrorHandler(error.message, 403);
           }
-          if (error.code >= 500 && !isCritical) {
-            setNotification('error', error.message);
-            throw new ErrorHandler(error.message, error.code);
-          }
-          if (error.code >= 500 && isCritical) {
-            nav('/server/error');
-            throw new ErrorHandler(error.message, error.code);
+          if (error.code >= 500 && error.code < 600) {
+            if (!isCritical) {
+              setNotification('error', error.message);
+            } else {
+              nav(`/error/server/${error.code}`);
+              return
+            }
           }
           throw error;
         }
