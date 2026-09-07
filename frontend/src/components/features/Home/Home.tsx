@@ -21,7 +21,7 @@ export default function Home() {
   const { refresh, posts, isLoading } = usePosts();
   const nav = useNavigate();
   const location = useLocation();
-  const optionReference = useRef<HTMLDivElement>(undefined);
+  const optionReference = useRef<HTMLDivElement | null>(null);
 
   const homeClickCount = useRef<number>(0);
   const timeoutId = useRef<number | undefined>(undefined);
@@ -40,7 +40,7 @@ export default function Home() {
           homeClickCount.current = 0;
         } else {
           optionReference.current?.scrollTo(0, 0);
-          if (timeoutId) return
+          if (timeoutId.current) return;
           timeoutId.current = setTimeout(() => {
             homeClickCount.current = 0;
           }, 3000);
