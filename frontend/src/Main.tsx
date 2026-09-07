@@ -26,7 +26,7 @@ const routes = createBrowserRouter([
     element: <App />,
     children: [
       {
-        path: '/error/server',
+        path: '/error/server/:errorcode',
         element: <ServerError />,
       },
       {
