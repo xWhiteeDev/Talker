@@ -5,6 +5,7 @@ import Tab from './Tab/Tab';
 import { Activity } from '../Activity/Activity';
 import type { TReactionUnion } from '../../../../../types/components/IComponentsUnion';
 import { useNavigate, useParams } from 'react-router-dom';
+import Button from '../../../../generic/UI/Button/Button';
 interface IProfile {
   fullName: string;
   birthdayDate: string;
@@ -75,6 +76,12 @@ export default function Profile() {
             <Tab header="Description" text={profile.description} />
           </div>
         </div>
+        {id && (
+          <div className={style.relationButtons}>
+            <Button text="+ Invite to friends" />
+          </div>
+        )}
+
         <div className={style.profileItems}>
           <div className={style.friendsList}>
             <div className={style.friendsHeader}>
@@ -85,6 +92,7 @@ export default function Profile() {
               {id && <span className={style.zero}>0 Friends</span>}
             </div>
           </div>
+
           <div className={style.contentList}>
             <div className={style.contentHeader}>
               <span>Content</span>
