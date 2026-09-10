@@ -12,7 +12,7 @@ export interface IFriendshipRepository {
 export interface IFriendshipService {
     findRelationById(id: number): Promise<FriendsRelation>;
     findRelationByUserId(id: number): Promise<FriendsRelation[]>;
-    findRelationBetween(userId: number, otherId: number): Promise<FriendsRelation>;
+    findRelationBetween(userId: number, otherId: number): Promise<FriendsRelation | null>;
     insertRelation(dto: FriendsRelationInsertDTO): Promise<boolean>;
     updateRelation(userId: number, otherId: number, dto: FriendsRelationUpdateDTO): Promise<boolean>;
     removeRelation(userId: number, otherId: number): Promise<boolean>;
