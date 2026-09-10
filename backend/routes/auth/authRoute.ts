@@ -1,4 +1,4 @@
-import express, { type Request, type Response } from 'express';
+import express, { type Request} from 'express';
 import { authController } from '../../loader/dependencyLoader.js';
 import { isDataValid, isRefreshTokenValid, isAccessTokenActive } from '../../middleware/middleware.js';
 import type { IRequirementOptions } from '../../middleware/types.js';

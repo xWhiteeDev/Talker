@@ -6,7 +6,7 @@ import type { DecodedPayload, IRequirement } from './types.js';
 
 configDotenv();
 export function isDataValid(requirements: IRequirement) {
-  return (req: Request, res: Response, next: NextFunction) => {
+  return (req: Request, _res: Response, next: NextFunction) => {
     try {
       const data = req.body.data;
       if (!data) {
@@ -66,7 +66,7 @@ export function isDataValid(requirements: IRequirement) {
 }
 
 export function isRefreshTokenValid() {
-  return async (req: Request, res: Response, next: NextFunction) => {
+  return async (req: Request, _res: Response, next: NextFunction) => {
     const refreshToken: string | undefined = req.cookies['refreshToken'];
     if (!refreshToken) {
       throw new ErrorHandler('Unauthorised without refresh token', 401, true);
@@ -81,7 +81,7 @@ export function isRefreshTokenValid() {
 }
 
 export function isAccessTokenActive() {
-  return async (req: Request, res: Response, next: NextFunction) => {
+  return async (req: Request, _res: Response, next: NextFunction) => {
     const accessToken: string = req.cookies['accessToken'];
     if (!accessToken) {
       throw new ErrorHandler('Unauthorised', 401, true);

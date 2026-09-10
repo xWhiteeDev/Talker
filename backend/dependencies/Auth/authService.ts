@@ -1,7 +1,7 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { configDotenv } from 'dotenv';
-import type { IAccountInsertDTO, IAccountRow, IAccountService, IUser } from '../Account/types.js';
+import type { IAccountInsertDTO,  IAccountService, IUser } from '../Account/types.js';
 import { ErrorHandler } from '../../handlers/errorHandler.js';
 import type { IAuthService, ILogin, IUserAuthorizationPassport } from './types.js';
 
