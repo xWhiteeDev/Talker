@@ -15,10 +15,9 @@ export class friendshipService implements IFriendshipService {
         if (!existingRelation) throw new ErrorHandler('Relations not found', 400);
         return existingRelation;
     }
-    async findRelationBetween(userId: number, otherId: number): Promise<FriendsRelation> {
+    async findRelationBetween(userId: number, otherId: number): Promise<FriendsRelation | null> {
         const existingRelation = await this.FriendRepository.findRelationBetween(userId, otherId);
-        if (!existingRelation) throw new ErrorHandler('Relation not found', 400);
-        return existingRelation;
+        return existingRelation ?? null; 
     }
     async insertRelation(dto: FriendsRelationInsertDTO): Promise<boolean> {
         if (dto.userId === dto.friendId) throw new ErrorHandler('Cannot add yourself as friend', 400);
