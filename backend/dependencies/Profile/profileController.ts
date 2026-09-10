@@ -1,5 +1,5 @@
 import type { Request, Response, NextFunction } from 'express';
-import type {  IProfileController, IProfileService } from './types.js';
+import type { IProfileController, IProfileService } from './types.js';
 import type { IUser } from '../Account/types.js';
 import { ErrorHandler } from '../../handlers/errorHandler.js';
 
@@ -8,12 +8,16 @@ class ProfileController implements IProfileController {
   async getUser(req: Request, res: Response, next: NextFunction): Promise<boolean> {
     try {
       const user: IUser = req.currentUser;
-      const requestedId = +req.params['id']
+      if (!req.params['id']) {
+        next(new ErrorHandler('Failed to get id property.', 400)); //TODO:Check tomorrow
+        return false
+      }
+      const requestedId = +req.params['id'];
       if (!user) {
         next(new ErrorHandler('Failed to get user property.', 400));
         return false;
       }
-      const profileData = await this.profileService.get(user.id,requestedId);
+      const profileData = await this.profileService.get(user.id, requestedId);
       res.status(200).json({ success: true, data: profileData });
       return true;
     } catch (error) {
@@ -21,7 +25,7 @@ class ProfileController implements IProfileController {
       return false;
     }
   }
-   async getMe(req: Request, res: Response, next: NextFunction): Promise<boolean> {
+  async getMe(req: Request, res: Response, next: NextFunction): Promise<boolean> {
     try {
       const user: IUser = req.currentUser;
 
@@ -29,7 +33,7 @@ class ProfileController implements IProfileController {
         next(new ErrorHandler('Failed to get user property.', 400));
         return false;
       }
-      const profileData = await this.profileService.get(user.id,user.id);
+      const profileData = await this.profileService.get(user.id, user.id);
       res.status(200).json({ success: true, data: profileData });
       return true;
     } catch (error) {
