@@ -10,6 +10,7 @@ import { commentReactionRouter, postReactionRouter } from '../routes/reaction/re
 import { commmentRouter } from '../routes/comment/commentRoute.js';
 import { profileRouter } from '../routes/profile/profileRoute.js';
 import { searchRouter } from '../routes/search/searchRoute.js';
+import { friendsRouter } from '../routes/friends/friendsRoute.js';
 dotEnv.config();
 const cfg = {
   serverPort: process.env['TALKER_SERVER_PORT'] ?? 3000,
@@ -17,7 +18,7 @@ const cfg = {
   connectionFaultMessage: process.env['TALKER_SERVER_CONNECTION_FAULT'] ?? '❌ Something went wrong with server connection ❌',
 };
 
-function globalMiddleware(err: ErrorHandler, req: Request, res: Response, next: NextFunction) {
+function globalMiddleware(err: ErrorHandler, _req: Request, res: Response, _next: NextFunction) {
   if (err.name !== 'ErrorHandler') {
     console.error(err);
 
@@ -34,7 +35,16 @@ function globalMiddleware(err: ErrorHandler, req: Request, res: Response, next: 
 }
 
 const app = express();
-app.use(cors({ origin: ['http://localhost:5173', 'http://127.0.0.1:5173'], credentials: true }));
+
+const corsOptions = {
+  origin: ['http://localhost:5173', 'http://127.0.0.1:5173'],
+  credentials: true,
+  methods: ['POST', 'GET', 'PATCH', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Access-Control-Allow-Methods'],
+  optionsSuccessStatus: 204,
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieparser());
 app.use('/api/auth', authRouter);
@@ -42,9 +52,9 @@ app.use('/api/posts', postRouter);
 app.use('/api/postReactions', postReactionRouter);
 app.use('/api/comments', commmentRouter);
 app.use('/api/commentReactions', commentReactionRouter);
-
 app.use('/api/profile', profileRouter);
 app.use('/api/search', searchRouter);
+app.use('/api/friends', friendsRouter);
 
 app.use(globalMiddleware);
 
