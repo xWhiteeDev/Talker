@@ -11,8 +11,14 @@ interface IProfile {
   joinDate: string;
   description: string;
   content: any; //ANY REMOVE
+  relation?:IProfileRelation | null
 }
 interface IProfileBody {
   id: number;
+}
+
+interface IProfileRelation {
+  status:null |'pending' | 'accepted';
+  creator:number
 }
 export type { IProfileService, IProfileController, IProfile, IProfileBody };
