@@ -16,6 +16,6 @@ friendsRouter.patch('/invites', isAccessTokenActive(), validateOtherUser(), asyn
 friendsRouter.delete('/invites', isAccessTokenActive(), validateOtherUser(), async (req, res, next) => {
     await friendsController.removeRelation(req, res, next);
 });
-friendsRouter.get('/invites/:otherid', isAccessTokenActive(), validateOtherUser(), async (req, res, next) => {
-    await friendsController.areInRelation(req, res, next);
-});
+// friendsRouter.get('/invites/:otherid', isAccessTokenActive(), validateOtherUser(), async (req, res, next) => {
+//     await friendsController.areInRelation(req, res, next);
+// }); TODO: Unused route for that moment
