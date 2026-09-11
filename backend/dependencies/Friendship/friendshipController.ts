@@ -8,7 +8,12 @@ export class friendshipController implements IFriendshipController {
   async areInRelation(req: Request, res: Response, next: NextFunction) {
     try {
       const user: currentUser = req.currentUser;
-      const result = await this.friendshipService.findRelationBetween(user.id, req.otherUserId!);
+      const otherId = req.body.data.otherId;
+      if (!otherId || (otherId && (isNaN(otherId) || otherId == undefined))) {
+        res.status(400).json({ success: false });
+        return false;
+      }
+      const result = await this.friendshipService.findRelationBetween(user.id, otherId);
       res.status(200).json({ success: true, data: result });
       return !!result;
     } catch (error) {
@@ -20,7 +25,12 @@ export class friendshipController implements IFriendshipController {
     try {
       const user: currentUser = req.currentUser;
       const otherId = req.body.data.otherId;
-      if (otherId && (isNaN(otherId) || otherId == undefined)) {
+      if (!otherId || (otherId && (isNaN(otherId) || otherId == undefined))) {
+        res.status(400).json({ success: false });
+        return false;
+      }
+      const areActuallyInAnyRelation = await this.friendshipService.findRelationBetween(user.id, otherId);
+      if (areActuallyInAnyRelation) {
         res.status(400).json({ success: false });
         return false;
       }
@@ -44,11 +54,10 @@ export class friendshipController implements IFriendshipController {
     try {
       const user: currentUser = req.currentUser;
       const otherId = req.body.data.otherId;
+
       const result = await this.friendshipService.removeRelation(user.id, otherId);
-      if (!result) {
-        next(new ErrorHandler('Failed to remove relation', 400));
-        return false;
-      }
+
+ 
       res.status(200).json({ success: true, data: result });
       return true;
     } catch (error) {
