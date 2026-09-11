@@ -5,11 +5,11 @@ export class PostRepository implements IPostRepository {
     console.log(`\x1b[32;1m🚀[PostRepository] Pool injected \x1b[0m`);
   }
   async findById(id: number, currentUserId: number, withDetails?: boolean): Promise<PostRow | undefined> {
-let query: string = `
+    let query: string = `
   SELECT 
     posts.id, 
     posts.created_at, 
-    posts.author_id, 
+    posts.author_id as authorId, 
     posts.content, 
     posts.visible_for, 
     posts.photo, 
@@ -23,30 +23,22 @@ let query: string = `
   LEFT JOIN accounts AS a 
     ON a.id = posts.author_id 
   WHERE 
-    posts.id = :id 
+    posts.id = :id
     AND (
       posts.visible_for = 'Public' 
       OR (
-        posts.visible_for = 'Friends' 
+        posts.visible_for = 'Friends'
         AND EXISTS (
           SELECT 1 
           FROM friendships 
-          WHERE (
-            userId = :currentUserId 
-            AND friendId = posts.author_id  
-            AND status = 'accepted'
-          ) 
-          OR (
-            userId = posts.author_id 
-            AND friendId = :currentUserId 
-            AND status = 'accepted'
-          )
+          WHERE (userId = :currentUserId AND friendId = posts.author_id AND status = 'accepted') 
+          OR (userId = posts.author_id AND friendId = :currentUserId AND status = 'accepted')         
         )
       ) 
       OR (
         posts.visible_for = 'Private' 
         AND posts.author_id = :currentUserId
-      )
+      ) or posts.author_id = :currentUserId
     )
   LIMIT 1
 `;
@@ -283,11 +275,11 @@ WHERE p.id = :id`;
       authorId: dto.authorId,
       content: dto.content,
       visible_for: dto.visible_for,
-      photo: JSON.stringify(dto.photo) ?? null,
-      video: JSON.stringify(dto.video) ?? null,
-      file: JSON.stringify(dto.file) ?? null,
-      gif: JSON.stringify(dto.gif) ?? null,
-      tagged_users: JSON.stringify(dto.tagged_users) ?? null,
+      photo: dto.photo && dto.photo?.length > 0 ? JSON.stringify(dto.photo) : null,
+      video: dto.video && dto.video?.length > 0 ? JSON.stringify(dto.video) : null,
+      file: dto.file && dto.file?.length > 0 ? JSON.stringify(dto.file) : null,
+      gif: dto.gif && dto.gif.length > 0 ? JSON.stringify(dto.gif) : null,
+      tagged_users: dto.tagged_users ? JSON.stringify(dto.tagged_users) : null,
       pinned_place: dto.pinned_place ?? null,
     });
     return result.affectedRows > 0;
@@ -311,7 +303,7 @@ WHERE p.id = :id`;
       if (dto[key] == undefined) continue;
       const fullKeyName: string = `${key}=:${key}`;
       updateKeys.push(fullKeyName);
-      if (typeof dto[key] == 'object') {
+      if (typeof dto[key] == 'object' && dto[key] !== null) {
         updateParams[key] = JSON.stringify(dto[key]);
       } else {
         updateParams[key] = dto[key];
@@ -379,14 +371,16 @@ WHERE p.id = :id`;
         FROM friendships 
         WHERE (userId = :userId OR friendId = :userId) 
           AND status = 'accepted'
-      )
-    )
+      ) OR posts.author_id=:userId
+    ) OR (posts.visible_for = 'Private' AND posts.author_id=:userId)
   ) 
   GROUP BY posts.id 
   ORDER BY posts.id DESC
 `;
 
     const [result] = await this.pool.query<PostRow[]>(query, { userId });
+    console.log(result);
+
     return result;
   }
 }
