@@ -16,7 +16,7 @@ export class friendshipRepository implements IFriendshipRepository {
         return result as FriendsRelation[] | undefined;
     }
     async findRelationBetween(userId: number, otherId: number): Promise<FriendsRelation | undefined> {
-        const query: string = 'SELECT * FROM friendships WHERE(userId=:userId AND friendId=:otherId) OR (userId=:otherId and friendId=:userId) LIMIT 1';
+        const query: string = `SELECT * FROM friendships WHERE(userId=:userId AND friendId=:otherId) OR (userId=:otherId and friendId=:userId) LIMIT 1`;
         const [[result]] = await this.pool.query<FriendsRelationRow[]>(query, {userId, otherId});
         return result as FriendsRelation | undefined;
     }
