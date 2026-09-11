@@ -13,11 +13,10 @@ export class AuthController implements IAuthController {
     try {
       const result = await this.authService.signUp(req.body.data);
       if (!result) {
-        next();
+        next(new ErrorHandler('Failed to create account', 400,false));
         return false;
       }
       res.status(200).json({ status: true, data: result });
-      next();
       return true;
     } catch (error) {
       next(error);
@@ -32,7 +31,7 @@ export class AuthController implements IAuthController {
         password: data.password,
       });
       if (!signResult) {
-        next();
+        next(new ErrorHandler('Failed to sign in', 500,false));
         return false;
       }
       res.cookie('accessToken', signResult.access, {
@@ -59,7 +58,6 @@ export class AuthController implements IAuthController {
       };
       req['currentUser'] = currentUserPayload;
       res.status(200).json({ success: true, data: currentUserPayload });
-      next();
       return true;
     } catch (error) {
       next(error);
@@ -79,7 +77,6 @@ export class AuthController implements IAuthController {
       maxAge: 5 * 60 * 1000,
     });
     res.status(200).json({ success: true, data: { id } });
-    next();
     return true;
   }
   async isAuthorized(req: Request, res: Response, next: NextFunction):Promise<boolean> {
