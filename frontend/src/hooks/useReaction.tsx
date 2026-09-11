@@ -22,12 +22,15 @@ export function useReaction(serverReactions: Partial<Record<TReactionUnion, numb
   });
   const { request } = useAPI();
   const { setNotification } = useNotify();
+  const [isPending, setPending] = useState<boolean>(false);
+
   const toggle = useCallback(
     async function toggle(newReactionName: TReactionUnion, column: TReactionHookUnionType, postId: number, commentId?: number) {
       const hookData = {
         endpoint: '',
         data: {},
       };
+      setPending(true);
       try {
         if (column === 'POST') {
           hookData.endpoint = '/api/postReactions/';
@@ -40,7 +43,8 @@ export function useReaction(serverReactions: Partial<Record<TReactionUnion, numb
             commentId: commentId,
           };
         }
-        const result = await request<boolean>(hookData.endpoint, 'POST', hookData.data);
+        const method = userReaction === newReactionName ? 'DELETE' : 'POST';
+        const result = await request<boolean>(hookData.endpoint, method, hookData.data);
         if (!result || !result.success) {
           throw new ErrorHandler(`Reaction request failed for ${column}`, 500);
         }
@@ -71,9 +75,12 @@ export function useReaction(serverReactions: Partial<Record<TReactionUnion, numb
           errorMessage = error.message;
         }
         setNotification('error', errorMessage);
+      } finally {
+        setPending(false);
       }
     },
-    [request,setNotification],
+    [request, setNotification],
   );
-  return { unifiedReactions, toggle };
+
+  return { unifiedReactions, toggle, isPending };
 }
