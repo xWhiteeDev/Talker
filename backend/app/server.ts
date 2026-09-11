@@ -11,6 +11,7 @@ import { commmentRouter } from '../routes/comment/commentRoute.js';
 import { profileRouter } from '../routes/profile/profileRoute.js';
 import { searchRouter } from '../routes/search/searchRoute.js';
 import { friendsRouter } from '../routes/friends/friendsRoute.js';
+import jwt from 'jsonwebtoken';
 dotEnv.config();
 const cfg = {
   serverPort: process.env['TALKER_SERVER_PORT'] ?? 3000,
@@ -18,20 +19,20 @@ const cfg = {
   connectionFaultMessage: process.env['TALKER_SERVER_CONNECTION_FAULT'] ?? '❌ Something went wrong with server connection ❌',
 };
 
-function globalMiddleware(err: ErrorHandler, _req: Request, res: Response, _next: NextFunction) {
-  if (err.name !== 'ErrorHandler') {
-    console.error(err);
-
-    res.status(500).json({ success: false, code: 500, message: 'Internal server error' });
+function globalMiddleware(err: Error, _req: Request, res: Response, _next: NextFunction) {
+  if (err instanceof ErrorHandler) {
+    if (!err.isOperational) {
+      res.status(500).json({ success: false, code: 500, message: 'Internal server error' });
+    } else {
+      res.status(err.code).json({ success: false, code: err.code, message: err.message });
+    }
     return;
   }
-  if (!err.isOperational) {
-    console.error(err);
-    res.status(500).json({ success: false, code: 500, message: 'Internal server error' });
+  if (err instanceof jwt.TokenExpiredError || err instanceof jwt.JsonWebTokenError) {
+    res.status(401).json({ success: false, code: 401, message: 'Invalid or expired token' });
     return;
   }
-  console.error(err);
-  res.status(err.code).json({ success: false, code: err.code, message: err.message });
+  res.status(500).json({ success: false, code: 500, message: 'Internal server error' });
 }
 
 const app = express();
