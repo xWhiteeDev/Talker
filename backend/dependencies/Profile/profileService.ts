@@ -1,7 +1,9 @@
 import { ErrorHandler } from '../../handlers/errorHandler.js';
-import type { IAccountService } from '../Account/types.js';
+import type { IAccountRow, IAccountService } from '../Account/types.js';
 import type { friendshipService } from '../Friendship/friendshipService.js';
+import type { FriendsRelation } from '../Friendship/types.js';
 import type { PostService } from '../Post/postService.js';
+import type { PostRow } from '../Post/types.js';
 import type { IProfile, IProfileService } from './types.js';
 
 class ProfileService implements IProfileService {
@@ -19,42 +21,42 @@ class ProfileService implements IProfileService {
       if (typeof userId !== 'number') {
         throw new ErrorHandler('User ID must be a number', 400);
       }
-      if (typeof requestedId !== 'number' && requestedId == undefined) {
+      if (typeof requestedId !== 'number' || requestedId < 0) {
         throw new ErrorHandler('RequestId cannot be a value which is not a number!', 400);
       }
-      const accountProfileProperties =
-        userId !== requestedId
-          ? await this.accountService.findUserById(requestedId)
-          : await this.accountService.findUserById(userId);
 
-      if (!accountProfileProperties) {
-        throw new ErrorHandler('Account not found', 404);
-      }
-      const [content, friendshipRelation] = await Promise.all([
-        this.postService.findByAuthor(userId, requestedId),
-        this.friendshipsService.findRelationBetween(userId, requestedId),
-      ]);
+      let accountProfileProperties: IAccountRow | null;
+      let content: PostRow[] | null = null;
+      let friendshipRelation: FriendsRelation | null;
+
       if (userId === requestedId) {
-        return {
-          fullName: accountProfileProperties.firstName + ' ' + accountProfileProperties.lastName,
-          birthdayDate: accountProfileProperties.birthdayDate,
-          joinDate: accountProfileProperties.created_at,
-          description: 'My hardcoded description',
-          content: content,
-        };
+        content = await this.postService.findByAuthor(userId, userId);
+        accountProfileProperties = await this.accountService.findUserById(requestedId);
+        friendshipRelation = null;
       } else {
-        return {
-          fullName: accountProfileProperties.firstName + ' ' + accountProfileProperties.lastName,
-          birthdayDate: accountProfileProperties.birthdayDate,
-          joinDate: accountProfileProperties.created_at,
-          description: 'My hardcoded description',
-          content: content,
-          relation:friendshipRelation ? {
-            status: friendshipRelation.status,
-            creator: friendshipRelation.userId,
-          } : null,
-        };
+        [content, friendshipRelation] = await Promise.all([
+          this.postService.findByAuthor(userId, requestedId),
+          this.friendshipsService.findRelationBetween(userId, requestedId),
+        ]);
+        accountProfileProperties = await this.accountService.findUserById(requestedId);
       }
+      if (!accountProfileProperties) {
+        throw new ErrorHandler('Account not found', 404, true);
+      }
+      return {
+        fullName: accountProfileProperties.firstName + ' ' + accountProfileProperties.lastName,
+        birthdayDate: accountProfileProperties.birthdayDate,
+        joinDate: accountProfileProperties.created_at,
+        description: 'My hardcoded description',
+        content: content,
+        relation:
+          friendshipRelation
+            ? {
+                status: friendshipRelation.status,
+                creator: friendshipRelation.userId,
+              }
+            : null,
+      };
     } catch (error) {
       throw error;
     }
