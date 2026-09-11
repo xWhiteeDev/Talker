@@ -24,20 +24,21 @@ interface ActivityElements {
 }
 
 export function LargeActivity() {
-  const { commentid, postid } = useParams();
+  const { commentid, postid } = useParams<string>();
   const { request } = useAPI();
   const [activityData, setActivityData] = useState<ActivityElements | undefined>(undefined);
   const [commentText, setCommentText] = useState<string>();
   const nav = useNavigate();
 
   async function addComment() {
+    //TODO: ADD PARAMETERS CHECKING
     const result = await request('/api/comments', 'POST', {
-      postId: +postid!,
-      parentId: commentid,
+      postId: +postid,
+      parentId: +commentid,
       content: commentText,
     });
     if (!result || !result.success) {
-      throw new ErrorHandler(`Adding commment fault for ${commentid} `, 500);
+      throw new ErrorHandler(`Adding commment fault for ${+commentid} `, 500);
     }
   }
   useEffect(() => {
@@ -51,7 +52,7 @@ export function LargeActivity() {
         setActivityData(res.data);
       }
     })();
-  }, [commentid, request]);
+  }, [commentid, request, postid]);
   return (
     activityData && (
       <div className={style.container}>
