@@ -19,7 +19,6 @@ export class PostService implements IPostService {
       existingPost = await this.PostRepository.findById(id, userId);
     }
     if (!existingPost) throw new ErrorHandler('Post does not exist', 404);
-
     const postVisibility = existingPost.visible_for;
     if (postVisibility === 'Public') {
       return existingPost;
@@ -57,7 +56,7 @@ export class PostService implements IPostService {
     return result;
   }
   async updatePost(userId: number, id: number, dto: PostUpdateDTO): Promise<boolean> {
-    const existingPost: PostRow | undefined = await this.PostRepository.findById(id);
+    const existingPost: PostRow | undefined = await this.PostRepository.findById(id, userId);
     if (!existingPost) throw new ErrorHandler('Post does not exist', 404);
     if (userId !== existingPost.authorId) throw new ErrorHandler('Access denied', 403);
     const result = await this.PostRepository.update(id, dto);
@@ -67,7 +66,7 @@ export class PostService implements IPostService {
     return result;
   }
   async deletePost(userId: number, id: number): Promise<boolean> {
-    const existingPost: PostRow | undefined = await this.PostRepository.findById(id);
+    const existingPost: PostRow | undefined = await this.PostRepository.findById(id, userId);
     if (!existingPost) throw new ErrorHandler('Post does not exist', 404);
     if (userId !== existingPost.authorId) throw new ErrorHandler('Access denied', 403);
     const result = await this.PostRepository.delete(id);
