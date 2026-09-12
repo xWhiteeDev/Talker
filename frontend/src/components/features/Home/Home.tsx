@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import style from './Home.module.css';
 import Logo from '../../generic/UI/Logo/Logo';
 import { useAPI } from '../../../hooks/useAPI';
@@ -13,12 +13,14 @@ import SearchLayer from './components/SearchLayer/SearchLayer';
 import type { IOptionList } from './components/OptionLayer/types';
 import useNotify from '../../../hooks/useNotify';
 import { ErrorHandler } from '../../../lib/customError';
+import { AuthContext } from '../../../context/authContext';
 
 export default function Home() {
   const [postText, setPostText] = useState<string | undefined>(undefined);
   const [visibility, setVisibility] = useState<string | undefined>(undefined);
   const { request } = useAPI();
   const { refresh, posts, isLoading } = usePosts();
+  const authContext = useContext(AuthContext);
   const nav = useNavigate();
   const location = useLocation();
   const optionReference = useRef<HTMLDivElement | null>(null);
@@ -132,10 +134,18 @@ export default function Home() {
                 createdAt={v.createdAt}
                 commentReactions={v.reactions}
                 userReaction={v.myReaction}
+                visibleFor={v.visibleFor}
                 postId={v.id}
                 subCommentsCount={v.commentsCount}
                 onFocus={() => {
                   nav(`post/${v.id}`);
+                }}
+                onUserClick={() => {
+                  if (authContext && +authContext.user?.id === v.authorId) {
+                    nav(`profile/me`);
+                  } else {
+                    nav(`profile/${v.authorId}`);
+                  }
                 }}
               />
             ))}

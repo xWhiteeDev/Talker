@@ -54,13 +54,13 @@ export default function Profile() {
   useEffect(() => {
     const endpoint: string = id ?? 'me';
     (async () => {
+
       const result = await request<IProfile>(`/api/profile/${endpoint}`, 'GET');
       if (!result || (result && !result.success) || !result.data) {
         nav('/');
         console.error('Failed to fetch profile!');
         return;
       }
-      console.log(result.data);
       setProfile(result.data);
       if (result.data.relation) {
         setRelation((prev) => {
@@ -72,7 +72,7 @@ export default function Profile() {
         });
       }
     })();
-  }, [id, nav, request]);
+  }, [id, nav, request, authContext?.user?.id]);
 
   async function addRequestToFriends(otherId: number) {
     if (isNaN(otherId) || otherId == null) {
@@ -100,7 +100,6 @@ export default function Profile() {
       return;
     }
     if (!id || (id && (isNaN(+id) || +id < 0))) {
-      console.log(id);
       console.error('Requested id cannot be any other type than number and cannot be lower than 0!');
       return;
     }
@@ -161,7 +160,7 @@ export default function Profile() {
             <Tab header="Description" text={profile.description} />
           </div>
         </div>
-        {id && authContext?.user && (
+        {id && authContext && authContext.user && (
           <div className={style.relationButtons}>
             {!relation && (
               <Button
