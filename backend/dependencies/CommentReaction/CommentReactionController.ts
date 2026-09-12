@@ -22,15 +22,21 @@ export class CommentReactionController {
         comment_id: reactionBody.commentId,
       };
       const requestedPost = await this.postService.findById(user.id, reactionBody.postId);
+
       if (!requestedPost) {
         next(new ErrorHandler('Access denied', 400));
         return false;
       }
       const comment = await this.commentsService.findCommentByCommentId(user.id, reactionBody.commentId);
+      if (!comment) {
+        next(new ErrorHandler('Comment not exist!', 400));
+        return false;
+      }
       if (comment.postId !== requestedPost.id) {
         next(new ErrorHandler('Comment is not part of that post!', 400));
         return false;
       }
+
       const result = await this.commentReactionService.insertCommentReaction(payload);
       if (!result) {
         next(new ErrorHandler('Failed to push reaction', 400));
