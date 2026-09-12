@@ -7,7 +7,10 @@ export class friendshipController implements IFriendshipController {
   constructor(private friendshipService: IFriendshipService) {}
   async areInRelation(req: Request, res: Response, next: NextFunction) {
     try {
-      const user: currentUser = req.currentUser;
+      const user: currentUser | undefined = req.currentUser;
+       if (!user) {
+        throw new ErrorHandler('Unauthorised', 401)
+      }
       const otherId = req.body.data.otherId;
       if (!otherId || isNaN(otherId) || otherId < 0) {
         res.status(400).json({ success: false });
@@ -23,7 +26,10 @@ export class friendshipController implements IFriendshipController {
   }
   async setRelation(req: Request, res: Response, next: NextFunction) {
     try {
-      const user: currentUser = req.currentUser;
+      const user: currentUser | undefined = req.currentUser;
+       if (!user) {
+        throw new ErrorHandler('Unauthorised', 401)
+      }
       const otherId = req.body.data.otherId;
       if (!otherId || isNaN(otherId) || otherId < 0) {
         res.status(400).json({ success: false });
@@ -52,7 +58,10 @@ export class friendshipController implements IFriendshipController {
   }
   async removeRelation(req: Request, res: Response, next: NextFunction) {
     try {
-      const user: currentUser = req.currentUser;
+      const user: currentUser | undefined = req.currentUser;
+       if (!user) {
+        throw new ErrorHandler('Unauthorised', 401)
+      }
       const otherId = req.body.data.otherId;
       if (!otherId || isNaN(otherId) || otherId < 0) {
         res.status(400).json({ success: false });
@@ -68,7 +77,10 @@ export class friendshipController implements IFriendshipController {
   }
   async acceptRelation(req: Request, res: Response, next: NextFunction) {
     try {
-      const user: currentUser = req.currentUser;
+      const user: currentUser | undefined = req.currentUser;
+       if (!user) {
+        throw new ErrorHandler('Unauthorised', 401)
+      }
       const otherId = req.body.data.otherId;
       const result = await this.friendshipService.acceptRelation(user.id, otherId);
       if (!result) {

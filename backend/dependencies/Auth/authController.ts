@@ -97,8 +97,7 @@ export class AuthController implements IAuthController {
       if (!req.currentUser) {
         throw new ErrorHandler('Unauthorized', 401, true);
       }
-      const { id }: IUser = req.currentUser;
-      const user = await this.authService.isAuthorized(+id);
+      const user = await this.authService.isAuthorized(+req.currentUser.id);
       if (!user) {
        throw new ErrorHandler('User not exist', 400);
       }

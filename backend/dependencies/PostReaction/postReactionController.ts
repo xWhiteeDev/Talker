@@ -12,7 +12,10 @@ export class PostReactionController {
   async createReaction(req: Request, res: Response, next: NextFunction) {
     try {
       const reactionBody = req.body.data;
-      const user: currentUser = req.currentUser;
+      const user: currentUser | undefined = req.currentUser;
+       if (!user) {
+        throw new ErrorHandler('Unauthorised', 401)
+      }
       const payload: PostReactionInsertDTO = {
         authorId: user.id,
         type: reactionBody.type,
@@ -37,7 +40,10 @@ export class PostReactionController {
   }
   async deleteReaction(req: Request, res: Response, next: NextFunction) {
     const reactionBody = req.body.data;
-    const user: currentUser = req.currentUser;
+    const user: currentUser | undefined = req.currentUser;
+     if (!user) {
+        throw new ErrorHandler('Unauthorised', 401)
+      }
     try {
       const result = await this.postReactionService.deleteUserReactionInPost(user.id, reactionBody.postId);
       if (!result) {

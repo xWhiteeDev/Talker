@@ -1,16 +1,19 @@
 import type { Request, Response, NextFunction } from 'express';
 import type { IProfileController, IProfileService } from './types.js';
-import type { IUser } from '../Account/types.js';
+import type { currentUser } from '../Account/types.js';
 import { ErrorHandler } from '../../handlers/errorHandler.js';
 
 class ProfileController implements IProfileController {
   constructor(private profileService: IProfileService) {}
   async getUser(req: Request, res: Response, next: NextFunction): Promise<boolean> {
     try {
-      const user: IUser = req.currentUser;
+      const user: currentUser | undefined = req.currentUser;
+      if (!user) {
+        throw new ErrorHandler('Unauthorised', 401);
+      }
       if (!req.params['id']) {
         next(new ErrorHandler('Failed to get id property.', 400)); //TODO:Check tomorrow
-        return false
+        return false;
       }
       const requestedId = +req.params['id'];
       if (!user) {
@@ -27,8 +30,10 @@ class ProfileController implements IProfileController {
   }
   async getMe(req: Request, res: Response, next: NextFunction): Promise<boolean> {
     try {
-      const user: IUser = req.currentUser;
-
+      const user: currentUser | undefined = req.currentUser;
+      if (!user) {
+        throw new ErrorHandler('Unauthorised', 401);
+      }
       if (!user) {
         next(new ErrorHandler('Failed to get user property.', 400));
         return false;
