@@ -1,7 +1,7 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { configDotenv } from 'dotenv';
-import type { IAccountInsertDTO,  IAccountService, IUser } from '../Account/types.js';
+import type { IAccountInsertDTO, IAccountService, IUser } from '../Account/types.js';
 import { ErrorHandler } from '../../handlers/errorHandler.js';
 import type { IAuthService, ILogin, IUserAuthorizationPassport } from './types.js';
 
@@ -41,6 +41,7 @@ export class AuthService implements IAuthService {
   }
   async signUp(document: IAccountInsertDTO): Promise<boolean | null> {
     const result = await this.accountService.insertUser(document);
+
     return result;
   }
   signNewToken(userId: number, tokenType: 'access' | 'refresh'): string {

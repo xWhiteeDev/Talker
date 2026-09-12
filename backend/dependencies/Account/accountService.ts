@@ -20,7 +20,6 @@ export class AccountService implements IAccountService {
         } catch (error) {
             return false;
         }
-
         const result = await this.accountRepository.insert(payload);
         return result;
     }
