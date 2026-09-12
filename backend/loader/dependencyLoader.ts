@@ -46,7 +46,7 @@ export const commmentsController = new CommentsController(commentsService, postS
 
 const commentReactionRepository = new CommentReactionRepository(dbPool);
 const commentReactionService = new CommentReactionService(commentReactionRepository);
-export const commentReactionController = new CommentReactionController(commentReactionService, postService);
+export const commentReactionController = new CommentReactionController(commentReactionService, postService,commentsService);
 
 export const profileService = new ProfileService(accountService, postService, friendsService);
 
