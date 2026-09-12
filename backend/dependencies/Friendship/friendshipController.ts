@@ -9,7 +9,7 @@ export class friendshipController implements IFriendshipController {
     try {
       const user: currentUser = req.currentUser;
       const otherId = req.body.data.otherId;
-      if (!otherId || (otherId && (isNaN(otherId) || otherId == undefined))) {
+      if (!otherId || isNaN(otherId) || otherId < 0) {
         res.status(400).json({ success: false });
         return false;
       }
@@ -25,7 +25,7 @@ export class friendshipController implements IFriendshipController {
     try {
       const user: currentUser = req.currentUser;
       const otherId = req.body.data.otherId;
-      if (!otherId || (otherId && (isNaN(otherId) || otherId == undefined))) {
+      if (!otherId || isNaN(otherId) || otherId < 0) {
         res.status(400).json({ success: false });
         return false;
       }
@@ -54,10 +54,11 @@ export class friendshipController implements IFriendshipController {
     try {
       const user: currentUser = req.currentUser;
       const otherId = req.body.data.otherId;
-
+      if (!otherId || isNaN(otherId) || otherId < 0) {
+        res.status(400).json({ success: false });
+        return false;
+      }
       const result = await this.friendshipService.removeRelation(user.id, otherId);
-
- 
       res.status(200).json({ success: true, data: result });
       return true;
     } catch (error) {
