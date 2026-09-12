@@ -11,30 +11,26 @@ export class CommentsController implements ICommentsController {
   ) {}
 
   async insertComment(req: Request, res: Response, next: NextFunction): Promise<boolean> {
-    const data: CommentBody | undefined = req.body.data;
-    const user: currentUser = req.currentUser;
-
-    if (!data || !user) {
-      next();
-      return false;
-    }
-    const canSeeThisPost = await this.postService.findById(user.id, data.postId);
-    if (!canSeeThisPost) {
-      next(new ErrorHandler('Access denied', 400));
-      return false;
-    }
-    const payload: CommentInsertDTO = {
-      post_id: data.postId,
-      user_id: user.id,
-      parent_id: data.parentId,
-      content: data.content,
-    };
-
     try {
+      const data: CommentBody | undefined = req.body.data;
+      const user: currentUser | undefined = req.currentUser;
+
+      if (!data || !user) {
+        throw new ErrorHandler('Invalid data', 400);
+      }
+      const canSeeThisPost = await this.postService.findById(user.id, data.postId);
+      if (!canSeeThisPost) {
+        throw new ErrorHandler('Access denied', 400);
+      }
+      const payload: CommentInsertDTO = {
+        post_id: data.postId,
+        user_id: user.id,
+        parent_id: data.parentId,
+        content: data.content,
+      };
       const result = await this.CommentsService.insertComment(payload);
       if (!result) {
-        next(new ErrorHandler('Failed to insert comment', 400));
-        return false;
+        throw new ErrorHandler('Failed to insert comment', 400);
       }
       res.status(201).json({ success: true, data: result });
       return true;
@@ -44,21 +40,18 @@ export class CommentsController implements ICommentsController {
     }
   }
   async findByPostId(req: Request, res: Response, next: NextFunction) {
-    const user: currentUser = req.currentUser;
-    if (!user) {
-      next(new ErrorHandler('User not assigned', 403));
-      return false;
-    }
-    let commentid = req.params['id'];
-    if (!commentid) {
-      next(new ErrorHandler('Comment id missing', 400));
-      return false;
-    }
     try {
+      const user: currentUser | undefined = req.currentUser;
+      if (!user) {
+        throw new ErrorHandler('User not assigned', 403);
+      }
+      let commentid = req.params['id'];
+      if (!commentid) {
+        throw new ErrorHandler('Comment id missing', 400);
+      }
       const result = await this.CommentsService.findCommentByCommentId(user.id, +commentid);
       if (!result) {
-        next(new ErrorHandler('Failed to find comment', 400));
-        return false;
+        throw new ErrorHandler('Failed to find comment', 400);
       }
       res.status(201).json({ success: true, data: result });
       return true;
