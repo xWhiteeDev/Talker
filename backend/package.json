@@ -20,7 +20,10 @@
     "dev": "tsx watch app/server.ts"
   },
   "devDependencies": {
+    "@types/cookie-parser": "^1.4.10",
+    "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/mysql": "^2.15.27",
     "@types/node": "^26.0.0",
     "tsx": "^4.22.4",
