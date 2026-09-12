@@ -7,16 +7,13 @@ class SearchController implements ISearchController {
   constructor(private searchService: ISearchService) {}
   async getByCriteria(req: Request, res: Response, next: NextFunction): Promise<boolean> {
     try {
-      const user: currentUser = req.currentUser;
+      const user: currentUser | undefined = req.currentUser;
       const params = req.query['criteria'] as string;
       if (!user || user.id == undefined || typeof user.id !== 'number') {
-        new ErrorHandler('Unauthorized', 401);
-        next('Unauthorized');
-        return false;
+        throw new ErrorHandler('Unauthorized', 401);
       }
       if (!params || typeof params !== 'string' || params.trim().length === 0) {
-        new ErrorHandler('Parameters fault', 400);
-        return false;
+       throw new ErrorHandler('Parameters fault', 400);
       }
       const [firstString, lastString] = params.split(' ');
       if (!firstString || !lastString) {
@@ -35,7 +32,7 @@ class SearchController implements ISearchController {
         res.status(error.code).json({ success: false, data: error.message });
       }
       next(error);
-      throw error;
+      return false
     }
   }
 }
