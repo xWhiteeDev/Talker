@@ -8,6 +8,9 @@ class SearchController implements ISearchController {
   async getByCriteria(req: Request, res: Response, next: NextFunction): Promise<boolean> {
     try {
       const user: currentUser | undefined = req.currentUser;
+      if (!user) {
+        throw new ErrorHandler('Unauthorised', 401)
+      }
       const params = req.query['criteria'] as string;
       if (!user || user.id == undefined || typeof user.id !== 'number') {
         throw new ErrorHandler('Unauthorized', 401);
@@ -28,9 +31,6 @@ class SearchController implements ISearchController {
       res.status(201).json({ success: true, data: result });
       return true;
     } catch (error) {
-      if (error instanceof ErrorHandler) {
-        res.status(error.code).json({ success: false, data: error.message });
-      }
       next(error);
       return false
     }
