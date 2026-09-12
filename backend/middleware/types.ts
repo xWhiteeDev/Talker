@@ -19,7 +19,3 @@ export interface IRequirementOptions {
 
 type AllowedRequirementType = 'string' | 'number' | 'array' | 'object'
 
-export interface DecodedPayload extends JwtPayload {
-    id:number;
-    tokenType:string;
-}
