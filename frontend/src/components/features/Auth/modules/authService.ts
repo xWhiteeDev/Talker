@@ -32,7 +32,7 @@ export async function handleSubmitAuthForm(
   const transmisionUrl = `/api/auth/${authorizationInfo.transmisionEndpoint}`;
   try {
     const res = await emitServer<IBasicUserInfo>(transmisionUrl, 'POST', objectifiedFormData);
-    if (!res || (res && !res.success)) {
+    if (!res || res.success === false) {
       throw new ErrorHandler('Failed to authorize', 400);
     }
     return { success: res.success, data: res.data };
