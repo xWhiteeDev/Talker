@@ -1,69 +1,63 @@
-import express, { type Request} from 'express';
+import express, { type Request } from 'express';
 import { authController } from '../../loader/dependencyLoader.js';
 import { isDataValid, isRefreshTokenValid, isAccessTokenActive } from '../../middleware/middleware.js';
-import type { IRequirementOptions } from '../../middleware/types.js';
+import type { IObjectRequirements } from '../../services/types.js';
 
 export const authRouter = express.Router();
 
-const registerCfg: Record<string, IRequirementOptions> = {
+const registerConfig: IObjectRequirements = {
   email: {
-    minLength: 5,
-    maxLength: 35,
     type: 'string',
-    isRequired: true,
-    trimmed: true,
+    requirements: {
+      minLength: 5,
+      maxLength: 100,
+    },
   },
   password: {
-    minLength: 5,
-    maxLength: 200,
     type: 'string',
-    isRequired: true,
-    trimmed: true,
+    requirements: {
+      minLength: 5,
+      maxLength: 100,
+    },
   },
   firstName: {
-    minLength: 3,
-    maxLength: 15,
     type: 'string',
-    isRequired: true,
-    trimmed: true,
+    requirements: {
+      minLength: 2,
+      maxLength: 34,
+    },
   },
   lastName: {
-    minLength: 3,
-    maxLength: 15,
     type: 'string',
-    isRequired: true,
-    trimmed: true,
-  },
-  birthdayDate: {
-    minLength: 3,
-    maxLength: 32,
-    type: 'string',
-    isRequired: true,
-    trimmed: true,
+    requirements: {
+      minLength: 2,
+      maxLength: 34,
+    },
   },
 };
 
-const loginCfg: Record<string, IRequirementOptions> = {
+const loginConfig: IObjectRequirements = {
   email: {
-    minLength: 5,
-    maxLength: 35,
     type: 'string',
-    isRequired: true,
-    trimmed: true,
+    requirements: {
+      minLength: 6,
+      maxLength: 100,
+    },
   },
   password: {
-    minLength: 5,
-    maxLength: 200,
     type: 'string',
-    isRequired: true,
-    trimmed: true,
+    requirements: {
+      minLength: 5,
+      maxLength: 100,
+    },
   },
 };
-authRouter.post('/register', isDataValid(registerCfg), async (req, res, next) => {
+
+authRouter.post('/register', isDataValid(registerConfig), async (req, res, next) => {
   await authController.createUser(req, res, next);
 });
 
-authRouter.post('/login', isDataValid(loginCfg), async (req, res, next) => {
+authRouter.post('/login', isDataValid(loginConfig), async (req, res, next) => {
   await authController.signIn(req, res, next);
 });
 authRouter.post('/refresh', isRefreshTokenValid(), async (req, res, next) => {
