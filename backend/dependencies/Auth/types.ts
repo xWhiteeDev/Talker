@@ -17,7 +17,13 @@ export interface ILogin {
   email: string;
   password: string;
 }
-
+export interface IUserRegisterPayload {
+  email:string;
+  password:string;
+  birthdayDate:string;
+  firstName:string;
+  lastName:string;
+}
 export interface IUserAuthorizationPassport {
   username: string;
   email: string;
