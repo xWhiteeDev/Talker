@@ -17,8 +17,7 @@ export function isDataValid(requirements: IObjectRequirements) {
       }
       const isValid = ReqValid.validateObject(data, requirements);
       if (!isValid) {
-        new ErrorHandler('Provided data is not valid!', 400);
-        return false;
+        throw new ErrorHandler('Provided data is not valid!', 400);
       }
       next();
       return true;

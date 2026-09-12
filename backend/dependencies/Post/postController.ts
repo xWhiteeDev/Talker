@@ -53,8 +53,7 @@ export class PostController {
         try {
             const user: currentUser | undefined = req.currentUser;
             if (!user) {
-                next(new ErrorHandler('User does not have their identifier', 400));
-                return false;
+                throw new ErrorHandler('User does not have their identifier', 400)
             }
             const data = req.body.data;
             const payload: PostInsertDTO = {
@@ -64,8 +63,7 @@ export class PostController {
             };
             const insertingResult = await this.PostService.insertPost(payload);
             if (!insertingResult) {
-                next(new ErrorHandler('Insert action goes wrong', 500));
-                return false;
+               throw new ErrorHandler('Insert action goes wrong', 500)
             }
             res.status(200).json({success: true, data: insertingResult});
             return insertingResult;

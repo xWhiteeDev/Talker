@@ -79,6 +79,7 @@ export class AuthController implements IAuthController {
   createNewToken(req: Request, res: Response, next: NextFunction) {
     if (!req.currentUser) {
       next(new ErrorHandler('Unauthorized', 401, true));
+      return false;
     }
     const { id } = req.currentUser;
     const signedToken = this.authService.signNewToken(id, 'access');
@@ -92,15 +93,14 @@ export class AuthController implements IAuthController {
     return true;
   }
   async isAuthorized(req: Request, res: Response, next: NextFunction): Promise<boolean> {
-    if (!req.currentUser) {
-      next(new ErrorHandler('Unauthorized', 401, true));
-    }
     try {
+      if (!req.currentUser) {
+        throw new ErrorHandler('Unauthorized', 401, true);
+      }
       const { id }: IUser = req.currentUser;
       const user = await this.authService.isAuthorized(+id);
       if (!user) {
-        new ErrorHandler('User not exist', 400);
-        return false;
+       throw new ErrorHandler('User not exist', 400);
       }
       const currentUserPayload = {
         username: user.username,
@@ -114,7 +114,7 @@ export class AuthController implements IAuthController {
       return true;
     } catch (error) {
       next(error);
+      return false;
     }
-    return true;
   }
 }
