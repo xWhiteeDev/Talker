@@ -14,7 +14,7 @@ export interface ICommentsRepository {
 export interface ICommentsService {
   findCommentsByPost(postId: number): Promise<CommentRow[] | null>;
   findUserCommentsByPostId(postId: number): Promise<CommentRow[] | null>;
-  findCommentByCommentId(userId: number, commentId: number): Promise<FoundComment>;
+  findCommentByCommentId(userId: number, commentId: number): Promise<FoundComment | null>;
   findCommentsByParentId(parentId: number): Promise<CommentRow[] | null>;
   insertComment(dto: CommentInsertDTO): Promise<boolean>;
   updateCommentContent(commentId: number, newContent: string): Promise<boolean>;
