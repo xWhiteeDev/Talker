@@ -33,6 +33,7 @@ export interface IStringRequirements {
     minLength: number;
     maxLength: number;
     trimmed?: boolean;
+    expectedValues?:string[]
     regex?: RegExp
 }
 export interface IArrayRequirements {

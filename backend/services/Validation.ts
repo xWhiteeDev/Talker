@@ -65,6 +65,9 @@ export class ReqValid {
     if (requirements.trimmed) {
       toValidate = toValidate.trim();
     }
+    if (requirements.expectedValues && !requirements.expectedValues.includes(toValidate)) {
+      return false;
+    }
     if (requirements.regex) {
       return requirements.regex.test(toValidate);
     }
