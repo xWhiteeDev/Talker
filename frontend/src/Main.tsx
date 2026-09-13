@@ -92,7 +92,6 @@ function Main() {
   const [notification, setNotification] = useState<INotificationHookProps | null>();
   const [loggedIn, setLoggedIn] = useState<boolean>(false);
   const [user, setUser] = useState<IBasicUserInfo | undefined>(undefined);
-
   function setNotify(notiContext: INotificationHookProps) {
     if (notification) {
       setNotification(() => null);
@@ -110,7 +109,7 @@ function Main() {
   function logout() {
     setLoggedIn(false);
     setUser(undefined);
-    return true;
+    return true
   }
 
   return (
