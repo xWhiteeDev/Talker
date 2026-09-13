@@ -5,10 +5,29 @@ import type {IObjectRequirements} from '../../services/types.js';
 
 export const commmentRouter = express.Router();
 const commentConfig:IObjectRequirements = {
+    postId: {
+        type:'number',
+        requirements:{
+            canBeNull:false,
+        }
+    },
+    parentId: {
+        type:'number',
+        requirements:{
+            canBeNull:true
+        }
+    },
+    content: {
+        type:'string',
+        requirements:{
+            canBeNull:false,
+            minLength:3,
+            maxLength:200
+        }
+    }
 
 }
-//TODO Tomorrow: Remember parentId will be sometimes null!
-commmentRouter.post('/',isDataValid(commentConfig), isAccessTokenActive(), async (req, res, next) => {
+commmentRouter.post('/', isAccessTokenActive(),isDataValid(commentConfig), async (req, res, next) => {
     await commmentsController.insertComment(req, res, next);
 });
 
