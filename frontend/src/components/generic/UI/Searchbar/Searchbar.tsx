@@ -1,10 +1,14 @@
 import { useNavigate } from 'react-router-dom';
 import style from './Searchbar.module.css';
 import type { ISearchResult } from '../../../../types/components/ISearch';
+import { useContext, useEffect, useState } from 'react';
+import { fetchImage } from '../../../../services/fetchImageService';
+import { AuthContext } from '../../../../context/authContext';
 
 interface SearchbarProps {
   onSubmit(text: string): void;
   onInput(text: string): void;
+  onUserClick():void
   text: string;
   results: ISearchResult[] | undefined;
 }
@@ -14,8 +18,17 @@ interface SearchResultProps {
   onClick(): void;
   moreImportantInfo?: string;
 }
-export default function Searchbar({ text, onInput, onSubmit, results }: SearchbarProps) {
+export default function Searchbar({ text, onInput, onSubmit, onUserClick,results }: SearchbarProps) {
+  const [defaultImage, setDefaultImage] = useState<string>();
+  useEffect(() => {
+    (async () => {
+      const img = await fetchImage('unk_person.png');
+      setDefaultImage(img);
+      console.log(img);
+    })();
+  }, []);
   const nav = useNavigate();
+  const authContext = useContext(AuthContext);
   return (
     <div className={style.container}>
       <div className={style.searchbar}>
@@ -45,9 +58,16 @@ export default function Searchbar({ text, onInput, onSubmit, results }: Searchba
               <SearchResult
                 key={v.fullName + i + v.avatar}
                 name={v.fullName}
-                avatarUrl={v.avatar}
+                avatarUrl={v.avatar ?? defaultImage}
                 moreImportantInfo={v.moreSpecifiedInfo}
-                onClick={() => nav(`/profile/${v.id}`)}
+                onClick={() => {
+                  if (authContext?.user && +authContext.user?.id === v.id) {
+                    nav(`/profile/me`);
+                  } else {
+                    nav(`/profile/${v.id}`);
+                  }
+                  onUserClick()
+                }}
               />
             ))}
         </div>
@@ -59,7 +79,7 @@ export default function Searchbar({ text, onInput, onSubmit, results }: Searchba
 const SearchResult = ({ name, moreImportantInfo, avatarUrl, onClick }: SearchResultProps) => {
   return (
     <div className={style.exampleresult} onClick={onClick}>
-      <div className={style.avatar} style={{ backgroundImage: avatarUrl }}></div>
+      <div className={style.avatar} style={{ backgroundImage: `url(${avatarUrl})` }}></div>
       <div className={style.result}>
         <div className={style.name}>{name}</div>
         {moreImportantInfo && <div className={style.importantinfo}>{moreImportantInfo}</div>}

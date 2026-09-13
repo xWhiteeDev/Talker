@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
 import Searchbar from '../../../../generic/UI/Searchbar/Searchbar';
 import { useAPI } from '../../../../../hooks/useAPI';
-import type {ISearchResult} from '../../../../../types/components/ISearch';
+import type { ISearchResult } from '../../../../../types/components/ISearch';
 
 export default function SearchLayer() {
   const [inputText, setInputText] = useState<string>('');
@@ -13,6 +13,7 @@ export default function SearchLayer() {
       const result = await request<ISearchResult[]>(`/api/search/?criteria=${text}`, 'GET');
       if (result && result.success) {
         const receivedData: ISearchResult[] | undefined = result.data;
+
         setResults(receivedData);
       }
     },
@@ -30,6 +31,10 @@ export default function SearchLayer() {
       }}
       onSubmit={async (text: string) => {
         await findByUserText(text);
+      }}
+      onUserClick={() => {
+        setResults([]);
+        setInputText('');
       }}
       results={results}
     />
