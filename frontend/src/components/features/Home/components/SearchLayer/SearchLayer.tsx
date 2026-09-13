@@ -10,7 +10,7 @@ export default function SearchLayer() {
   const findByUserText = useCallback(
     async function findByUserText(text: string) {
       if (!text || text.length === 0 || typeof text !== 'string' || text.trim().length === 0) return;
-      const result = await request<ISearchResult[]>(`/api/search/?criteria=${text}`, 'GET');
+      const result = await request<ISearchResult[]>(`/api/search/?criteria=${encodeURIComponent(text)}`, 'GET');
       if (result && result.success) {
         const receivedData: ISearchResult[] | undefined = result.data;
 
