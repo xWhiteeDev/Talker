@@ -18,11 +18,7 @@ export function usePosts() {
           throw new ErrorHandler('Loading posts failure', 500);
         }
         const postPacket = result.data;
-        setPosts((prev) => {
-          const existing = prev ?? [];
-          const newPosts = postPacket.filter((p: IPostShape) => !existing.some((e) => e.id === p.id));
-          return [...newPosts, ...existing];
-        });
+        setPosts(postPacket);
       } catch (error) {
         if (error instanceof ErrorHandler) {
           setNotification('error', error.message);
