@@ -1,4 +1,4 @@
-import { useCallback,  useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useAPI } from './useAPI';
 import { ErrorHandler } from '../lib/customError';
 import type { IPostShape } from '../types/hooks/IPostHook';
@@ -21,7 +21,7 @@ export function usePosts() {
         setPosts((prev) => {
           const existing = prev ?? [];
           const newPosts = postPacket.filter((p: IPostShape) => !existing.some((e) => e.id === p.id));
-          return [ ...newPosts,...existing,];
+          return [...newPosts, ...existing];
         });
       } catch (error) {
         if (error instanceof ErrorHandler) {
@@ -37,7 +37,6 @@ export function usePosts() {
     },
     [request],
   );
- 
 
   return { request, refresh, posts, isLoading };
 }
