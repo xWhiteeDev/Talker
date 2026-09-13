@@ -27,7 +27,7 @@ export class PostService implements IPostService {
       return existingPost;
     }
     if (postVisibility === 'Friends') {
-      const relationBetweenUsers = await this.FriendsService.findRelationBetween(userId, existingPost.authorId);
+      const relationBetweenUsers = await this.FriendsService.findRelationBetween(userId, existingPost.authorId,'accepted');
       if (!relationBetweenUsers) return null;
       return existingPost;
     }
