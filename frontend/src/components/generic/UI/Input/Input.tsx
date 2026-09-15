@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
-import style from "./input.module.css";
-import type {ICSSVarProps} from "../../../../types/components/ICSSVarProps";
-import {fetchImage} from "../../../../services/fetchImageService";
+import { useEffect, useState } from 'react';
+import style from './input.module.css';
+import type { ICSSVarProps } from '../../../../types/components/ICSSVarProps';
+import { fetchImage } from '../../../../services/fetchImageService';
 
 interface InputProps {
   image?: string;
@@ -20,8 +20,6 @@ interface InputProps {
   additionalStyle?: React.CSSProperties;
   placeholderSize?: string;
 }
-
-
 
 export default function Input({
   image,
@@ -43,18 +41,20 @@ export default function Input({
   const [img, setImg] = useState<string>();
   useEffect(() => {
     if (!image) return;
-    fetchImage(image).then((res) => {
-      if (res) setImg(res);
-    });
+    (async () => {
+      const resultImage = await fetchImage(image);
+      setImg(resultImage);
+    })();
+    
   }, [image]);
   return (
     <div
       style={{
-        display: "flex",
-        justifyContent: "flex-start",
-        alignItems: "center",
-        backgroundColor: "rgba(31, 31, 31, 0.45)",
-        border: "1px solid black",
+        display: 'flex',
+        justifyContent: 'flex-start',
+        alignItems: 'center',
+        backgroundColor: 'rgba(31, 31, 31, 0.45)',
+        border: '1px solid black',
         ...additionalStyle,
       }}
     >
@@ -62,11 +62,11 @@ export default function Input({
         <img
           src={img}
           style={{
-            height: "100%",
-            margin: "2%",
-            aspectRatio: "1/1",
+            height: '100%',
+            margin: '2%',
+            aspectRatio: '1/1',
             flexShrink: 0,
-            objectFit: "contain",
+            objectFit: 'contain',
           }}
         />
       )}
@@ -83,11 +83,13 @@ export default function Input({
         onSubmit={(e) => onSubmit?.(e)}
         onChange={(e) => onChange?.(e)}
         onInput={(e) => onInput?.(e)}
-        style={{
-          "--placeholderSize": placeholderSize,
-          height: '50%',
-          width: "85%",
-        } as ICSSVarProps}
+        style={
+          {
+            '--placeholderSize': placeholderSize,
+            height: '50%',
+            width: '85%',
+          } as ICSSVarProps
+        }
         onFocus={(e) => onFocus?.(e)}
       />
     </div>
