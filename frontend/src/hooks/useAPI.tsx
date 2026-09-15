@@ -31,8 +31,9 @@ export function useAPI() {
               return;
             }
             retry.current = true;
+            //TODO: TRY CATCH HERE later
             const refreshedNewToken = await refreshToken();
-            if (!refreshedNewToken.success && refreshedNewToken.requiresLogin) {
+            if (!refreshedNewToken || refreshedNewToken.requiresLogin) {
               nav('/auth/login');
               authContext?.logout();
               return;
@@ -56,7 +57,7 @@ export function useAPI() {
               setNotification('error', error.message);
             } else {
               nav(`/error/server/${error.code}`);
-              return
+              return;
             }
           }
           throw error;
