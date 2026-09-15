@@ -7,6 +7,8 @@ import type { TReactionUnion } from '../../../../../types/components/IComponents
 import { useNavigate, useParams } from 'react-router-dom';
 import Button from '../../../../generic/UI/Button/Button';
 import { AuthContext } from '../../../../../context/authContext';
+import { ErrorHandler } from '../../../../../lib/customError';
+import useNotify from '../../../../../hooks/useNotify';
 interface IProfile {
   fullName: string;
   birthdayDate: string;
@@ -51,25 +53,32 @@ export default function Profile() {
   const { id } = useParams();
   const [relation, setRelation] = useState<IRelationState | null>(null);
   const authContext = useContext(AuthContext);
+  const { setNotification } = useNotify();
   useEffect(() => {
     const endpoint: string = id ?? 'me';
     (async () => {
-
-      const result = await request<IProfile>(`/api/profile/${endpoint}`, 'GET');
-      if (!result || (result && !result.success) || !result.data) {
-        nav('/');
-        console.error('Failed to fetch profile!');
-        return;
-      }
-      setProfile(result.data);
-      if (result.data.relation) {
-        setRelation((prev) => {
-          if (!result.data?.relation) return prev;
-          return {
-            ...(prev || {}),
-            ...result.data.relation,
-          };
-        });
+      try {
+        const result = await request<IProfile>(`/api/profile/${endpoint}`, 'GET');
+        if (!result || (result && !result.success) || !result.data) {
+          nav('/');
+          throw new ErrorHandler('Failed to fetch profile', 400);
+        }
+        setProfile(result.data);
+        if (result.data.relation) {
+          setRelation((prev) => {
+            if (!result.data?.relation) return prev;
+            return {
+              ...(prev || {}),
+              ...result.data.relation,
+            };
+          });
+        }
+      } catch (error) {
+        if (error instanceof ErrorHandler) {
+          setNotification('error', error.message);
+          return false;
+        }
+        setNotification('error', 'Unknown error during fetching profile');
       }
     })();
   }, [id, nav, request, authContext?.user?.id]);
@@ -79,19 +88,26 @@ export default function Profile() {
       console.error('Failed to send request to user. ID is not a number');
       return;
     }
-    //TODO: Use try catch here
-    const result = await request<boolean>('/api/friends/invites', 'POST', { otherId });
-    if (result && result.success == true && result.data == true) {
-      if (authContext && authContext.user) {
-        const userId = authContext.user.id;
-        setRelation((prev) => {
-          return {
-            ...(prev || {}),
-            status: 'pending',
-            creator: +userId,
-          };
-        });
+    try {
+      const result = await request<boolean>('/api/friends/invites', 'POST', { otherId });
+      if (result && result.success == true && result.data == true) {
+        if (authContext && authContext.user) {
+          const userId = authContext.user.id;
+          setRelation((prev) => {
+            return {
+              ...(prev || {}),
+              status: 'pending',
+              creator: +userId,
+            };
+          });
+        }
       }
+    } catch (error) {
+      if (error instanceof ErrorHandler) {
+        setNotification('error', error.message);
+        return false;
+      }
+      setNotification('error', 'Unknown error during sending an request!');
     }
   }
   async function setRequestStatus(status: 'decline' | 'accepted') {
@@ -99,7 +115,7 @@ export default function Profile() {
       console.error('You can only provide non-empty string!');
       return;
     }
-    if (!id || (id && (isNaN(+id) || +id < 0))) {
+    if (!id || isNaN(+id) || +id < 0) {
       console.error('Requested id cannot be any other type than number and cannot be lower than 0!');
       return;
     }
@@ -111,25 +127,32 @@ export default function Profile() {
     }
     const routeMethod = status === 'decline' ? 'DELETE' : 'PATCH';
     const otherId = +id;
-    //TODO: Use try catch here
+    try {
+      const result = await request<boolean>('/api/friends/invites', routeMethod, { otherId });
+      if (!result || !result.success) {
+        console.error('Cannot change relaton state!');
+        return;
+      }
 
-    const result = await request<boolean>('/api/friends/invites', routeMethod, { otherId });
-    if (!result || !result.success) {
-      console.error('Cannot change relaton state!');
-      return;
-    }
-    if (routeMethod === 'DELETE') {
-      setRelation(null);
-    }
-    if (routeMethod === 'PATCH') {
-      setRelation((p) => {
-        if (!p) return null;
-        return {
-          ...p,
-          status: 'accepted',
-          creator: p.creator,
-        };
-      });
+      if (routeMethod === 'DELETE') {
+        setRelation(null);
+      }
+      if (routeMethod === 'PATCH') {
+        setRelation((p) => {
+          if (!p) return null;
+          return {
+            ...p,
+            status: 'accepted',
+            creator: p.creator,
+          };
+        });
+      }
+    } catch (err) {
+      if (err instanceof ErrorHandler) {
+        setNotification('error', err.message);
+        return false;
+      }
+      setNotification('error', 'Unknown error during changing relation status');
     }
   }
   return (
@@ -236,6 +259,7 @@ export default function Profile() {
                     userReaction={v.myReaction}
                     commentReactions={v.reactions}
                     subCommentsCount={v.commentsCount}
+                    visibleFor={v.visibleFor}
                     type={'POST'}
                     onFocus={() => {
                       nav(`/post/${v.id}`);

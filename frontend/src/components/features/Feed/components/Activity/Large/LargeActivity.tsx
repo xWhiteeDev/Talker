@@ -8,6 +8,7 @@ import CommentCreator from '../../CommentCreator/CommentCreator';
 import ActivityReactions from '../../ActivityReactions/ActivityReactions';
 import { Activity } from '../Activity';
 import type { TReactionUnion } from '../../../../../../types/components/IComponentsUnion';
+import useNotify from '../../../../../../hooks/useNotify';
 
 interface ActivityElements {
   postId: number;
@@ -29,27 +30,45 @@ export function LargeActivity() {
   const [activityData, setActivityData] = useState<ActivityElements | undefined>(undefined);
   const [commentText, setCommentText] = useState<string>();
   const nav = useNavigate();
+  const { setNotification } = useNotify();
 
   async function addComment() {
-    //TODO: ADD PARAMETERS CHECKING
-    const result = await request('/api/comments', 'POST', {
-      postId: +postid,
-      parentId: +commentid,
-      content: commentText,
-    });
-    if (!result || !result.success) {
-      throw new ErrorHandler(`Adding commment fault for ${+commentid} `, 500);
+    try {
+      const result = await request('/api/comments', 'POST', {
+        postId: postid ? +postid : undefined,
+        parentId: commentid ? +commentid : undefined,
+        content: commentText,
+      });
+      if (!result || !result.success) {
+        throw new ErrorHandler('Failed to add comment', 400);
+      }
+      setNotification('success', 'Comment added');
+    } catch (error) {
+      if (error instanceof ErrorHandler) {
+        setNotification('error', error.message);
+        return false;
+      }
+      setNotification('error', 'Unknown error during comment adding.');
     }
   }
+
   useEffect(() => {
     const query: string = commentid === undefined && postid ? `/api/posts/${postid}` : `/api/comments/${commentid}`;
     (async () => {
-      const res = await request<ActivityElements>(query, 'GET');
-      if (!res || !res.success) {
-        throw new ErrorHandler('Failed to fetch comment', 400);
-      }
-      if (res.data) {
-        setActivityData(res.data);
+      try {
+        const res = await request<ActivityElements>(query, 'GET');
+        if (!res || !res.success) {
+          throw new ErrorHandler('Failed to fetch activity', 400);
+        }
+        if (res.data) {
+          setActivityData(res.data);
+        }
+      } catch (error) {
+        if (error instanceof ErrorHandler) {
+          setNotification('error', error.message);
+          return false;
+        }
+        setNotification('error', 'Unknown error during fetching activity.');
       }
     })();
   }, [commentid, request, postid]);
