@@ -99,7 +99,7 @@ export class AuthController implements IAuthController {
       }
       const user = await this.authService.isAuthorized(+req.currentUser.id);
       if (!user) {
-       throw new ErrorHandler('User not exist', 400);
+       throw new ErrorHandler('User not exist', 401);
       }
       const currentUserPayload = {
         username: user.username,
