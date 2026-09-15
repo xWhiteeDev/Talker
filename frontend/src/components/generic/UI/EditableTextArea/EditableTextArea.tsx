@@ -1,15 +1,14 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from 'react';
 
 interface EditableTextAreaProps {
-    placeholder?: string;
-    max:number;
-    placeholderFontSize?: string,
-    placeholderFontWeight?: string,
-    placeholderColor?: string;
-    additionalStyle?: React.CSSProperties;
-    onInput?(text:string): void;
-    securedText?:string
-
+  placeholder?: string;
+  max: number;
+  placeholderFontSize?: string;
+  placeholderFontWeight?: string;
+  placeholderColor?: string;
+  additionalStyle?: React.CSSProperties;
+  onInput?(text: string): void;
+  securedText?: string;
 }
 
 export default function EditableTextArea({
@@ -27,12 +26,9 @@ export default function EditableTextArea({
   const [isEmpty, setIsEmpty] = useState<boolean>(true);
 
   useEffect(() => {
-    if (
-      (securedText === "" || securedText == undefined) &&
-      placeholderRef.current
-    ) {
-      if (placeholderRef.current.textContent !== "") {
-        placeholderRef.current.textContent = "";
+    if ((securedText === '' || securedText == undefined) && placeholderRef.current) {
+      if (placeholderRef.current.textContent !== '') {
+        placeholderRef.current.textContent = '';
         setIsEmpty(true);
       }
     }
@@ -40,26 +36,25 @@ export default function EditableTextArea({
 
   const handleInput = () => {
     if (placeholderRef.current) {
-      const text = placeholderRef.current.textContent || "";
+      const text = placeholderRef.current.textContent || '';
       setIsEmpty(text.trim().length === 0);
       onInput?.(text);
     }
   };
 
   return (
-    <div style={{ overflowY: "hidden", position:'relative' }}>
+    <div style={{ overflowY: 'hidden', position: 'relative' }}>
       {isEmpty && !focused && (
         <span
           style={{
-            position: "absolute",
-            pointerEvents: "none",
+            position: 'absolute',
+            pointerEvents: 'none',
             color: placeholderColor,
             fontSize: placeholderFontSize,
             fontWeight: placeholderFontWeight,
-            userSelect: "none",
-            whiteSpace: "nowrap",
-                      ...additionalStyle,
-
+            userSelect: 'none',
+            whiteSpace: 'nowrap',
+            ...additionalStyle,
           }}
         >
           {placeholder}
@@ -68,32 +63,22 @@ export default function EditableTextArea({
 
       <div
         ref={placeholderRef}
-        contentEditable={
-          securedText
-            ? securedText !== undefined
-              ? "plaintext-only"
-              : undefined
-            : "plaintext-only"
-        }
-        content={securedText ?? undefined}
+        contentEditable={securedText ? (securedText !== undefined ? 'plaintext-only' : undefined) : 'plaintext-only'}
         onBeforeInput={(e) => {
-          if (
-            placeholderRef.current &&
-            placeholderRef.current.textContent.length > max
-          ) {
+          if (placeholderRef.current && placeholderRef.current.textContent.length > max) {
             e.preventDefault();
             return false;
           }
         }}
         style={{
-          outline: "none",
-          border: "none",
-          overflowY: "auto",
-          color: "black",
-          whiteSpace: "pre-wrap",
-          wordBreak: "break-word",
-          minHeight: "1.5em", // Zapewnia miejsce na jedną linijkę, gdy pole jest puste
-          height: "auto",
+          outline: 'none',
+          border: 'none',
+          overflowY: 'auto',
+          color: 'black',
+          whiteSpace: 'pre-wrap',
+          wordBreak: 'break-word',
+          minHeight: '1.5em', // Zapewnia miejsce na jedną linijkę, gdy pole jest puste
+          height: 'auto',
           ...additionalStyle,
         }}
         onInput={handleInput}
