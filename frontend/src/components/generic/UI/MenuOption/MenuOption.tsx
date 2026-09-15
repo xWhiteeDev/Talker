@@ -35,9 +35,9 @@ export default function MenuOption({ text, onClick, icon }: MenuOptionProps) {
 
   return (
     <div className={style.container}>
-      <div className={style.elements}>
+      <div className={style.elements} onClick={onClick}>
         {icon && <div className={style.icon} style={{ backgroundImage: `url("${iconString}")` }}></div>}
-        <span onClick={onClick}>
+        <span >
           <strong>{firstWord}</strong> {restWord}
         </span>
       </div>
