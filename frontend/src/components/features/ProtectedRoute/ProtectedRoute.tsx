@@ -21,11 +21,13 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
   }, []);
 
   useEffect(() => {
-    if (status == 'Unauthorized') {
-      nav('/auth/login');
-      authContext?.logout();
+    if (status === 'Unauthorized') {
+      const isLoggedOut = authContext?.logout();
+      if (isLoggedOut) {
+          nav('/auth/login')
+      }
     }
-    if (status == 'Authorized') {
+    if (status === 'Authorized') {
       (async () => {
         const result = await request<IBasicUserInfo>('/api/auth/isAuth', 'GET');
         if (!result || (result && !result.success) || !result.data) {
