@@ -7,15 +7,27 @@ import style from './Login.module.css';
 import Button from '../../../../../generic/UI/Button/Button.tsx';
 import Input from '../../../../../generic/UI/Input/Input.tsx';
 import { handleSubmitAuthForm } from '../../../modules/authService.ts';
-import { registerValidationConfig } from '../../../assets/configuration.ts';
-import { validatorFunctions } from '../../../../../../services/validationMethods.ts';
 import useNotify from '../../../../../../hooks/useNotify.tsx';
 import { AuthContext } from '../../../../../../context/authContext.ts';
+import type { IObjectRequirements } from '../../../../../../services/types';
 
-const loginPacketData = {
-  transmisionEndpoint: 'login',
-  validationConfiguration: registerValidationConfig,
-  validationFunctions: validatorFunctions,
+const loginValidationConfig: IObjectRequirements = {
+  email: {
+    type: 'string',
+    requirements: {
+      minLength: 6,
+      maxLength: 100,
+      canBeNull: false,
+    },
+  },
+  password: {
+    type: 'string',
+    requirements: {
+      minLength: 5,
+      maxLength: 100,
+      canBeNull: false,
+    },
+  },
 };
 
 export default function Login() {
@@ -34,7 +46,7 @@ export default function Login() {
       <div className={style.section}>
         <form
           onSubmit={async (event) => {
-            const authorizationResult = await handleSubmitAuthForm(event, setNotification, loginPacketData);
+            const authorizationResult = await handleSubmitAuthForm(event, setNotification, 'login', loginValidationConfig);
             if (authorizationResult) {
               if (authCtx) {
                 if (authorizationResult.success && authorizationResult.data) {

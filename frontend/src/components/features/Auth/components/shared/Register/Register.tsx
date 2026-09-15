@@ -4,9 +4,8 @@ import CustomText from '../../../../../generic/UI/Text/Text';
 import Button from '../../../../../generic/UI/Button/Button';
 import Input from '../../../../../generic/UI/Input/Input';
 import { handleSubmitAuthForm } from '../../../modules/authService';
-import { registerValidationConfig } from '../../../assets/configuration';
-import { validatorFunctions } from '../../../../../../services/validationMethods';
 import useNotify from '../../../../../../hooks/useNotify';
+import type {IObjectRequirements} from '../../../../../../services/types';
 
 const Inputs = {
   mainSection: [
@@ -15,8 +14,8 @@ const Inputs = {
       name: 'email',
       placeholder: 'Write your email here',
       image: 'email_ico.png',
-      min: registerValidationConfig.email.length?.min,
-      max: registerValidationConfig.email.length?.max,
+      min: 6,
+      max: 70,
       additionalStyle: { width: '75%', height: '15%' },
     },
     {
@@ -24,8 +23,8 @@ const Inputs = {
       name: 'password',
       placeholder: 'Write your password here',
       image: 'pass_ico.png',
-      min: registerValidationConfig.password.length?.min,
-      max: registerValidationConfig.password.length?.max,
+      min: 5,
+      max: 70,
       additionalStyle: { width: '75%', height: '15%' },
     },
     {
@@ -41,25 +40,53 @@ const Inputs = {
       type: 'text',
       name: 'firstName',
       placeholder: 'First name',
-      min: registerValidationConfig.personalData.length?.min,
-      max: registerValidationConfig.personalData.length?.max,
+      min: 2,
+      max: 15,
       additionalStyle: { width: '45%', height: '75%' },
     },
     {
       type: 'text',
       name: 'lastName',
       placeholder: 'Last name',
-      min: registerValidationConfig.personalData.length?.min,
-      max: registerValidationConfig.personalData.length?.max,
+      min: 2,
+      max: 15,
       additionalStyle: { width: '45%', height: '75%' },
     },
   ],
 };
-
-const registerPacketData = {
-  transmisionEndpoint: 'register',
-  validationConfiguration: registerValidationConfig,
-  validationFunctions: validatorFunctions,
+const registerConfig: IObjectRequirements = {
+  email: {
+    type: 'string',
+    requirements: {
+      minLength: 5,
+      maxLength: 100,
+      canBeNull: false,
+    },
+  },
+  password: {
+    type: 'string',
+    requirements: {
+      minLength: 5,
+      maxLength: 100,
+      canBeNull: false,
+    },
+  },
+  firstName: {
+    type: 'string',
+    requirements: {
+      minLength: 2,
+      maxLength: 34,
+      canBeNull: false,
+    },
+  },
+  lastName: {
+    type: 'string',
+    requirements: {
+      minLength: 2,
+      maxLength: 34,
+      canBeNull: false,
+    },
+  },
 };
 
 export default function Register() {
@@ -76,10 +103,10 @@ export default function Register() {
         <form
           style={{ height: '100%', width: '100%' }}
           onSubmit={async (event) => {
-            const authResult = await handleSubmitAuthForm(event, setNotification, registerPacketData);
+            const authResult = await handleSubmitAuthForm(event, setNotification, 'register', registerConfig);
             if (authResult && authResult.success) {
               await nav('/auth/login');
-              setNotification('success', 'Account created')
+              setNotification('success', 'Account created');
             }
           }}
         >

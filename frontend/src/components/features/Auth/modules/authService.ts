@@ -1,35 +1,25 @@
 import { emitServer } from '../../../../lib/API/emitServer';
 import { ErrorHandler } from '../../../../lib/customError';
-import { validate } from '../../../../services/validationService';
-import type { IGlobalConfiguration, IValidationFunctions } from '../../../../types/services/IValidator';
 import type { IBasicUserInfo } from '../../../../types/components/IUser';
 import type { TNotificationType } from '../../../../types/components/IComponentsUnion';
-
-interface AuthorizationInfo {
-  transmisionEndpoint: string;
-  validationConfiguration: IGlobalConfiguration;
-  validationFunctions: IValidationFunctions;
-}
+import { Validify } from '../../../../services/Validify';
+import type { IObjectRequirements } from '../../../../services/types';
 
 export async function handleSubmitAuthForm(
   event: React.SubmitEvent<HTMLFormElement>,
   notifcationFunction: (type: TNotificationType, message: string) => void,
-  authorizationInfo: AuthorizationInfo,
+  emitEndpoint: string,
+  validationRequirements: IObjectRequirements,
 ) {
   event.preventDefault();
-
   const formData = new FormData(event.currentTarget);
   const objectifiedFormData = Object.fromEntries(formData);
-  const validationResult = validate(
-    objectifiedFormData,
-    authorizationInfo.validationConfiguration,
-    authorizationInfo.validationFunctions,
-  );
+  const validationResult = Validify.validateObject(objectifiedFormData, validationRequirements);
   if (!validationResult) {
     notifcationFunction('error', 'Validation failed!');
     return false;
   }
-  const transmisionUrl = `/api/auth/${authorizationInfo.transmisionEndpoint}`;
+  const transmisionUrl = `/api/auth/${emitEndpoint}`;
   try {
     const res = await emitServer<IBasicUserInfo>(transmisionUrl, 'POST', objectifiedFormData);
     if (!res || res.success === false) {

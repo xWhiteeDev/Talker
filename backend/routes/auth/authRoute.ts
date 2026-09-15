@@ -11,6 +11,7 @@ const registerConfig: IObjectRequirements = {
     requirements: {
       minLength: 5,
       maxLength: 100,
+      canBeNull:false
     },
   },
   password: {
@@ -18,6 +19,8 @@ const registerConfig: IObjectRequirements = {
     requirements: {
       minLength: 5,
       maxLength: 100,
+            canBeNull:false
+
     },
   },
   firstName: {
@@ -25,6 +28,7 @@ const registerConfig: IObjectRequirements = {
     requirements: {
       minLength: 2,
       maxLength: 34,
+      canBeNull:false
     },
   },
   lastName: {
@@ -32,6 +36,7 @@ const registerConfig: IObjectRequirements = {
     requirements: {
       minLength: 2,
       maxLength: 34,
+      canBeNull:false
     },
   },
 };
