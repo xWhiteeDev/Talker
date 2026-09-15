@@ -2,7 +2,7 @@ import { createRoot } from 'react-dom/client';
 import App from './App.tsx';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import Auth from './components/features/Auth/components/AuthLayout.tsx';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import CustomNotification from './components/generic/UI/Notification/CustomNotification.tsx';
 import Home from './components/features/Home/Home.tsx';
 import Login from './components/features/Auth/components/shared/Login/Login.tsx';
@@ -92,14 +92,22 @@ function Main() {
   const [notification, setNotification] = useState<INotificationHookProps | null>();
   const [loggedIn, setLoggedIn] = useState<boolean>(false);
   const [user, setUser] = useState<IBasicUserInfo | undefined>(undefined);
+  const timerid = useRef<null | number>(null);
   function setNotify(notiContext: INotificationHookProps) {
     if (notification) {
       setNotification(() => null);
     }
     setNotification(notiContext);
-    setTimeout(() => {
-      setNotification(null);
-    }, 4000);
+    if (timerid.current == null) {
+      timerid.current = setTimeout(() => {
+        setNotification(null);
+      }, 4000);
+    } else {
+      clearTimeout(timerid.current);
+      timerid.current = setTimeout(() => {
+        setNotification(null);
+      }, 4000);
+    }
   }
   function login(userData: IBasicUserInfo) {
     setLoggedIn(true);
@@ -109,7 +117,7 @@ function Main() {
   function logout() {
     setLoggedIn(false);
     setUser(undefined);
-    return true
+    return true;
   }
 
   return (
