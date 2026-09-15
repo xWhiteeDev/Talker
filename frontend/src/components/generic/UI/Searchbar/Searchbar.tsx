@@ -8,7 +8,7 @@ import { AuthContext } from '../../../../context/authContext';
 interface SearchbarProps {
   onSubmit(text: string): void;
   onInput(text: string): void;
-  onUserClick():void
+  onUserClick(): void;
   text: string;
   results: ISearchResult[] | undefined;
 }
@@ -18,15 +18,17 @@ interface SearchResultProps {
   onClick(): void;
   moreImportantInfo?: string;
 }
-export default function Searchbar({ text, onInput, onSubmit, onUserClick,results }: SearchbarProps) {
+export default function Searchbar({ text, onInput, onSubmit, onUserClick, results }: SearchbarProps) {
   const [defaultImage, setDefaultImage] = useState<string>();
+  const resultLength = results && results.length > 0
   useEffect(() => {
-    (async () => {
-      const img = await fetchImage('unk_person.png');
-      setDefaultImage(img);
-      console.log(img);
-    })();
-  }, []);
+    if (resultLength) {
+      (async () => {
+        const img = await fetchImage('unk_person.png');
+        setDefaultImage(img);
+      })();
+    }
+  }, [resultLength]);
   const nav = useNavigate();
   const authContext = useContext(AuthContext);
   return (
@@ -66,7 +68,7 @@ export default function Searchbar({ text, onInput, onSubmit, onUserClick,results
                   } else {
                     nav(`/profile/${v.id}`);
                   }
-                  onUserClick()
+                  onUserClick();
                 }}
               />
             ))}
