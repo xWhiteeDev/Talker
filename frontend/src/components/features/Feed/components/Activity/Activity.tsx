@@ -8,7 +8,7 @@ interface ActivityProps {
   avatar: string | null;
   authorName: string;
   content: string;
-  visibleFor:string;
+  visibleFor?:string;
   createdAt: string;
   postId: number;
   userReaction: TReactionUnion;
