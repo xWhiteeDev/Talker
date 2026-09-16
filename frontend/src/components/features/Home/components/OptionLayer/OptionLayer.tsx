@@ -43,7 +43,6 @@ export default function OptionLayer({ items }: OptionLayerProps) {
             onClick={async () => {
               const result = await request('/api/auth/logout', 'POST', undefined);
               if (result?.success) {
-                //TODO: Confirmation in future
                 authContext?.logout();
                 nav('/auth/login');
               } 

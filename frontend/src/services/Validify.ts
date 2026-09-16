@@ -1,9 +1,5 @@
 import type {TValidationHandler, IStringRequirements, INumberRequirements, IArrayRequirements, IObjectRequirements} from './types';
 
-
-//TODO: DO BETTER VALIDATING | Remember to add it to auth/components/...
-
-
 export class Validify {
   static validationMethods: TValidationHandler = {
     string: (toValidate: string, requirements: IStringRequirements) => Validify.validateString(toValidate, requirements),
