@@ -55,12 +55,7 @@ export default function Home() {
       onClick: () => {
         nav(`/profile/me`);
       },
-    },
-    { name: 'Messages', icon: 'messages_ico' },
-    { name: 'Friends list', icon: 'friendslist_ico' },
-    { name: 'Groups', icon: 'groups_ico' },
-    { name: 'Notifications', icon: 'notifications_ico' },
-    { name: 'Buy & Sell', icon: 'buyandsell_ico' },
+    }
   ];
 
   useEffect(() => {
