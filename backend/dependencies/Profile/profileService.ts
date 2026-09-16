@@ -1,7 +1,7 @@
 import { ErrorHandler } from '../../handlers/errorHandler.js';
 import type { IAccountRow, IAccountService } from '../Account/types.js';
 import type { friendshipService } from '../Friendship/friendshipService.js';
-import type { FriendsRelation } from '../Friendship/types.js';
+import type { FriendsRelation, IAcceptedRelationRow } from '../Friendship/types.js';
 import type { PostService } from '../Post/postService.js';
 import type { PostRow } from '../Post/types.js';
 import type { IProfile, IProfileService } from './types.js';
@@ -28,15 +28,17 @@ class ProfileService implements IProfileService {
       let accountProfileProperties: IAccountRow | null;
       let content: PostRow[] | null = null;
       let friendshipRelation: FriendsRelation | null;
-
+      let friends: IAcceptedRelationRow[] | null;
       if (userId === requestedId) {
         content = await this.postService.findByAuthor(userId, userId);
         accountProfileProperties = await this.accountService.findUserById(requestedId);
+        friends = await this.friendshipsService.findAllAcceptedRelations(requestedId);
         friendshipRelation = null;
       } else {
-        [content, friendshipRelation] = await Promise.all([
+        [content, friendshipRelation, friends] = await Promise.all([
           this.postService.findByAuthor(userId, requestedId),
           this.friendshipsService.findRelationBetween(userId, requestedId),
+          this.friendshipsService.findAllAcceptedRelations(requestedId),
         ]);
         accountProfileProperties = await this.accountService.findUserById(requestedId);
       }
@@ -49,13 +51,13 @@ class ProfileService implements IProfileService {
         joinDate: accountProfileProperties.created_at,
         description: 'My hardcoded description',
         content: content,
-        relation:
-          friendshipRelation
-            ? {
-                status: friendshipRelation.status,
-                creator: friendshipRelation.userId,
-              }
-            : null,
+        relation: friendshipRelation
+          ? {
+              status: friendshipRelation.status,
+              creator: friendshipRelation.userId,
+            }
+          : null,
+        friends: friends,
       };
     } catch (error) {
       throw error;

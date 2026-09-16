@@ -9,6 +9,8 @@ import Button from '../../../../generic/UI/Button/Button';
 import { AuthContext } from '../../../../../context/authContext';
 import { ErrorHandler } from '../../../../../lib/customError';
 import useNotify from '../../../../../hooks/useNotify';
+import Friend from './Friend/Friend';
+
 interface IProfile {
   fullName: string;
   birthdayDate: string;
@@ -16,12 +18,18 @@ interface IProfile {
   description: string;
   content: IContent[];
   relation?: IProfileRelation;
+  friends: IBasicFriendInfo[];
 }
 
 type TProfileRelation = null | 'pending' | 'accepted';
 interface IProfileRelation {
   status: TProfileRelation;
   creator: number;
+}
+interface IBasicFriendInfo {
+  fullName: string;
+  otherUserId: number;
+  avatar: string | null;
 }
 interface IContent {
   id: number;
@@ -64,6 +72,7 @@ export default function Profile() {
           throw new ErrorHandler('Failed to fetch profile', 400);
         }
         setProfile(result.data);
+        console.log(result.data);
         if (result.data.relation) {
           setRelation((prev) => {
             if (!result.data?.relation) return prev;
@@ -166,7 +175,10 @@ export default function Profile() {
             <Tab header="Live in" text="Mielec, Poland" />
           </div>
           <div className={style.profile}>
-            <div className={style.avatar} style={{ backgroundImage: `url(https://ui-avatars.com/api/?name=${profile.fullName.split(' ').join('+')})` }}></div>
+            <div
+              className={style.avatar}
+              style={{ backgroundImage: `url(https://ui-avatars.com/api/?name=${profile.fullName.split(' ').join('+')})` }}
+            ></div>
             <div className={style.name}>
               <span>
                 <strong>{profile.fullName}</strong>
@@ -239,6 +251,22 @@ export default function Profile() {
               <span>Friends</span>
             </div>
             <div className={style.friendsContent}>
+              {profile.friends.length == 0 && <span>0 friends</span>}
+              {profile.friends &&
+                profile.friends.length > 0 &&
+                profile.friends.map((v) => (
+                  <Friend
+                    name={v.fullName}
+                    avatar={v.avatar ?? null}
+                    onClick={() => {
+                      if (authContext?.user && +authContext.user?.id === v.otherUserId) {
+                        nav(`/profile/me`);
+                      } else {
+                        nav(`/profile/${v.otherUserId}`);
+                      }
+                    }}
+                  />
+                ))}
             </div>
           </div>
 

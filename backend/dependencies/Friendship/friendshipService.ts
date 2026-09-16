@@ -5,6 +5,7 @@ import type {
   FriendsRelation,
   FriendsRelationInsertDTO,
   FriendsRelationUpdateDTO,
+  IAcceptedRelationRow,
 } from './types.js';
 
 export class friendshipService implements IFriendshipService {
@@ -27,6 +28,10 @@ export class friendshipService implements IFriendshipService {
     const existingRelation = await this.FriendRepository.findRelationBetween(userId, otherId, status);
     return existingRelation ?? null;
   }
+  async findAllAcceptedRelations(userId: number): Promise<IAcceptedRelationRow[] | null> {
+    const relations = await this.FriendRepository.findAllAcceptedRelations(userId);
+    return relations ?? null;
+  }
   async insertRelation(dto: FriendsRelationInsertDTO): Promise<boolean> {
     if (dto.userId === dto.friendId) throw new ErrorHandler('Cannot add yourself as friend', 400);
 
@@ -43,7 +48,7 @@ export class friendshipService implements IFriendshipService {
     return result;
   }
   async acceptRelation(userId: number, otherId: number): Promise<boolean> {
-    const existingRelation = await this.FriendRepository.findRelationBetween(userId, otherId,'pending');
+    const existingRelation = await this.FriendRepository.findRelationBetween(userId, otherId, 'pending');
     if (!existingRelation) throw new ErrorHandler('Relation not found with exact user', 400);
     if (userId !== existingRelation.friendId) throw new ErrorHandler('You cannot accept relation offer sent by you', 403);
     const result = await this.FriendRepository.update(userId, otherId, { status: 'accepted' });

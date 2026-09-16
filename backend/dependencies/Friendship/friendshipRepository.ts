@@ -5,6 +5,7 @@ import type {
   FriendsRelationRow,
   FriendsRelationInsertDTO,
   FriendsRelationUpdateDTO,
+  IAcceptedRelationRow,
 } from './types.js';
 
 export class friendshipRepository implements IFriendshipRepository {
@@ -19,7 +20,7 @@ export class friendshipRepository implements IFriendshipRepository {
     const [result] = await this.pool.query<FriendsRelationRow[]>(query, { userId });
     return result as FriendsRelation[] | undefined;
   }
-  async findRelationBetween(userId: number, otherId: number, status?:string): Promise<FriendsRelation | undefined> {
+  async findRelationBetween(userId: number, otherId: number, status?: string): Promise<FriendsRelation | undefined> {
     let query: string;
     if (status) {
       query = `SELECT * FROM friendships WHERE(userId=:userId AND friendId=:otherId AND status=:status) OR (userId=:otherId AND friendId=:userId AND status=:status ) LIMIT 1`;
@@ -29,6 +30,15 @@ export class friendshipRepository implements IFriendshipRepository {
     const [[result]] = await this.pool.query<FriendsRelationRow[]>(query, { userId, otherId, status });
     return result as FriendsRelation | undefined;
   }
+  async findAllAcceptedRelations(userId: number): Promise<IAcceptedRelationRow[] | undefined> {
+    const query = `SELECT base.otherUserId, CONCAT(accounts.firstName," ",accounts.lastName) as fullName, base.id FROM (
+      SELECT status,id, CASE WHEN userId=:userId THEN friendId ELSE userId END AS otherUserId FROM friendships WHERE (STATUS='accepted' AND (userId=:userId OR friendId=:userId))
+    ) as base 
+     LEFT JOIN accounts ON accounts.id = base.otherUserId ORDER BY base.id DESC LIMIT 9`;
+    const [result] = await this.pool.query<IAcceptedRelationRow[]>(query, { userId });
+    return result
+  }
+
   async insert(dto: FriendsRelationInsertDTO): Promise<boolean> {
     const query: string = 'INSERT INTO friendships (userId,friendId,status) VALUES (:userId,:friendId,:status)';
     const [result] = await this.pool.execute<ResultSetHeader>(query, {
