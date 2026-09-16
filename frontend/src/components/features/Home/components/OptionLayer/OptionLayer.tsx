@@ -15,7 +15,8 @@ export default function OptionLayer({ items }: OptionLayerProps) {
   const authContext = useContext(AuthContext);
   const { request } = useAPI();
   const nav = useNavigate();
-  return (
+  return authContext && (
+    
     <div className={style.container}>
       <div className={style.options}>
         {items.map((v, i) => {
@@ -24,7 +25,7 @@ export default function OptionLayer({ items }: OptionLayerProps) {
       </div>
       <div className={style.userContainer}>
         <div className={style.user}>
-          <div className={style.userAvatar}></div>
+          <div className={style.userAvatar} style={{backgroundImage:`url(https://ui-avatars.com/api/?name=${authContext.user?.username.split(' ').join('+')})`}}></div>
           <div className={style.usernameAndRole}>
             <div className={style.username}>
               {authContext && authContext.user && <strong>{authContext.user.username}</strong>}
