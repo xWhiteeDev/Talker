@@ -4,7 +4,6 @@ import {ErrorHandler} from "../../handlers/errorHandler.js";
 
 export class AccountService implements IAccountService {
     constructor(private accountRepository: IAccountRepository) {
-        console.log(`\x1b[32;1m🚀[AccountService] accountRepository injected \x1b[0m`);
     }
     async insertUser(data: IAccountInsertDTO): Promise<boolean> {
         const existingUser = await this.accountRepository.isExist(data.email);

@@ -7,7 +7,6 @@ import type { currentUser } from '../Account/types.js';
 configDotenv();
 export class AuthController implements IAuthController {
   constructor(private authService: IAuthService) {
-    console.log(`\x1b[32;1m🚀[authController] AccountService injected \x1b[0m`);
   }
   async createUser(req: Request, res: Response, next: NextFunction): Promise<boolean> {
     try {

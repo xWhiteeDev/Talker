@@ -54,4 +54,3 @@ export const profileController = new ProfileController(profileService);
 
 const searchService = new SearchService(accountService);
 export const searchController = new SearchController(searchService);
-console.log(`\x1b[42;1m✅ All dependencies loaded correctly! \x1b[0m`);

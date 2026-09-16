@@ -1,9 +1,7 @@
 import type { ResultSetHeader, ExecuteValues, Pool } from 'mysql2/promise';
 import type { IPostRepository, PostInsertDTO, PostRow, PostUpdateDTO } from './types.js';
 export class PostRepository implements IPostRepository {
-  constructor(private pool: Pool) {
-    console.log(`\x1b[32;1m🚀[PostRepository] Pool injected \x1b[0m`);
-  }
+  constructor(private pool: Pool) {  }
   async findById(id: number, currentUserId: number, withDetails?: boolean): Promise<PostRow | undefined> {
     let query: string = `
   SELECT 
@@ -379,8 +377,6 @@ WHERE p.id = :id`;
 `;
 
     const [result] = await this.pool.query<PostRow[]>(query, { userId });
-    console.log(result);
-
     return result;
   }
 }

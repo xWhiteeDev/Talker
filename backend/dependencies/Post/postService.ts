@@ -9,7 +9,6 @@ export class PostService implements IPostService {
     private FriendsService: IFriendshipService,
     private accountService: IAccountService,
   ) {
-    console.log(`\x1b[32;1m🚀[PostService] PostRepository injected \x1b[0m`);
   }
   async findById(userId: number, id: number, withComments?: boolean): Promise<PostRow | null> {
     let existingPost;

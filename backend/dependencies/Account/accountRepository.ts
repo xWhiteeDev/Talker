@@ -3,7 +3,6 @@ import type { IAccountRepository, IAccountRow, IAccountInsertDTO, IAccountUpdate
 
 export class AccountRepository implements IAccountRepository {
   constructor(private pool: Pool) {
-    console.log(`\x1b[32;1m🚀[AccountRepository] Pool injected \x1b[0m`);
   }
   async findWithCredentials(email: string): Promise<IAccountRow | null> {
     const [[result]] = await this.pool.query<IAccountRow[]>('SELECT * FROM accounts WHERE email=:email LIMIT 1', { email });

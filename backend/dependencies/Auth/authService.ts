@@ -8,7 +8,6 @@ import type { IAuthService, ILogin, IUserAuthorizationPassport } from './types.j
 configDotenv();
 export class AuthService implements IAuthService {
   constructor(private accountService: IAccountService) {
-    console.log(`\x1b[32;1m🚀[AuthService] accountService injected \x1b[0m`);
   }
   async signIn(document: ILogin): Promise<IUser | null> {
     const existingUser = await this.accountService.findUserWithCredentials(document.email);
