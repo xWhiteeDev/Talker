@@ -50,7 +50,6 @@
 
 
 .avatar {
-    background-image: url(../../../../../assets//unk_person.png);
     background-position: center;
     background-size: cover;
     background-repeat: no-repeat;
@@ -135,6 +134,7 @@
 }
 
 .friendsList {
+
     background-color: rgba(0, 0, 0, 0.041);
     box-shadow: -3px 5px 2px 2px rgba(0, 0, 0, 0.171);
     width: 35%;
@@ -180,34 +180,20 @@
 
 
 
-.testPostContainer {
-    background-color: rgba(0, 0, 0, 0.041);
-    border-radius: 8px;
-    box-shadow: -3px 5px 2px 2px rgba(0, 0, 0, 0.171);
-    width: 90%;
-    min-height: 13vh;
-    max-height: 18vh;
-    margin: 0.4vh;
-}
-
-.testFriendContainer {
-    background-color: rgba(43, 43, 43, 0.089);
-    aspect-ratio: 1/1;
-    border-radius: 7px;
-    margin: 1vh;
-    width: 75%;
-}
 
 .friendsContent {
     display: grid;
     grid-template-rows: auto;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(3,1.4fr);
     grid-auto-rows: auto;
     /* background-color: red; */
     width: 100%;
-    max-height: 50vh;
+    max-height: 41vh;
     overflow-y: auto;
     scrollbar-gutter: stable;
+    row-gap: 1vh;
+
+
 }
 
 .zero {
