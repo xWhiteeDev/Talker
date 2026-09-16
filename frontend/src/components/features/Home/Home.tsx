@@ -55,7 +55,7 @@ export default function Home() {
       onClick: () => {
         nav(`/profile/me`);
       },
-    }
+    },
   ];
 
   useEffect(() => {
@@ -136,7 +136,7 @@ export default function Home() {
                   nav(`post/${v.id}`);
                 }}
                 onUserClick={() => {
-                  if (authContext && +authContext.user?.id === v.authorId) {
+                  if (authContext?.user && +authContext.user.id === v.authorId) {
                     nav(`profile/me`);
                   } else {
                     nav(`profile/${v.authorId}`);
