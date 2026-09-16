@@ -1,5 +1,4 @@
 import style from './UserActivityInfo.module.css';
-import unk_person from '../../../../../assets/unk_person.png';
 
 interface UserActivityInfoProps {
   avatar: string | null;
@@ -13,7 +12,7 @@ export default function UserActivityInfo({ avatar, authorName, createdAt, visibi
   return (
     <div className={style.user}>
       <div className={style.userAvatar}>
-        <img src={avatar ?? unk_person} className={style.avatar} alt="user avatar" onClick={onClick} />
+        <img src={avatar ?? `https://ui-avatars.com/api/?name=${authorName}`} className={style.avatar} alt="user avatar" onClick={onClick} />
       </div>
       <div className={style.postInfo}>
         <span style={{ fontWeight: '600' }}>{authorName}</span>

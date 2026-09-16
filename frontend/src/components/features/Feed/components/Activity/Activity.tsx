@@ -38,7 +38,7 @@ export const Activity = memo(function Activity({
   return (
     <div className={style.activityContainer}>
       <div className={style.activityUser}>
-        <UserActivityInfo avatar={avatar ?? null} authorName={authorName}  createdAt={createdAt} visibility={visibleFor} onClick={onUserClick} />
+        <UserActivityInfo avatar={avatar} authorName={authorName}  createdAt={createdAt} visibility={visibleFor} onClick={onUserClick} />
       </div>
       <div className={style.activityCommentContent}>
         <span>{content}</span>

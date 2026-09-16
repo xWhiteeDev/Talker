@@ -15,6 +15,7 @@ interface ActivityElements {
   id: number;
   userId: number;
   parentId: number;
+  avatar:string
   content: string;
   createdAt: string;
   fullName: string;
@@ -82,7 +83,7 @@ export function LargeActivity() {
         </div>
         <div className={style.userInfoContainer}>
           {activityData && (
-            <UserActivityInfo avatar={null} authorName={activityData.fullName} createdAt={activityData.createdAt} />
+            <UserActivityInfo avatar={activityData.avatar} authorName={activityData.fullName} createdAt={activityData.createdAt} />
           )}
         </div>
         <div className={style.contentContainer}>{activityData.content}</div>
@@ -111,7 +112,7 @@ export function LargeActivity() {
               <Activity
                 key={v.id}
                 type="COMMENT"
-                avatar={null}
+                avatar={v.avatar}
                 authorName={v.fullName}
                 createdAt={v.createdAt}
                 content={v.content}

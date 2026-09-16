@@ -166,7 +166,7 @@ export default function Profile() {
             <Tab header="Live in" text="Mielec, Poland" />
           </div>
           <div className={style.profile}>
-            <div className={style.avatar}></div>
+            <div className={style.avatar} style={{ backgroundImage: `url(https://ui-avatars.com/api/?name=${profile.fullName.split(' ').join('+')})` }}></div>
             <div className={style.name}>
               <span>
                 <strong>{profile.fullName}</strong>
@@ -238,10 +238,8 @@ export default function Profile() {
             <div className={style.friendsHeader}>
               <span>Friends</span>
             </div>
-            {/* <div className={style.friendsContent}>
-              {!id && <span className={style.zero}>You don't have any friends...</span>}
-              {id && <span className={style.zero}>0 Friends</span>}
-            </div> */}
+            <div className={style.friendsContent}>
+            </div>
           </div>
 
           <div className={style.contentList}>
@@ -251,7 +249,7 @@ export default function Profile() {
                 profile.content.map((v) => (
                   <Activity
                     key={v.id}
-                    avatar={null}
+                    avatar={`https://ui-avatars.com/api/?name=${v.fullName}`}
                     authorName={v.fullName}
                     content={v.content}
                     createdAt={v.createdAt}
