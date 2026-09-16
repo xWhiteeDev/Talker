@@ -49,17 +49,13 @@ interface IContent {
   pinnedPlace: string | null;
 }
 
-interface IRelationState {
-  status: TProfileRelation;
-  creator: number;
-}
 
 export default function Profile() {
   const { request } = useAPI();
   const [profile, setProfile] = useState<IProfile | undefined>(undefined);
   const nav = useNavigate();
   const { id } = useParams();
-  const [relation, setRelation] = useState<IRelationState | null>(null);
+  const [relation, setRelation] = useState<IProfileRelation | null>(null);
   const authContext = useContext(AuthContext);
   const { setNotification } = useNotify();
   useEffect(() => {
@@ -72,7 +68,6 @@ export default function Profile() {
           throw new ErrorHandler('Failed to fetch profile', 400);
         }
         setProfile(result.data);
-        console.log(result.data);
         if (result.data.relation) {
           setRelation((prev) => {
             if (!result.data?.relation) return prev;
@@ -257,6 +252,7 @@ export default function Profile() {
                 profile.friends.map((v) => (
                   <Friend
                     name={v.fullName}
+                    key={v.otherUserId + v.fullName}
                     avatar={v.avatar ?? null}
                     onClick={() => {
                       if (authContext?.user && +authContext.user?.id === v.otherUserId) {
