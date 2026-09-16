@@ -1,0 +1,41 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    justify-content:center;
+    align-items: center;
+    background-color: rgba(8, 8, 8, 0.068);
+    aspect-ratio: 1/1;
+    height: 12vh;
+    justify-self: center;
+    max-height: max-content;
+    border-radius: 5px;
+    cursor: pointer;
+    padding: 0.2vh;
+    box-shadow: -3px 2px 5px rgba(0, 0, 0, 0.185);
+    text-align: center;
+    max-width: max-content;
+    overflow-wrap: anywhere;
+}
+
+.container:hover {
+    opacity: 0.7;
+}
+
+.avatar {
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    aspect-ratio: 1/1;
+    width: 3.3vw;
+    border-radius: 50%;
+}
+
+.container .name {
+    font-size: 1rem;
+    display: -webkit-box;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+}
