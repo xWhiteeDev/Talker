@@ -1,8 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import style from './Searchbar.module.css';
 import type { ISearchResult } from '../../../../types/components/ISearch';
-import { useContext, useEffect, useState } from 'react';
-import { fetchImage } from '../../../../services/fetchImageService';
+import { useContext } from 'react';
 import { AuthContext } from '../../../../context/authContext';
 
 interface SearchbarProps {
@@ -19,16 +18,6 @@ interface SearchResultProps {
   moreImportantInfo?: string;
 }
 export default function Searchbar({ text, onInput, onSubmit, onUserClick, results }: SearchbarProps) {
-  const [defaultImage, setDefaultImage] = useState<string>();
-  const resultLength = results && results.length > 0
-  useEffect(() => {
-    if (resultLength) {
-      (async () => {
-        const img = await fetchImage('unk_person.png');
-        setDefaultImage(img);
-      })();
-    }
-  }, [resultLength]);
   const nav = useNavigate();
   const authContext = useContext(AuthContext);
   return (
@@ -60,7 +49,7 @@ export default function Searchbar({ text, onInput, onSubmit, onUserClick, result
               <SearchResult
                 key={v.fullName + i + v.avatar}
                 name={v.fullName}
-                avatarUrl={v.avatar ?? defaultImage}
+                avatarUrl={v.avatar}
                 moreImportantInfo={v.moreSpecifiedInfo}
                 onClick={() => {
                   if (authContext?.user && +authContext.user?.id === v.id) {
@@ -81,7 +70,7 @@ export default function Searchbar({ text, onInput, onSubmit, onUserClick, result
 const SearchResult = ({ name, moreImportantInfo, avatarUrl, onClick }: SearchResultProps) => {
   return (
     <div className={style.exampleresult} onClick={onClick}>
-      <div className={style.avatar} style={{ backgroundImage: `url(${avatarUrl})` }}></div>
+      <div className={style.avatar} style={{ backgroundImage: `url(${avatarUrl ?? `https://ui-avatars.com/api/?name=${name.split(' ').join('+')}`})` }}></div>
       <div className={style.result}>
         <div className={style.name}>{name}</div>
         {moreImportantInfo && <div className={style.importantinfo}>{moreImportantInfo}</div>}
