@@ -1,12 +1,17 @@
 
 export async function refreshToken() {
   const fullEndpoint = import.meta.env['VITE_SERVER_ENDPOINT'] + '/api/auth/refresh';
-  const res = await fetch(fullEndpoint, { method: 'POST', credentials: 'include' });
-  if (!res.ok) {
-    if (res.status === 401) {
-      return { success: false, requiresLogin: true };
+  try {
+    const res = await fetch(fullEndpoint, { method: 'POST', credentials: 'include' });
+    if (!res.ok) {
+      if (res.status === 401) {
+        return { success: false, requiresLogin: true };
+      }
+      return { success: false, requiresLogin: false };
     }
+    return { success: true, requiresLogin: false };
+  } catch (e) {
+    console.error('Server error during refreshing token',e);
     return { success: false, requiresLogin: false };
   }
-  return { success: true, requiresLogin: false };
 }

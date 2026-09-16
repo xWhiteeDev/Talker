@@ -31,7 +31,6 @@ export function useAPI() {
               return;
             }
             retry.current = true;
-            //TODO: TRY CATCH HERE later
             const refreshedNewToken = await refreshToken();
             if (!refreshedNewToken || refreshedNewToken.requiresLogin) {
               nav('/auth/login');
