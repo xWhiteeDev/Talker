@@ -2,7 +2,7 @@ import type { NextFunction, Request, Response } from 'express';
 import { configDotenv } from 'dotenv';
 import { ErrorHandler } from '../../handlers/errorHandler.js';
 import type { IAuthController, IAuthService, ILogin, IUserAuthorizationPassport, IUserRegisterPayload } from './types.js';
-import type { currentUser, IUser } from '../Account/types.js';
+import type { currentUser } from '../Account/types.js';
 
 configDotenv();
 export class AuthController implements IAuthController {
