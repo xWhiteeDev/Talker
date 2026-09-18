@@ -10,15 +10,13 @@ import type {
 
 export class friendshipService implements IFriendshipService {
   constructor(private FriendRepository: IFriendshipRepository) {}
-  async findRelationById(id: number): Promise<FriendsRelation> {
+  async findRelationById(id: number): Promise<FriendsRelation | null> {
     const existingRelation = await this.FriendRepository.findById(id);
-    if (!existingRelation) throw new ErrorHandler('Relation not found', 400);
-    return existingRelation;
+    return existingRelation ?? null;
   }
-  async findRelationByUserId(id: number): Promise<FriendsRelation[]> {
+  async findRelationByUserId(id: number): Promise<FriendsRelation[] | null> {
     const existingRelation = await this.FriendRepository.findByUserId(id);
-    if (!existingRelation) throw new ErrorHandler('Relations not found', 400);
-    return existingRelation;
+    return existingRelation ?? null;
   }
   async findRelationBetween(userId: number, otherId: number, status?: string): Promise<FriendsRelation | null> {
     const allowedStatuses = ['accepted', 'pending'];
@@ -43,7 +41,7 @@ export class friendshipService implements IFriendshipService {
   async updateRelation(userId: number, friendId: number, dto: FriendsRelationUpdateDTO): Promise<boolean> {
     const existingRelation = await this.FriendRepository.findRelationBetween(userId, friendId);
     if (!existingRelation) throw new ErrorHandler('Relation not found with exact user', 400);
-    if (existingRelation.friendId !== userId) throw new ErrorHandler('Cannot accept yourself ', 403);
+    if (existingRelation.userId === userId) throw new ErrorHandler('Cannot accept yourself', 403);
     const result = await this.FriendRepository.update(userId, friendId, dto);
     return result;
   }

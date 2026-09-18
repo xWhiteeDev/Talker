@@ -11,8 +11,8 @@ export interface IFriendshipRepository {
   findAllAcceptedRelations(requestedId: number): Promise<IAcceptedRelationRow[] | undefined>;
 }
 export interface IFriendshipService {
-  findRelationById(id: number): Promise<FriendsRelation>;
-  findRelationByUserId(id: number): Promise<FriendsRelation[]>;
+  findRelationById(id: number): Promise<FriendsRelation  | null>;
+  findRelationByUserId(id: number): Promise<FriendsRelation[]  | null>;
   findRelationBetween(userId: number, otherId: number, status?: string): Promise<FriendsRelation | null>;
   findAllAcceptedRelations(userId: number): Promise<IAcceptedRelationRow[] | null>;
   insertRelation(dto: FriendsRelationInsertDTO): Promise<boolean>;
