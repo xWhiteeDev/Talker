@@ -63,7 +63,7 @@ export class friendshipController implements IFriendshipController {
         throw new ErrorHandler('Unauthorised', 401);
       }
       const otherId = req.body.data.otherId;
-      if (!otherId || isNaN(otherId) || otherId < 0) {
+      if (!otherId || isNaN(otherId)  || typeof otherId === 'string' || otherId < 0) {
         res.status(400).json({ success: false });
         return false;
       }
