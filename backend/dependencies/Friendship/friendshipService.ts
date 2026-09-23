@@ -1,4 +1,4 @@
-import { ErrorHandler } from '../../handlers/errorHandler.js';
+import {ErrorHandler} from '../../handlers/errorHandler.js';
 import type {
   IFriendshipService,
   IFriendshipRepository,
@@ -9,7 +9,7 @@ import type {
 } from './types.js';
 
 export class friendshipService implements IFriendshipService {
-  constructor(private FriendRepository: IFriendshipRepository) {}
+  constructor(private FriendRepository: IFriendshipRepository) { }
   async findRelationById(id: number): Promise<FriendsRelation | null> {
     const existingRelation = await this.FriendRepository.findById(id);
     return existingRelation ?? null;
@@ -39,6 +39,10 @@ export class friendshipService implements IFriendshipService {
     return result;
   }
   async updateRelation(userId: number, friendId: number, dto: FriendsRelationUpdateDTO): Promise<boolean> {
+    const allowedStatuses = ['accepted', 'pending'];
+    if (dto.status && !allowedStatuses.includes(dto.status)) {
+      return false;
+    }
     const existingRelation = await this.FriendRepository.findRelationBetween(userId, friendId);
     if (!existingRelation) throw new ErrorHandler('Relation not found with exact user', 400);
     if (existingRelation.userId === userId) throw new ErrorHandler('Cannot accept yourself', 403);
@@ -49,7 +53,7 @@ export class friendshipService implements IFriendshipService {
     const existingRelation = await this.FriendRepository.findRelationBetween(userId, otherId, 'pending');
     if (!existingRelation) throw new ErrorHandler('Relation not found with exact user', 400);
     if (userId !== existingRelation.friendId) throw new ErrorHandler('You cannot accept relation offer sent by you', 403);
-    const result = await this.FriendRepository.update(userId, otherId, { status: 'accepted' });
+    const result = await this.FriendRepository.update(userId, otherId, {status: 'accepted'});
     return result;
   }
   async removeRelation(userId: number, otherId: number): Promise<boolean> {
