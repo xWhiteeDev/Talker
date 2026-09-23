@@ -39,6 +39,9 @@
     "jsonwebtoken": "^9.0.3",
     "mysql": "^2.18.1",
     "mysql2": "^3.22.5",
-    "vitest": "5.0.1"
+    "vitest": "^5.0.1"
+  },
+  "allowScripts": {
+    "esbuild@0.28.1": true
   }
 }
