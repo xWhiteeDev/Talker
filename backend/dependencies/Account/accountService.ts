@@ -15,7 +15,6 @@ export class AccountService implements IAccountService {
         payload.lastName = data.lastName.trim();
         try {
             payload.password = await bcrypt.hash(data.password, 12);
-
         } catch (error) {
             return false;
         }
