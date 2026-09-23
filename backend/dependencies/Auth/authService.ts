@@ -38,9 +38,8 @@ export class AuthService implements IAuthService {
       refresh: refreshToken,
     };
   }
-  async signUp(document: IAccountInsertDTO): Promise<boolean | null> {
+  async signUp(document: IAccountInsertDTO): Promise<boolean> {
     const result = await this.accountService.insertUser(document);
-
     return result;
   }
   signNewToken(userId: number, tokenType: 'access' | 'refresh'): string {
