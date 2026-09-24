@@ -16,21 +16,22 @@ export class AccountService implements IAccountService {
         try {
             payload.password = await bcrypt.hash(data.password, 12);
         } catch (error) {
-            return false;
+            throw error;
         }
         const result = await this.accountRepository.insert(payload);
         return result;
     }
     async updateUser(data: IAccountUpdateDTO): Promise<boolean> {
         const existingUser = await this.accountRepository.isExist(data.email);
-        if (!existingUser) return false;
+        if (!existingUser) {
+            throw new ErrorHandler("User not exist", 400);
+        }
         const payload = {...data};
         if (data.password) {
             try {
                 payload.password = await bcrypt.hash(data.password, 12);
-
             } catch (error) {
-                return false;
+                throw error;
             }
         }
         return await this.accountRepository.update(payload);
@@ -54,8 +55,8 @@ export class AccountService implements IAccountService {
         const result = await this.accountRepository.delete(email);
         return result;
     }
-    async findUserByCriteria(firstString?:string, lastString?:string) {
-        const result = await this.accountRepository.findByCriteria(firstString,lastString)
-        return result
+    async findUserByCriteria(firstString?: string, lastString?: string) {
+        const result = await this.accountRepository.findByCriteria(firstString, lastString);
+        return result;
     }
 }
