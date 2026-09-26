@@ -107,3 +107,117 @@ describe('updateUser', () => {
     });
 
 });
+
+describe('findUserWithCredentials', () => {
+    it('Should passsed when provided email in repository is the same as provided in service ', async () => {
+        const fakeRepository = {
+            findWithCredentials: vi.fn()
+        };
+        const service = new AccountService(fakeRepository as any);
+        const testEmail = 'test@proton.me';
+        await service.findUserWithCredentials(testEmail);
+        expect(fakeRepository.findWithCredentials).toHaveBeenCalledWith(testEmail);
+    });
+    it('Should return user row when found', async () => {
+        const fakeDbRow = {
+            email: 'test@proton.me'
+        };
+        const fakeRepository = {
+            findWithCredentials: vi.fn().mockResolvedValue(fakeDbRow)
+        };
+        const service = new AccountService(fakeRepository as any);
+        const testEmail = 'test@proton.me';
+        const result = await service.findUserWithCredentials(testEmail);
+        expect(result).toBe(fakeDbRow);
+    });
+});
+
+describe('findUserById', () => {
+    it('Should passsed when provided id in repository is the same as provided in service ', async () => {
+        const fakeRepository = {
+            findById: vi.fn()
+        };
+        const service = new AccountService(fakeRepository as any);
+        const testId = 2;
+        await service.findUserById(testId);
+        expect(fakeRepository.findById).toHaveBeenCalledWith(testId);
+    });
+    it('Should return user row when found', async () => {
+        const fakeDbRow = {
+            id: 5
+        };
+        const fakeRepository = {
+            findById: vi.fn().mockResolvedValue(fakeDbRow)
+        };
+        const service = new AccountService(fakeRepository as any);
+        const testId = 5;
+        const result = await service.findUserById(testId);
+        expect(result).toBe(fakeDbRow);
+    });
+});
+
+describe('isUserExist', () => {
+    it('Should passed when provided argument is the same as input', async () => {
+        const testEmail = 'test@proton.me';
+        const fakeRepo = {
+            isExist: vi.fn()
+        };
+        const service = new AccountService(fakeRepo as any);
+        await service.isUserExist(testEmail);
+        expect(fakeRepo.isExist).toHaveBeenCalledWith(testEmail);
+    });
+    it('Should return true when user exist', async () => {
+        const testEmail = 'test@proton.me';
+        const fakeRepo = {
+            isExist: vi.fn().mockResolvedValue(true)
+        };
+        const service = new AccountService(fakeRepo as any);
+        await expect(service.isUserExist(testEmail)).resolves.toBe(true);
+    });
+});
+
+describe('deleteUser', () => {
+    it('Should be passed when repository argument matching with input', async () => {
+        const testEmail = 'test@proton.me';
+        const fakeRepo = {
+            isExist: vi.fn().mockResolvedValue(true),
+            delete: vi.fn().mockResolvedValue(true)
+        };
+        const service = new AccountService(fakeRepo as any);
+        await service.deleteUser(testEmail);
+        expect(fakeRepo.isExist).toHaveBeenCalledWith(testEmail);
+        expect(fakeRepo.delete).toHaveBeenCalledWith(testEmail);
+
+    });
+    it('Should return false when user not exist', async () => {
+        const testEmail = 'test@proton.me';
+        const fakeRepo = {
+            isExist: vi.fn().mockResolvedValue(false)
+        };
+        const service = new AccountService(fakeRepo as any);
+        await expect(service.deleteUser(testEmail)).resolves.toBe(false);
+    });
+    it('Should return true when user exist and delete succeed', async () => {
+        const testEmail = 'test@proton.me';
+        const fakeRepo = {
+            isExist: vi.fn().mockResolvedValue(true),
+            delete: vi.fn().mockResolvedValue(true),
+
+        };
+        const service = new AccountService(fakeRepo as any);
+        await expect(service.deleteUser(testEmail)).resolves.toBe(true);
+    });
+});
+
+describe('findUserByCriteria', () => {
+    it('Should pass correct args and return its result', async () => {
+        const fakeAcountRow = [{fullName: 'Max Harris', id: 3}];
+        const fakeRepository = {
+            findByCriteria: vi.fn().mockResolvedValue(fakeAcountRow)
+        };
+        const service = new AccountService(fakeRepository as any);
+        const result = await service.findUserByCriteria('Max', 'Harris');
+        expect(fakeRepository.findByCriteria).toHaveBeenCalledWith('Max', 'Harris');
+        expect(result).toBe(fakeAcountRow);
+    });
+});
