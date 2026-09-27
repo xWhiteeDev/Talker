@@ -318,7 +318,7 @@ WHERE p.id = :id`;
     const [result] = await this.pool.execute<ResultSetHeader>(query, {id});
     return result.affectedRows > 0;
   }
-  async findAll(userId: number): Promise<PostRow[]> {
+  async findAll(userId: number): Promise<PostRow[] | null> {
     const query: string = `
   WITH post_reactions AS (
     SELECT 
@@ -376,6 +376,7 @@ WHERE p.id = :id`;
 `;
 
     const [result] = await this.pool.query<PostRow[]>(query, {userId});
+    if (result.length === 0) return null
     return result;
   }
 }

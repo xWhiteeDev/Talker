@@ -1,12 +1,12 @@
-import type { RowDataPacket } from 'mysql2';
+import type {RowDataPacket} from 'mysql2';
 
 export interface IPostRepository {
   findById(id: number, currentUserId?: number, withDetails?: boolean): Promise<PostRow | undefined>;
-  findByAuthor(userId: number,targetId:number): Promise<PostRow[] | null>;
+  findByAuthor(userId: number, targetId: number): Promise<PostRow[] | null>;
   insert(dto: PostInsertDTO): Promise<boolean>;
   update(id: number, dto: PostUpdateDTO): Promise<boolean>;
   delete(id: number): Promise<boolean>;
-  findAll(userId: number): Promise<PostRow[]>;
+  findAll(userId: number): Promise<PostRow[] | null>;
 }
 export interface IPostService {
   findById(userId: number, id: number, withDetails?: boolean): Promise<PostRow | null>;
