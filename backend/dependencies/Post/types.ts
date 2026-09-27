@@ -43,11 +43,10 @@ export type PostInsertDTO = {
   video?: string[];
   file?: string[];
   gif?: string[];
-  tagged_users?: string[];
+  tagged_users?: number[];
   pinned_place?: string;
 };
 export interface PostUpdateDTO extends Omit<PostInsertDTO, 'author' | 'authorId'> {
-  id:number
 }
 
 type Visibility = 'Public' | 'Friends' | 'Private';
