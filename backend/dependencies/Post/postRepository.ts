@@ -1,7 +1,7 @@
-import type { ResultSetHeader, ExecuteValues, Pool } from 'mysql2/promise';
-import type { IPostRepository, PostInsertDTO, PostRow, PostUpdateDTO } from './types.js';
+import type {ResultSetHeader, ExecuteValues, Pool} from 'mysql2/promise';
+import type {IPostRepository, PostInsertDTO, PostRow, PostUpdateDTO} from './types.js';
 export class PostRepository implements IPostRepository {
-  constructor(private pool: Pool) {  }
+  constructor(private pool: Pool) { }
   async findById(id: number, currentUserId: number, withDetails?: boolean): Promise<PostRow | undefined> {
     let query: string = `
   SELECT 
@@ -256,8 +256,8 @@ WHERE p.id = :id`;
         my: myProfileQuery,
       },
       params: {
-        someone: { userId, targetId },
-        my: { userId },
+        someone: {userId, targetId},
+        my: {userId},
       },
     };
 
@@ -308,15 +308,14 @@ WHERE p.id = :id`;
       }
     }
     if (Object.keys(updateParams).length == 0) return false;
-    updateParams['id'] = id;
     const connectedQueryValues: string = updateKeys.join(',');
     const fullLiteralQueryString: string = `UPDATE posts SET ${connectedQueryValues} WHERE id=:id LIMIT 1`;
-    const [result] = await this.pool.execute<ResultSetHeader>(fullLiteralQueryString, updateParams as ExecuteValues);
+    const [result] = await this.pool.execute<ResultSetHeader>(fullLiteralQueryString, {id, ...updateParams} as ExecuteValues);
     return result.affectedRows > 0;
   }
   async delete(id: number): Promise<boolean> {
     const query: string = 'DELETE FROM posts WHERE id=:id LIMIT 1';
-    const [result] = await this.pool.execute<ResultSetHeader>(query, { id });
+    const [result] = await this.pool.execute<ResultSetHeader>(query, {id});
     return result.affectedRows > 0;
   }
   async findAll(userId: number): Promise<PostRow[]> {
@@ -376,7 +375,7 @@ WHERE p.id = :id`;
   ORDER BY posts.id DESC
 `;
 
-    const [result] = await this.pool.query<PostRow[]>(query, { userId });
+    const [result] = await this.pool.query<PostRow[]>(query, {userId});
     return result;
   }
 }
