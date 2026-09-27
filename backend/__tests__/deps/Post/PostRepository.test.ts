@@ -219,3 +219,27 @@ describe('delete', () => {
         expect(result).toBe(true);
     });
 });
+describe('findAll', () => {
+    const fakeDbRows: IMockedPostRow[] = [];
+
+    for (let i = 0; i < 4; i++) {
+        const mockedRow = mockPostRow({
+            id: i,
+            authorId: 3
+        });
+        fakeDbRows.push(mockedRow);
+    }
+    it('Should pass when both of arguments provided correctly', async () => {
+
+        const fakePool = {
+            query: vi.fn().mockResolvedValue([fakeDbRows])
+        };
+        const repo = new PostRepository(fakePool as any);
+        const result = await repo.findAll(3);
+        const [query, params] = fakePool.query.mock.calls[0] as [string, Record<string, unknown>];
+        expect(query).toContain(`posts.visible_for = 'Friends'`);
+        expect(query).toContain(`posts.visible_for = 'Private' AND posts.author_id=:userId`);
+        expect(params).toEqual({userId: 3});
+        expect(result).toContainEqual(expect.objectContaining({authorId: 3}));
+    });
+});
