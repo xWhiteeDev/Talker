@@ -58,6 +58,23 @@ describe('insertUser', () => {
         const service = new AccountService(fakeAccountRepository as any);
         await expect(service.insertUser(fakeInsertData)).resolves.toBe(false);
     });
+    it('Should trim names and hash password before insert', async () => {
+        vi.mocked(bcrypt.hash).mockResolvedValue('hashed-password' as never);
+        const fakeAccountRepository = {
+            isExist: vi.fn().mockResolvedValue(false),
+            insert: vi.fn().mockResolvedValue(true)
+        };
+        const service = new AccountService(fakeAccountRepository as any);
+        await service.insertUser({...fakeInsertData, firstName: '  Jacob ', lastName: ' Sohan  '});
+        expect(fakeAccountRepository.isExist).toHaveBeenCalledWith('test1234@proton.me');
+        expect(bcrypt.hash).toHaveBeenCalledWith('123456a', 12);
+        expect(fakeAccountRepository.insert).toHaveBeenCalledWith({
+            ...fakeInsertData,
+            firstName: 'Jacob',
+            lastName: 'Sohan',
+            password: 'hashed-password'
+        });
+    });
 });
 
 describe('updateUser', () => {
@@ -104,6 +121,27 @@ describe('updateUser', () => {
         };
         const service = new AccountService(fakeAccountRepository as any);
         await expect(service.updateUser(fakeUpdateData)).resolves.toBe(false);
+    });
+    it('Should pass hashed password to repository', async () => {
+        vi.mocked(bcrypt.hash).mockResolvedValue('hashed-password' as never);
+        const fakeAccountRepository = {
+            isExist: vi.fn().mockResolvedValue(true),
+            update: vi.fn().mockResolvedValue(true)
+        };
+        const service = new AccountService(fakeAccountRepository as any);
+        await service.updateUser(fakeUpdateData);
+        expect(bcrypt.hash).toHaveBeenCalledWith('1234567a', 12);
+        expect(fakeAccountRepository.update).toHaveBeenCalledWith({...fakeUpdateData, password: 'hashed-password'});
+    });
+    it('Should not hash password when it is not updated', async () => {
+        const fakeAccountRepository = {
+            isExist: vi.fn().mockResolvedValue(true),
+            update: vi.fn().mockResolvedValue(true)
+        };
+        const service = new AccountService(fakeAccountRepository as any);
+        await service.updateUser({email: 'test12345@proton.me', lastName: 'Hilton'});
+        expect(bcrypt.hash).not.toHaveBeenCalled();
+        expect(fakeAccountRepository.update).toHaveBeenCalledWith({email: 'test12345@proton.me', lastName: 'Hilton'});
     });
 
 });

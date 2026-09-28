@@ -125,6 +125,24 @@ describe('findByCriteria', () => {
         await repo.findByCriteria('Harris');
         expect(fakePool.query).toHaveBeenCalledWith(expect.stringContaining('WHERE firstName=:firstString OR lastName=:firstString'), {firstString: 'Harris', lastString: undefined});
     });
+    it('Should search by last string only when first string is not provided', async () => {
+        const fakeRows = [{fullName: 'Calvin Harris', id: 55}];
+        const fakePool = {
+            query: vi.fn().mockResolvedValue([fakeRows])
+        };
+        const repo = new AccountRepository(fakePool as any);
+        const result = await repo.findByCriteria(undefined, 'Harris');
+        expect(fakePool.query).toHaveBeenCalledWith(expect.stringContaining('WHERE lastName=:lastString OR firstName=:lastString'), {firstString: undefined, lastString: 'Harris'});
+        expect(result).toBe(fakeRows);
+    });
+    it('Should return null without querying database when no criteria provided', async () => {
+        const fakePool = {
+            query: vi.fn()
+        };
+        const repo = new AccountRepository(fakePool as any);
+        await expect(repo.findByCriteria()).resolves.toBe(null);
+        expect(fakePool.query).not.toHaveBeenCalled();
+    });
 });
 
 describe('isExist', () => {
