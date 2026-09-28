@@ -130,3 +130,149 @@ describe('findLatestPosts', () => {
     });
 });
 
+
+describe('findByAuthor', () => {
+    it('Should pass userId and authorId to repository and return its result', async () => {
+        const mockedRows = [mockPostRow({id: 1, authorId: 5}), mockPostRow({id: 2, authorId: 5})];
+        const fakePostRepository = {
+            findByAuthor: vi.fn().mockResolvedValue(mockedRows)
+        };
+        const service = new PostService(fakePostRepository as any, {} as any, {} as any);
+        const result = await service.findByAuthor(3, 5);
+        expect(fakePostRepository.findByAuthor).toHaveBeenCalledWith(3, 5);
+        expect(result).toBe(mockedRows);
+    });
+
+    it('Should return null when author does not have posts', async () => {
+        const fakePostRepository = {
+            findByAuthor: vi.fn().mockResolvedValue(null)
+        };
+        const service = new PostService(fakePostRepository as any, {} as any, {} as any);
+        await expect(service.findByAuthor(3, 5)).resolves.toBe(null);
+    });
+});
+
+describe('insertPost', () => {
+    const dto = {authorId: 3, content: 'Hello world', visible_for: 'Public' as const};
+
+    it('Should throw an error when author account does not exist', async () => {
+        const fakeAccountService = {
+            findUserById: vi.fn().mockResolvedValue(null)
+        };
+        const fakePostRepository = {
+            insert: vi.fn()
+        };
+        const service = new PostService(fakePostRepository as any, {} as any, fakeAccountService as any);
+        await expect(service.insertPost(dto)).rejects.toThrow('User not exist');
+        expect(fakeAccountService.findUserById).toHaveBeenCalledWith(3);
+        expect(fakePostRepository.insert).not.toHaveBeenCalled();
+    });
+
+    it('Should throw an error when insert failed', async () => {
+        const fakeAccountService = {
+            findUserById: vi.fn().mockResolvedValue({id: 3})
+        };
+        const fakePostRepository = {
+            insert: vi.fn().mockResolvedValue(false)
+        };
+        const service = new PostService(fakePostRepository as any, {} as any, fakeAccountService as any);
+        await expect(service.insertPost(dto)).rejects.toThrow('Operation failed');
+    });
+
+    it('Should return true when post inserted', async () => {
+        const fakeAccountService = {
+            findUserById: vi.fn().mockResolvedValue({id: 3})
+        };
+        const fakePostRepository = {
+            insert: vi.fn().mockResolvedValue(true)
+        };
+        const service = new PostService(fakePostRepository as any, {} as any, fakeAccountService as any);
+        await expect(service.insertPost(dto)).resolves.toBe(true);
+        expect(fakePostRepository.insert).toHaveBeenCalledWith(dto);
+    });
+});
+
+describe('updatePost', () => {
+    const dto = {content: 'Updated content', visible_for: 'Friends' as const};
+
+    it('Should throw an error when post does not exist', async () => {
+        const fakePostRepository = {
+            findById: vi.fn().mockResolvedValue(undefined),
+            update: vi.fn()
+        };
+        const service = new PostService(fakePostRepository as any, {} as any, {} as any);
+        await expect(service.updatePost(3, 10, dto)).rejects.toThrow('Post does not exist');
+        expect(fakePostRepository.findById).toHaveBeenCalledWith(10, 3);
+        expect(fakePostRepository.update).not.toHaveBeenCalled();
+    });
+
+    it('Should throw access denied when user is not an author', async () => {
+        const fakePostRepository = {
+            findById: vi.fn().mockResolvedValue(mockPostRow({id: 10, authorId: 7})),
+            update: vi.fn()
+        };
+        const service = new PostService(fakePostRepository as any, {} as any, {} as any);
+        await expect(service.updatePost(3, 10, dto)).rejects.toThrow('Access denied');
+        expect(fakePostRepository.update).not.toHaveBeenCalled();
+    });
+
+    it('Should throw an error when update failed', async () => {
+        const fakePostRepository = {
+            findById: vi.fn().mockResolvedValue(mockPostRow({id: 10, authorId: 3})),
+            update: vi.fn().mockResolvedValue(false)
+        };
+        const service = new PostService(fakePostRepository as any, {} as any, {} as any);
+        await expect(service.updatePost(3, 10, dto)).rejects.toThrow('Operation failed');
+    });
+
+    it('Should return true when post updated', async () => {
+        const fakePostRepository = {
+            findById: vi.fn().mockResolvedValue(mockPostRow({id: 10, authorId: 3})),
+            update: vi.fn().mockResolvedValue(true)
+        };
+        const service = new PostService(fakePostRepository as any, {} as any, {} as any);
+        await expect(service.updatePost(3, 10, dto)).resolves.toBe(true);
+        expect(fakePostRepository.update).toHaveBeenCalledWith(10, dto);
+    });
+});
+
+describe('deletePost', () => {
+    it('Should throw an error when post does not exist', async () => {
+        const fakePostRepository = {
+            findById: vi.fn().mockResolvedValue(undefined),
+            delete: vi.fn()
+        };
+        const service = new PostService(fakePostRepository as any, {} as any, {} as any);
+        await expect(service.deletePost(3, 10)).rejects.toThrow('Post does not exist');
+        expect(fakePostRepository.delete).not.toHaveBeenCalled();
+    });
+
+    it('Should throw access denied when user is not an author', async () => {
+        const fakePostRepository = {
+            findById: vi.fn().mockResolvedValue(mockPostRow({id: 10, authorId: 7})),
+            delete: vi.fn()
+        };
+        const service = new PostService(fakePostRepository as any, {} as any, {} as any);
+        await expect(service.deletePost(3, 10)).rejects.toThrow('Access denied');
+        expect(fakePostRepository.delete).not.toHaveBeenCalled();
+    });
+
+    it('Should throw an error when delete failed', async () => {
+        const fakePostRepository = {
+            findById: vi.fn().mockResolvedValue(mockPostRow({id: 10, authorId: 3})),
+            delete: vi.fn().mockResolvedValue(false)
+        };
+        const service = new PostService(fakePostRepository as any, {} as any, {} as any);
+        await expect(service.deletePost(3, 10)).rejects.toThrow('Operation failed');
+    });
+
+    it('Should return true when post deleted', async () => {
+        const fakePostRepository = {
+            findById: vi.fn().mockResolvedValue(mockPostRow({id: 10, authorId: 3})),
+            delete: vi.fn().mockResolvedValue(true)
+        };
+        const service = new PostService(fakePostRepository as any, {} as any, {} as any);
+        await expect(service.deletePost(3, 10)).resolves.toBe(true);
+        expect(fakePostRepository.delete).toHaveBeenCalledWith(10);
+    });
+});

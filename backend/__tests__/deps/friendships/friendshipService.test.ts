@@ -174,3 +174,62 @@ describe('removeRelation', () => {
     expect(fakeRepo.delete).toHaveBeenCalled();
   });
 });
+describe('findRelationById', () => {
+  it('should return null when relation not found', async () => {
+    const fakeRepo = {
+      findById: vi.fn().mockResolvedValue(undefined),
+    };
+    const service = new friendshipService(fakeRepo as any);
+    await expect(service.findRelationById(3)).resolves.toBeNull();
+    expect(fakeRepo.findById).toHaveBeenCalledWith(3);
+  });
+
+  it('should return relation when found', async () => {
+    const relation = {id: 3, userId: 1, friendId: 2, status: 'accepted'};
+    const fakeRepo = {
+      findById: vi.fn().mockResolvedValue(relation),
+    };
+    const service = new friendshipService(fakeRepo as any);
+    await expect(service.findRelationById(3)).resolves.toBe(relation);
+  });
+});
+
+describe('findRelationByUserId', () => {
+  it('should return null when relations not found', async () => {
+    const fakeRepo = {
+      findByUserId: vi.fn().mockResolvedValue(undefined),
+    };
+    const service = new friendshipService(fakeRepo as any);
+    await expect(service.findRelationByUserId(1)).resolves.toBeNull();
+    expect(fakeRepo.findByUserId).toHaveBeenCalledWith(1);
+  });
+
+  it('should return relations when found', async () => {
+    const relations = [{id: 3}, {id: 4}];
+    const fakeRepo = {
+      findByUserId: vi.fn().mockResolvedValue(relations),
+    };
+    const service = new friendshipService(fakeRepo as any);
+    await expect(service.findRelationByUserId(1)).resolves.toBe(relations);
+  });
+});
+
+describe('findAllAcceptedRelations', () => {
+  it('should return null when relations not found', async () => {
+    const fakeRepo = {
+      findAllAcceptedRelations: vi.fn().mockResolvedValue(undefined),
+    };
+    const service = new friendshipService(fakeRepo as any);
+    await expect(service.findAllAcceptedRelations(1)).resolves.toBeNull();
+    expect(fakeRepo.findAllAcceptedRelations).toHaveBeenCalledWith(1);
+  });
+
+  it('should return accepted relations when found', async () => {
+    const relations = [{otherUserId: 2, fullName: 'Max Harris'}];
+    const fakeRepo = {
+      findAllAcceptedRelations: vi.fn().mockResolvedValue(relations),
+    };
+    const service = new friendshipService(fakeRepo as any);
+    await expect(service.findAllAcceptedRelations(1)).resolves.toBe(relations);
+  });
+});

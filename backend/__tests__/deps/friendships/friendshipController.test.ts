@@ -209,3 +209,98 @@ describe('removeRelation', () => {
     expect(fakeService.removeRelation).toHaveBeenCalledWith(5, 4);
   });
 });
+describe('acceptRelation', () => {
+  it('should throw unauthorised when currentUser is not passed', async () => {
+    const fakeService = {};
+    const http = createHttpMock({currentUser: undefined}) as any;
+    const controller = new friendshipController(fakeService as any);
+    await controller.acceptRelation(http.req, http.res, http.next);
+    expect(http.next).toHaveBeenCalledWith(expect.objectContaining({message: 'Unauthorised'}));
+  });
+
+  it('should return status 400 and success false when otherId is not passed', async () => {
+    const fakeService = {
+      acceptRelation: vi.fn(),
+    };
+    const http = createHttpMock({
+      currentUser: {id: 5},
+      body: {data: {otherId: undefined}}
+    }) as any;
+    const controller = new friendshipController(fakeService as any);
+    await controller.acceptRelation(http.req, http.res, http.next);
+    expect(http.res.status).toHaveBeenCalledWith(400);
+    expect(http.res.json).toHaveBeenCalledWith({success: false});
+    expect(fakeService.acceptRelation).not.toHaveBeenCalled();
+  });
+
+  it('should return status 400 and success false when otherId is negative', async () => {
+    const fakeService = {
+      acceptRelation: vi.fn(),
+    };
+    const http = createHttpMock({
+      currentUser: {id: 5},
+      body: {data: {otherId: -3}}
+    }) as any;
+    const controller = new friendshipController(fakeService as any);
+    await controller.acceptRelation(http.req, http.res, http.next);
+    expect(http.res.status).toHaveBeenCalledWith(400);
+    expect(http.res.json).toHaveBeenCalledWith({success: false});
+    expect(fakeService.acceptRelation).not.toHaveBeenCalled();
+  });
+
+  it('should return status 400 and success false when otherId is not a number', async () => {
+    const fakeService = {
+      acceptRelation: vi.fn(),
+    };
+    const http = createHttpMock({
+      currentUser: {id: 5},
+      body: {data: {otherId: 'abc'}}
+    }) as any;
+    const controller = new friendshipController(fakeService as any);
+    await controller.acceptRelation(http.req, http.res, http.next);
+    expect(http.res.status).toHaveBeenCalledWith(400);
+    expect(fakeService.acceptRelation).not.toHaveBeenCalled();
+  });
+
+  it('should call next with an error when accept failed', async () => {
+    const fakeService = {
+      acceptRelation: vi.fn().mockResolvedValue(false),
+    };
+    const http = createHttpMock({
+      currentUser: {id: 5},
+      body: {data: {otherId: 4}}
+    }) as any;
+    const controller = new friendshipController(fakeService as any);
+    await controller.acceptRelation(http.req, http.res, http.next);
+    expect(http.next).toHaveBeenCalledWith(expect.objectContaining({message: 'Failed to accept relation'}));
+    expect(http.res.status).not.toHaveBeenCalled();
+  });
+
+  it('should pass service error to next', async () => {
+    const fakeService = {
+      acceptRelation: vi.fn().mockRejectedValue(new Error('You cannot accept relation offer sent by you')),
+    };
+    const http = createHttpMock({
+      currentUser: {id: 5},
+      body: {data: {otherId: 4}}
+    }) as any;
+    const controller = new friendshipController(fakeService as any);
+    await controller.acceptRelation(http.req, http.res, http.next);
+    expect(http.next).toHaveBeenCalledWith(expect.objectContaining({message: 'You cannot accept relation offer sent by you'}));
+  });
+
+  it('should return status 202 and success true when succeed', async () => {
+    const fakeService = {
+      acceptRelation: vi.fn().mockResolvedValue(true),
+    };
+    const http = createHttpMock({
+      currentUser: {id: 5},
+      body: {data: {otherId: 4}}
+    }) as any;
+    const controller = new friendshipController(fakeService as any);
+    await controller.acceptRelation(http.req, http.res, http.next);
+    expect(fakeService.acceptRelation).toHaveBeenCalledWith(5, 4);
+    expect(http.res.status).toHaveBeenCalledWith(202);
+    expect(http.res.json).toHaveBeenCalledWith({success: true, data: true});
+  });
+});
