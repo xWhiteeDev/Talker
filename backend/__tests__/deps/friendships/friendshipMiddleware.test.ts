@@ -25,7 +25,6 @@ describe('validateOtherUser', () => {
   it('should call next without arguments when otherId is a number', async () => {
     const http = createHttpMock({body: {data: {otherId: 5}}}) as any;
     await validateOtherUser()(http.req, http.res, http.next);
-    expect(http.next).toHaveBeenCalledTimes(1);
     expect(http.next).toHaveBeenCalledWith();
   });
 

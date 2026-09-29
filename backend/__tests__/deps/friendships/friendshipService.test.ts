@@ -119,7 +119,7 @@ describe('updateRelation', () => {
   it('should return false when status is not allowed', async () => {
     const fakeRepo = {};
     const service = new friendshipService(fakeRepo as any);
-    await expect(service.updateRelation(1, 2, {status: 'blocked'})).resolves.toBe(false);
+    await expect(service.updateRelation(1, 2, {status: 'blocked'} as any)).resolves.toBe(false);
   });
 });
 

@@ -1,4 +1,4 @@
-import {describe, expect, it, vi} from "vitest";
+import {afterAll, beforeAll, describe, expect, it, vi} from "vitest";
 import {PostRepository} from "../../../dependencies/Post/postRepository.js";
 
 
@@ -58,7 +58,7 @@ describe('findById', () => {
 
         const repo = new PostRepository(fakePool as any);
         const result = await repo.findById(6, 4);
-        const [query, params] = fakePool.query.mock.calls[0] as any;
+        const [query, params] = fakePool.query.mock.calls[0] as [string, Record<string, unknown>];
         expect(query).toContain('posts.id = :id');
         expect(query).toContain("posts.visible_for = 'Friends'");
         expect(query).toContain("posts.visible_for = 'Private'");
@@ -220,15 +220,19 @@ describe('delete', () => {
     });
 });
 describe('findAll', () => {
-    const fakeDbRows: IMockedPostRow[] = [];
-
-    for (let i = 0; i < 4; i++) {
-        const mockedRow = mockPostRow({
-            id: i,
-            authorId: 3
-        });
-        fakeDbRows.push(mockedRow);
-    }
+    let fakeDbRows: IMockedPostRow[] = [];
+    beforeAll(() => {
+        for (let i = 0; i < 4; i++) {
+            const mockedRow = mockPostRow({
+                id: i,
+                authorId: 3
+            });
+            fakeDbRows.push(mockedRow);
+        }
+    });
+    afterAll(() => {
+        fakeDbRows = [];
+    });
     it('Should pass when both of arguments provided correctly', async () => {
 
         const fakePool = {

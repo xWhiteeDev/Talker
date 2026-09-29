@@ -16,7 +16,7 @@ describe('findById', () => {
       query: vi.fn().mockResolvedValue([[]]),
     };
     const repo = new friendshipRepository(fakePool as any);
-    await expect(repo.findById(3)).resolves.toBeUndefined();
+    await expect(repo.findById(3)).resolves.toBe(undefined);
   });
 
   it('should return relation when found', async () => {

@@ -3,7 +3,7 @@ import {CommentReactionRepository} from "../../../dependencies/CommentReaction/C
 import type {CommentReactionInsertDTO} from "../../../dependencies/CommentReaction/types.js";
 
 describe('findById', () => {
-    it('Should pass id to WHERE clause', async () => {
+    it('Should pass when query contains WHERE id and params received id', async () => {
         const fakePool = {
             query: vi.fn().mockResolvedValue([[]])
         };
@@ -17,7 +17,7 @@ describe('findById', () => {
             query: vi.fn().mockResolvedValue([[]])
         };
         const repo = new CommentReactionRepository(fakePool as any);
-        await expect(repo.findById(7)).resolves.toBeUndefined();
+        await expect(repo.findById(7)).resolves.toBe(undefined);
     });
 
     it('Should return reaction when found', async () => {

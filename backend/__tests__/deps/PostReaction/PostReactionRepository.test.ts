@@ -17,7 +17,7 @@ describe('findById', () => {
             query: vi.fn().mockResolvedValue([[]])
         };
         const repo = new PostReactionRepository(fakePool as any);
-        await expect(repo.findById(7)).resolves.toBeUndefined();
+        await expect(repo.findById(7)).resolves.toBe(undefined);
     });
 
     it('Should return reaction when found', async () => {

@@ -28,7 +28,7 @@ function createServices(overrides: {account?: unknown, posts?: unknown, relation
     };
 }
 
-function createProfileService(services: ReturnType<typeof createServices>) {
+function createProfileService(services:ReturnType<typeof createServices>) {
     return new ProfileService(services.accountService as any, services.postService as any, services.friendshipService as any);
 }
 
