@@ -1,122 +1,15 @@
-import { useContext } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import Logo from '../../../../../generic/UI/Logo/Logo.tsx';
-import CustomText from '../../../../../generic/UI/Text/Text.tsx';
-import Quote from '../../../../../generic/UI/Quote/Quote.tsx';
-import style from './Login.module.css';
-import Button from '../../../../../generic/UI/Button/Button.tsx';
-import Input from '../../../../../generic/UI/Input/Input.tsx';
-import { handleSubmitAuthForm } from '../../../modules/authService.ts';
-import useNotify from '../../../../../../hooks/useNotify.tsx';
-import { AuthContext } from '../../../../../../context/authContext.ts';
-import type { IObjectRequirements } from '../../../../../../services/types';
+import CustomText from '../../../../../../newComponents/CustomText/CustomText';
+import FlexContainer from '../../../../../../newComponents/FlexContainer/FlexContainer';
 
-const loginValidationConfig: IObjectRequirements = {
-  email: {
-    type: 'string',
-    requirements: {
-      minLength: 6,
-      maxLength: 100,
-      canBeNull: false,
-    },
-  },
-  password: {
-    type: 'string',
-    requirements: {
-      minLength: 5,
-      maxLength: 100,
-      canBeNull: false,
-    },
-  },
-};
+const welcomeTextArray = ['Stay on track, with your friends', `Don't miss out on the action!`, 'Great news awaits you!'];
 
 export default function Login() {
-  const nav = useNavigate();
-  const { setNotification } = useNotify();
-  const authCtx = useContext(AuthContext);
   return (
-    <div className={style.sidebar}>
-      <div className={style.mediaInfo}>
-        <div className={style.mediaLogo}>
-          <Logo additionalStyle={{ aspectRatio: '1/1', width: '45%' }} />
-          <CustomText text="Let's talk" bottomText="together!" additionalStyle={{ fontSize: '2.1rem' }} />
-        </div>
-        <Quote text="Say Hello to your friends!" additionalStyle={{ fontSize: '1.9rem', fontWeight: '600' }} />
-      </div>
-      <div className={style.section}>
-        <form
-          onSubmit={async (event) => {
-            const authorizationResult = await handleSubmitAuthForm(event, setNotification, 'login', loginValidationConfig);
-            if (authorizationResult) {
-              if (authCtx) {
-                if (authorizationResult.success && authorizationResult.data) {
-                  authCtx.login(authorizationResult.data);
-                  await nav('/');
-                }
-              }
-            }
-          }}
-        >
-          <CustomText text="Fill authorization fields" additionalStyle={{ fontWeight: '600', fontSize: '1.2rem' }} />
-          <Input
-            additionalStyle={{
-              width: '85%',
-              height: '9%',
-              fontSize: '1.2rem',
-            }}
-            type="email"
-            name="email"
-            placeholder="Type your email or phone number"
-            image="login_ico.png"
-          />
-          <Input
-            additionalStyle={{ width: '85%', height: '9%' }}
-            type="password"
-            name="password"
-            placeholder="Type your password"
-            image="pass_ico.png"
-          />
-          <Link
-            to="/recovery"
-            style={{
-              color: 'black',
-              fontSize: '1.32rem',
-              marginTop: '7%',
-            }}
-          >
-            I forgot a password...
-          </Link>
-          <div className={style.buttonSection}>
-            <Button
-              text="Sign in"
-              type="submit"
-              additionalStyle={{
-                width: '60%',
-                height: '19%',
-                backgroundColor: '#3dc2318a',
-                color: 'white',
-                fontSize: '1.7rem',
-              }}
-            />
-            <Button
-              type="button"
-              text="Sign up"
-              additionalStyle={{
-                width: '60%',
-                height: '19%',
-                backgroundColor: '#0c81b827',
-                color: 'white',
-                fontSize: '1.7rem',
-              }}
-              onClick={() => nav('/auth/register')}
-            />
-            <CustomText
-              additionalStyle={{ textAlign: 'center' }}
-              text="Remember! Talker administration will never ask you about your password"
-            />
-          </div>
-        </form>
-      </div>
-    </div>
+    <FlexContainer direction="row" width="100vw" height="100vh" justifyContent="flex-start">
+      <FlexContainer direction="row" width="45%" height="100vh" gap="4vw" justifyContent="center">
+        <CustomText fontSize="2.8rem" text={<span><b>Stay</b> on track, <b>with</b> your <b>friends</b> </span>} color="#2e2e2ebe" withShadow={true} />
+      </FlexContainer>
+      <FlexContainer direction="row" width="100%" height="100vh" gap="4vw" justifyContent="center" />
+    </FlexContainer>
   );
 }
