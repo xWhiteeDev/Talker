@@ -1,4 +1,4 @@
-import style from "./optionList.module.css";
+import style from "./OptionList.module.css";
 
 interface OptionListProps {
     placeholderText: string;
