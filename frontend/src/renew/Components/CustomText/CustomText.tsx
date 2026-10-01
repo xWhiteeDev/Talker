@@ -1,20 +1,21 @@
 interface ICustomTextProps {
   text: any;
   withShadow?: boolean;
-  color?: string;
+  color: string;
   fontSize?: string;
   fontWeight?: string;
-  bolderText?:string[]
+  bolderText?:string[];
+  textShadow?:string
 }
 
 function CustomText(props: ICustomTextProps) {
   return (
     <span
       style={{
-        color: props.color ?? 'black',
+        color: props.color,
         fontSize: props.fontSize ?? '1rem',
         fontWeight: props.fontWeight ?? '500',
-        textShadow: props.withShadow ? `5px 4px 4px${props.color}` : '',
+        textShadow: props.textShadow,
       }}
     >
       {props.text}
