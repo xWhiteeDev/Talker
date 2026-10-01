@@ -1,16 +1,11 @@
 import { createRoot } from 'react-dom/client';
 import App from './App.tsx';
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import Auth from './components/features/Auth/components/AuthLayout.tsx';
-import { useRef, useState } from 'react';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';import { useRef, useState } from 'react';
 import CustomNotification from './components/generic/UI/Notification/CustomNotification.tsx';
 import Home from './components/features/Home/Home.tsx';
-import Login from './components/features/Auth/components/shared/Login/Login.tsx';
-import Register from './components/features/Auth/components/shared/Register/Register.tsx';
 import { CustomNotificationCtx } from './context/customNotificationContext.ts';
 
 import ProtectedRoute from './components/features/ProtectedRoute/ProtectedRoute.tsx';
-import AuthorizationProtectedRoute from './components/features/ProtectedRoute/AuthorizationProtectedRoute.tsx';
 import './Main.css';
 import type { INotificationHookProps } from './types/hooks/INotificationHook';
 import { LargeActivity } from './components/features/Feed/components/Activity/Large/LargeActivity.tsx';
@@ -18,6 +13,8 @@ import Profile from './components/features/Feed/components/profile/Profile.tsx';
 import { AuthContext } from './context/authContext.ts';
 import type { IBasicUserInfo } from './types/components/IUser';
 import ServerError from './components/features/ServerError/ServerError.tsx';
+import Login from './components/features/Auth/components/Login/Login.tsx';
+import Register from './components/features/Auth/components/Register/Register.tsx';
 
 const root = document.getElementById('root');
 const routes = createBrowserRouter([
@@ -28,6 +25,14 @@ const routes = createBrowserRouter([
       {
         path: '/error/server/:errorcode',
         element: <ServerError />,
+      },
+      {
+        path:'/login',
+        element:<Login/>
+      },
+      {
+        path:'/register',
+        element:<Register/>
       },
       {
         path: '/',
@@ -60,29 +65,6 @@ const routes = createBrowserRouter([
             element: <Profile />,
           },
         ],
-      },
-    ],
-  },
-
-  {
-    path: '/auth',
-    element: <Auth />,
-    children: [
-      {
-        path: 'login',
-        element: (
-          <AuthorizationProtectedRoute>
-            <Login />
-          </AuthorizationProtectedRoute>
-        ),
-      },
-      {
-        path: 'register',
-        element: (
-          <AuthorizationProtectedRoute>
-            <Register />
-          </AuthorizationProtectedRoute>
-        ),
       },
     ],
   },
