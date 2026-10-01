@@ -24,7 +24,7 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
     if (status === 'Unauthorized') {
       const isLoggedOut = authContext?.logout();
       if (isLoggedOut) {
-          nav('/auth/login')
+          nav('/login')
       }
     }
     if (status === 'Authorized') {
