@@ -1,0 +1,10 @@
+.CheckboxContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 10vw;
+    height: 4vh;
+}
+.CheckboxContainer span {
+    font-weight: 600;
+}
