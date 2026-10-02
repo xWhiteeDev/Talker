@@ -26,14 +26,14 @@ export function useAPI() {
         if (error instanceof ErrorHandler) {
           if (error.code == 401) {
             if (retry.current === true) {
-              nav('/auth/login');
+              nav('/signin');
               authContext?.logout();
               return;
             }
             retry.current = true;
             const refreshedNewToken = await refreshToken();
             if (!refreshedNewToken || refreshedNewToken.requiresLogin) {
-              nav('/auth/login');
+              nav('/signin');
               authContext?.logout();
               return;
             }

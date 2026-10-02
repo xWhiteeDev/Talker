@@ -27,11 +27,11 @@ const routes = createBrowserRouter([
         element: <ServerError />,
       },
       {
-        path:'/login',
+        path:'/signin',
         element:<Login/>
       },
       {
-        path:'/register',
+        path:'/signup',
         element:<Register/>
       },
       {

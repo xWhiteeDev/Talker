@@ -44,7 +44,7 @@ export default function OptionLayer({ items }: OptionLayerProps) {
               const result = await request('/api/auth/logout', 'POST', undefined);
               if (result?.success) {
                 authContext?.logout();
-                nav('/auth/login');
+                nav('/signin');
               } 
             }}
           />
