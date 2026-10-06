@@ -1,4 +1,4 @@
-import type { TFlexDirection, TFlexPosition, TPositionUnion } from '../../interfaces/Unions';
+import type { TFlexDirection, TFlexPosition, TPositionUnion } from '../../Interfaces/Unions';
 
 interface IContainerProps {
   width: string;
