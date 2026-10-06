@@ -1,4 +1,4 @@
-import type {TTextAlign} from "../../interfaces/Unions";
+import type {TTextAlign} from "../../Interfaces/Unions";
 
 interface ICustomTextProps {
   text: React.ReactNode | string;
@@ -7,6 +7,7 @@ interface ICustomTextProps {
   fontWeight?: string;
   textShadow?:string;
   textAlign?: TTextAlign
+  className?:string
 }
 
 function CustomText(props: ICustomTextProps) {
@@ -19,6 +20,7 @@ function CustomText(props: ICustomTextProps) {
         fontWeight: props.fontWeight ?? '500',
         textShadow: props.textShadow,
       }}
+      className={props.className}
     >
       {props.text}
     </span>
