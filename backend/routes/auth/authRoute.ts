@@ -1,7 +1,7 @@
-import express, { type Request } from 'express';
-import { authController } from '../../loader/dependencyLoader.js';
-import { isDataValid, isRefreshTokenValid, isAccessTokenActive } from '../../middleware/middleware.js';
-import type { IObjectRequirements } from '../../services/types.js';
+import express, {type Request} from 'express';
+import {authController} from '../../loader/dependencyLoader.js';
+import {isDataValid, isRefreshTokenValid, isAccessTokenActive} from '../../middleware/middleware.js';
+import type {IObjectRequirements} from '../../services/types.js';
 
 export const authRouter = express.Router();
 
@@ -11,7 +11,7 @@ const registerConfig: IObjectRequirements = {
     requirements: {
       minLength: 5,
       maxLength: 100,
-      canBeNull:false
+      canBeNull: false
     },
   },
   password: {
@@ -19,7 +19,7 @@ const registerConfig: IObjectRequirements = {
     requirements: {
       minLength: 5,
       maxLength: 100,
-            canBeNull:false
+      canBeNull: false
 
     },
   },
@@ -28,7 +28,7 @@ const registerConfig: IObjectRequirements = {
     requirements: {
       minLength: 2,
       maxLength: 34,
-      canBeNull:false
+      canBeNull: false
     },
   },
   lastName: {
@@ -36,7 +36,7 @@ const registerConfig: IObjectRequirements = {
     requirements: {
       minLength: 2,
       maxLength: 34,
-      canBeNull:false
+      canBeNull: false
     },
   },
 };
@@ -58,6 +58,11 @@ const loginConfig: IObjectRequirements = {
   },
 };
 
+
+authRouter.get('/', async (req, res, next) => {
+  await authController.isEmailTaken(req, res, next);
+
+});
 authRouter.post('/register', isDataValid(registerConfig), async (req, res, next) => {
   await authController.createUser(req, res, next);
 });
@@ -69,7 +74,7 @@ authRouter.post('/logout', isAccessTokenActive(), async (_req, res, _next) => {
   res.clearCookie('accessToken');
   res.clearCookie('refreshToken');
 
-  res.status(200).json({ success: true });
+  res.status(200).json({success: true});
 });
 authRouter.post('/refresh', isRefreshTokenValid(), async (req, res, next) => {
   authController.createNewToken(req, res, next);

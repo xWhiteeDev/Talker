@@ -1,9 +1,9 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { configDotenv } from 'dotenv';
-import type { IAccountInsertDTO, IAccountService, IUser } from '../Account/types.js';
-import { ErrorHandler } from '../../handlers/errorHandler.js';
-import type { IAuthService, ILogin, IUserAuthorizationPassport } from './types.js';
+import {configDotenv} from 'dotenv';
+import type {IAccountInsertDTO, IAccountService, IUser} from '../Account/types.js';
+import {ErrorHandler} from '../../handlers/errorHandler.js';
+import type {IAuthService, ILogin, IUserAuthorizationPassport} from './types.js';
 
 configDotenv();
 export class AuthService implements IAuthService {
@@ -19,14 +19,14 @@ export class AuthService implements IAuthService {
       throw new ErrorHandler('Invalid data', 400);
     }
     const accessToken: string = jwt.sign(
-      { id: existingUser.id, tokenType: 'access' },
+      {id: existingUser.id, tokenType: 'access'},
       process.env['TALKER_SERVER_JWT_ACCESS_SECRET']!,
-      { expiresIn: '5m' },
+      {expiresIn: '5m'},
     );
     const refreshToken: string = jwt.sign(
-      { id: existingUser.id, tokenType: 'refresh' },
+      {id: existingUser.id, tokenType: 'refresh'},
       process.env['TALKER_SERVER_JWT_REFRESH_SECRET']!,
-      { expiresIn: '7d' },
+      {expiresIn: '7d'},
     );
     return {
       username: `${existingUser.firstName} ${existingUser.lastName}`,
@@ -44,11 +44,14 @@ export class AuthService implements IAuthService {
   }
   signNewToken(userId: number, tokenType: 'access' | 'refresh'): string {
     const secret = {
-      access: { secret: process.env['TALKER_SERVER_JWT_ACCESS_SECRET']!, expiresIn: '5m' as const },
-      refresh: { secret: process.env['TALKER_SERVER_JWT_REFRESH_SECRET']!, expiresIn: '7d' as const },
+      access: {secret: process.env['TALKER_SERVER_JWT_ACCESS_SECRET']!, expiresIn: '5m' as const},
+      refresh: {secret: process.env['TALKER_SERVER_JWT_REFRESH_SECRET']!, expiresIn: '7d' as const},
     };
-    const token = jwt.sign({ id: userId, tokenType }, secret[tokenType].secret, { expiresIn: secret[tokenType].expiresIn });
+    const token = jwt.sign({id: userId, tokenType}, secret[tokenType].secret, {expiresIn: secret[tokenType].expiresIn});
     return token;
+  }
+  async isEmailTaken(email: string) {
+    return (await this.accountService.isUserExist(email));
   }
   async isAuthorized(id: number): Promise<IUserAuthorizationPassport | null> {
     const existingUser = await this.accountService.findUserById(id);

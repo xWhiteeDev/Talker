@@ -1,5 +1,5 @@
-import type { NextFunction, Response, Request } from 'express';
-import type { IAccountInsertDTO, IUser } from '../Account/types.js';
+import type {NextFunction, Response, Request} from 'express';
+import type {IAccountInsertDTO, IUser} from '../Account/types.js';
 
 export interface IAuthService {
   signUp(document: IAccountInsertDTO): Promise<boolean | null>;
@@ -7,22 +7,23 @@ export interface IAuthService {
   signIn(document: ILogin): Promise<IUser | null>;
   signNewToken(userId: number, tokenType: 'access' | 'refresh'): string;
   isAuthorized(id: number): Promise<IUserAuthorizationPassport | null>;
+  isEmailTaken(email: string): Promise<boolean>;
 }
 export interface IAuthController {
   createUser(req: Request, res: Response, next: NextFunction): Promise<boolean>;
   signIn(req: Request, res: Response, next: NextFunction): Promise<boolean>;
-  isAuthorized(req: Request, res: Response, next: NextFunction):Promise<boolean>
+  isAuthorized(req: Request, res: Response, next: NextFunction): Promise<boolean>;
 }
 export interface ILogin {
   email: string;
   password: string;
 }
 export interface IUserRegisterPayload {
-  email:string;
-  password:string;
-  birthdayDate:string;
-  firstName:string;
-  lastName:string;
+  email: string;
+  password: string;
+  birthdayDate: string;
+  firstName: string;
+  lastName: string;
 }
 export interface IUserAuthorizationPassport {
   username: string;

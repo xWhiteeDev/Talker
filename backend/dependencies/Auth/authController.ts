@@ -117,4 +117,18 @@ export class AuthController implements IAuthController {
       return false;
     }
   }
+  async isEmailTaken(req: Request, res: Response, next: NextFunction) {
+    try {
+      const email = req.query['email'];
+      if (typeof email !== 'string') {
+        res.status(400).json({message: 'Email was expected as string!'});
+        return false;
+      }
+      const result = await this.authService.isEmailTaken(email);
+      res.status(200).json({message: 'ok', data: result});
+    } catch (error) {
+      next(error);
+      return false
+    }
+  }
 }
