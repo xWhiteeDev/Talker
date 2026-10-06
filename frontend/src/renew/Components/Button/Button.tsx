@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import type { TButtonType, TFlexPosition, TTextAlign } from '../../interfaces/Unions';
+import type { TButtonType, TFlexPosition, TTextAlign } from '../../Interfaces/Unions';
 import style from './Button.module.css';
 import type { IconName } from '../Icon';
 import { Icon } from '../Icon/Icon';
@@ -13,6 +13,7 @@ interface IButtonProps {
   type?: TButtonType;
   color?: string;
   fontSize?: string;
+  border?: string;
   fontWeight?: string;
   padding?: string;
   textAlign?: TTextAlign;
@@ -23,51 +24,42 @@ interface IButtonProps {
   iconAspectRatio?: string;
   itemsAlignPosition?: TFlexPosition;
   itemsJustifyPosition?: TFlexPosition;
+  gap?:string
   disabled?: boolean;
   onClick?: () => void;
 }
 
 function Button(props: IButtonProps) {
   return (
-    <div
-      onClick={props.disabled ? undefined : props.onClick}
+    <button
+      type={props.type ?? 'button'}
+      form={props.form}
+      disabled={props.disabled}
+      onClick={props.onClick}
+      className={style.ButtonContainer}
       style={{
         width: props.width,
-        backgroundColor: props.backgroundColor,
         height: props.height,
+        border: props.border ?? 'none',
+        backgroundColor: props.backgroundColor,
         justifyContent: props.itemsJustifyPosition,
         alignItems: props.itemsAlignPosition,
         cursor: props.disabled ? 'not-allowed' : 'pointer',
         opacity: props.disabled ? 0.5 : 1,
+        textAlign: props.textAlign,
+        fontSize: props.fontSize,
+        color: props.color,
+        fontWeight: props.fontWeight,
+        padding: props.padding,
+        gap:props.gap
+        
       }}
-      className={style.ButtonContainer}
     >
       {props.icon && (
-        <FlexContainer
-          width="auto"
-          height="100%"
-          justifyContent={props.itemsJustifyPosition}
-          alignItems={props.itemsAlignPosition}
-        >
-          <Icon name={props.icon} height={props.iconHeight} width={props.iconWidth} aspectRatio={props.iconAspectRatio} />
-        </FlexContainer>
+        <Icon name={props.icon} height={props.iconHeight} width={props.iconWidth} aspectRatio={props.iconAspectRatio} />
       )}
-      <button
-        form={props.form}
-        style={{
-          textAlign: props.textAlign,
-          fontSize: props.fontSize,
-          color: props.color,
-          fontWeight: props.fontWeight,
-          background: 'none',
-          cursor: props.disabled ? 'not-allowed' : 'pointer'
-        }}
-        type={props.type}
-        disabled={props.disabled}
-      >
-        {props.text}
-      </button>
-    </div>
+      {props.text}
+    </button>
   );
 }
 export default Button;
