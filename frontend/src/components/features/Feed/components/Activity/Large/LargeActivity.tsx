@@ -1,14 +1,11 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import style from './LargeActivity.module.css';
-import { useAPI } from '../../../../../../hooks/useAPI';
 import { useEffect, useState } from 'react';
-import { ErrorHandler } from '../../../../../../lib/customError';
 import UserActivityInfo from '../../UserActivityInfo/UserActivityInfo';
 import CommentCreator from '../../CommentCreator/CommentCreator';
 import ActivityReactions from '../../ActivityReactions/ActivityReactions';
 import { Activity } from '../Activity';
 import type { TReactionUnion } from '../../../../../../types/components/IComponentsUnion';
-import useNotify from '../../../../../../hooks/useNotify';
 
 interface ActivityElements {
   postId: number;
