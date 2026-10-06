@@ -1,43 +1,24 @@
-import { isUrlValid } from '../../services/guardService';
-import type { TEmitMethod, TEmitData, TEmitResult } from '../../types/hooks/IAPI';
-import { ErrorHandler } from '../customError';
+import {BACKEND_ENDPOINT} from "../../cfg";
+import type {TAPIMethod} from "../../types/lib/types";
+import {EmitError} from "../Error/EmitError";
 
-export async function emitServer<T>(url: string, method: TEmitMethod, data?: TEmitData): Promise<TEmitResult<T> | undefined> {
-  try {
-    const fullEndpoint = import.meta.env['VITE_SERVER_ENDPOINT'] + url;
-    const isUrlCorrect: boolean = isUrlValid(fullEndpoint);
-    if (!isUrlCorrect) {
-      throw new ErrorHandler('[emitServer] Provided url is not correct!', 502);
-    }
-    if (data && !(Array.isArray(data) || (typeof data === 'object' && data !== null)))
-      throw new ErrorHandler('[emitServer] Provided data does not meet requirements!', 500);
-    const res: Response = await fetch(fullEndpoint, {
-      method,
-      headers: {
-        'Content-type': 'application/json',
-      },
-      body: data ? JSON.stringify({ data }) : undefined,
-      credentials: 'include',
-    });
-    if (!res.ok) {
-      const responseCode: number = res.status;
-      const responseData: { message: string } = await res.json();
-      const responseMessage: string = responseData.message;
-      throw new ErrorHandler(responseMessage, responseCode);
-    }
-    if (res.status === 204) {
-      return undefined;
-    }
-    const responseData: TEmitResult<T> = (await res.json()) as TEmitResult<T>;
-    return responseData;
-  } catch (error) {
-    if (error instanceof ErrorHandler) {
-      throw new ErrorHandler(error.message, error.code);
-    }
-    if (error instanceof Error) {
-      throw new ErrorHandler(error.message, 500);
+async function emitServer<T>(url: string, method: TAPIMethod, data?: unknown): Promise<T> {
+    try {
+        const result = await fetch(BACKEND_ENDPOINT + url, {
+            method,
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(data)
+        });
+        if (!result.ok) {
+            const statusCode: number = result.status;
+            const statusMessage: string = result.statusText;
+            throw new EmitError(statusCode, statusMessage);
+        }
+        return (await result.json()) as T;
+    } catch (error) {
+        throw error
     }
 
-    throw new ErrorHandler('Unknown error from server', 500);
-  }
+
 }
+export default emitServer;
