@@ -1,18 +1,10 @@
 import { createRoot } from 'react-dom/client';
 import App from './App.tsx';
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';import { useRef, useState } from 'react';
-import CustomNotification from './components/generic/UI/Notification/CustomNotification.tsx';
-import Home from './components/features/Home/Home.tsx';
-import { CustomNotificationCtx } from './context/customNotificationContext.ts';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { useRef, useState } from 'react';
 
-import ProtectedRoute from './components/features/ProtectedRoute/ProtectedRoute.tsx';
 import './Main.css';
-import type { INotificationHookProps } from './types/hooks/INotificationHook';
-import { LargeActivity } from './components/features/Feed/components/Activity/Large/LargeActivity.tsx';
-import Profile from './components/features/Feed/components/profile/Profile.tsx';
-import { AuthContext } from './context/authContext.ts';
 import type { IBasicUserInfo } from './types/components/IUser';
-import ServerError from './components/features/ServerError/ServerError.tsx';
 import Login from './components/features/Auth/components/Login/Login.tsx';
 import Register from './components/features/Auth/components/Register/Register.tsx';
 
@@ -23,73 +15,36 @@ const routes = createBrowserRouter([
     element: <App />,
     children: [
       {
-        path: '/error/server/:errorcode',
-        element: <ServerError />,
+        path: '/signin',
+        element: <Login />,
       },
       {
-        path:'/signin',
-        element:<Login/>
-      },
-      {
-        path:'/signup',
-        element:<Register/>
-      },
-      {
-        path: '/',
-        element: (
-          <ProtectedRoute>
-            <Home />
-          </ProtectedRoute>
-        ),
-        children: [
-          {
-            path: 'post/:postid',
-            element: (
-              <ProtectedRoute>
-                <LargeActivity />
-              </ProtectedRoute>
-            ),
-            children: [
-              {
-                path: 'comments/:commentid',
-                element: <LargeActivity />,
-              },
-            ],
-          },
-          {
-            path: 'profile/me',
-            element: <Profile />,
-          },
-          {
-            path: 'profile/:id',
-            element: <Profile />,
-          },
-        ],
-      },
-    ],
+        path: '/signup',
+        element: <Register />,
+      }
+    ]
   },
 ]);
 
 function Main() {
-  const [notification, setNotification] = useState<INotificationHookProps | null>();
   const [loggedIn, setLoggedIn] = useState<boolean>(false);
   const [user, setUser] = useState<IBasicUserInfo | undefined>(undefined);
   const timerid = useRef<null | number>(null);
-  function setNotify(notiContext: INotificationHookProps) {
-    if (notification) {
-      setNotification(() => null);
-    }
-    setNotification(notiContext);
-    if (timerid.current == null) {
-      timerid.current = setTimeout(() => {
-        setNotification(null);
-      }, 4000);
-    } else {
-      clearTimeout(timerid.current);
-      timerid.current = setTimeout(() => {
-        setNotification(null);
-      }, 4000);
-    }
+  function setNotify(notiContext: any) {
+    // if (notification) {
+    //   setNotification(() => null);
+    // }
+    // setNotification(notiContext);
+    // if (timerid.current == null) {
+    //   timerid.current = setTimeout(() => {
+    //     setNotification(null);
+    //   }, 4000);
+    // } else {
+    //   clearTimeout(timerid.current);
+    //   timerid.current = setTimeout(() => {
+    //     setNotification(null);
+    //   }, 4000);
+    // }
   }
   function login(userData: IBasicUserInfo) {
     setLoggedIn(true);
@@ -102,14 +57,7 @@ function Main() {
     return true;
   }
 
-  return (
-    <AuthContext.Provider value={{ login, logout, loggedIn, user }}>
-      <CustomNotificationCtx.Provider value={{ setNotify }}>
-        {<RouterProvider router={routes} />}
-        {notification && <CustomNotification type={notification.type} message={notification.message} />}
-      </CustomNotificationCtx.Provider>
-    </AuthContext.Provider>
-  );
+  return <RouterProvider router={routes} />;
 }
 
 createRoot(root!).render(<Main />);
