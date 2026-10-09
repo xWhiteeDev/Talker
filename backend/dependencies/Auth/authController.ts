@@ -3,6 +3,8 @@ import {configDotenv} from 'dotenv';
 import {ErrorHandler} from '../../handlers/errorHandler.js';
 import type {IAuthController, IAuthService, ILogin, IUserAuthorizationPassport, IUserRegisterPayload} from './types.js';
 import type {currentUser} from '../Account/types.js';
+import {generateRandomCode} from '../../helpers/char.js';
+import {Emailer} from '../../services/Resend/Resend.js';
 
 configDotenv();
 export class AuthController implements IAuthController {
@@ -128,7 +130,15 @@ export class AuthController implements IAuthController {
       res.status(200).json({message: 'ok', data: result});
     } catch (error) {
       next(error);
-      return false
+      return false;
+    }
+  }
+  async generateCode(req: Request, res: Response, next: NextFunction) {
+    try {
+      const generatedCode = generateRandomCode(4);
+      await Emailer.send('Confirm your account', `<h1>Your special code for activating account arrived!</h1><span>That code will be only available for 10 minutes</span><br><br/><span><strong>Your code is: ${generatedCode}</strong></span>`, 'whiteedev@proton.me');
+    } catch (error) {
+
     }
   }
 }

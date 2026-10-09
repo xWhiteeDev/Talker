@@ -1,27 +1,31 @@
-import { AuthController } from '../dependencies/Auth/authController.js';
-import { createPool } from '../database/database.js';
-import { AuthService } from '../dependencies/Auth/authService.js';
-import { AccountRepository } from '../dependencies/Account/accountRepository.js';
-import { AccountService } from '../dependencies/Account/accountService.js';
-import { friendshipRepository } from '../dependencies/Friendship/friendshipRepository.js';
-import { friendshipService } from '../dependencies/Friendship/friendshipService.js';
-import { friendshipController } from '../dependencies/Friendship/friendshipController.js';
-import { PostRepository } from '../dependencies/Post/postRepository.js';
-import { PostService } from '../dependencies/Post/postService.js';
-import { PostController } from '../dependencies/Post/postController.js';
-import { PostReactionRepository } from '../dependencies/PostReaction/postReactionRepository.js';
-import { PostReactionService } from '../dependencies/PostReaction/postReactionService.js';
-import { PostReactionController } from '../dependencies/PostReaction/postReactionController.js';
-import { CommentsRepository } from '../dependencies/Comments/CommentsRepository.js';
-import { CommentsService } from '../dependencies/Comments/CommentsService.js';
-import { CommentsController } from '../dependencies/Comments/CommentsController.js';
-import { CommentReactionRepository } from '../dependencies/CommentReaction/CommentReactionRepository.js';
-import { CommentReactionService } from '../dependencies/CommentReaction/CommentReactionService.js';
-import { CommentReactionController } from '../dependencies/CommentReaction/CommentReactionController.js';
-import { ProfileService } from '../dependencies/Profile/profileService.js';
-import { ProfileController } from '../dependencies/Profile/profileController.js';
-import { SearchService } from '../dependencies/Search/searchService.js';
-import { SearchController } from '../dependencies/Search/searchController.js';
+import {AuthController} from '../dependencies/Auth/authController.js';
+import {createPool} from '../database/database.js';
+import {AuthService} from '../dependencies/Auth/authService.js';
+import {AccountRepository} from '../dependencies/Account/accountRepository.js';
+import {AccountService} from '../dependencies/Account/accountService.js';
+import {friendshipRepository} from '../dependencies/Friendship/friendshipRepository.js';
+import {friendshipService} from '../dependencies/Friendship/friendshipService.js';
+import {friendshipController} from '../dependencies/Friendship/friendshipController.js';
+import {PostRepository} from '../dependencies/Post/postRepository.js';
+import {PostService} from '../dependencies/Post/postService.js';
+import {PostController} from '../dependencies/Post/postController.js';
+import {PostReactionRepository} from '../dependencies/PostReaction/postReactionRepository.js';
+import {PostReactionService} from '../dependencies/PostReaction/postReactionService.js';
+import {PostReactionController} from '../dependencies/PostReaction/postReactionController.js';
+import {CommentsRepository} from '../dependencies/Comments/CommentsRepository.js';
+import {CommentsService} from '../dependencies/Comments/CommentsService.js';
+import {CommentsController} from '../dependencies/Comments/CommentsController.js';
+import {CommentReactionRepository} from '../dependencies/CommentReaction/CommentReactionRepository.js';
+import {CommentReactionService} from '../dependencies/CommentReaction/CommentReactionService.js';
+import {CommentReactionController} from '../dependencies/CommentReaction/CommentReactionController.js';
+import {ProfileService} from '../dependencies/Profile/profileService.js';
+import {ProfileController} from '../dependencies/Profile/profileController.js';
+import {SearchService} from '../dependencies/Search/searchService.js';
+import {SearchController} from '../dependencies/Search/searchController.js';
+import {CodeRepository} from '../dependencies/Code/codeRepository.js';
+import {CodeService} from '../dependencies/Code/codeSerivce.js';
+import {CodeController} from '../dependencies/Code/codeController.js';
+import {Emailer} from '../services/Resend/Resend.js';
 
 export const dbPool = createPool();
 const accountRepository = new AccountRepository(dbPool);
@@ -46,7 +50,7 @@ export const commmentsController = new CommentsController(commentsService, postS
 
 const commentReactionRepository = new CommentReactionRepository(dbPool);
 const commentReactionService = new CommentReactionService(commentReactionRepository);
-export const commentReactionController = new CommentReactionController(commentReactionService, postService,commentsService);
+export const commentReactionController = new CommentReactionController(commentReactionService, postService, commentsService);
 
 export const profileService = new ProfileService(accountService, postService, friendsService);
 
@@ -54,3 +58,8 @@ export const profileController = new ProfileController(profileService);
 
 const searchService = new SearchService(accountService);
 export const searchController = new SearchController(searchService);
+
+
+const codeRepository = new CodeRepository(dbPool);
+const codeService = new CodeService(codeRepository);
+export const codeController = new CodeController(codeService, Emailer);

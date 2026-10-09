@@ -12,6 +12,7 @@ import { profileRouter } from '../routes/profile/profileRoute.js';
 import { searchRouter } from '../routes/search/searchRoute.js';
 import { friendsRouter } from '../routes/friends/friendsRoute.js';
 import jwt from 'jsonwebtoken';
+import {codeRouter} from '../routes/code/codeRoute.js';
 dotEnv.config();
 const cfg = {
   serverPort: process.env['TALKER_SERVER_PORT'] ?? 3000,
@@ -56,6 +57,7 @@ app.use('/api/commentReactions', commentReactionRouter);
 app.use('/api/profile', profileRouter);
 app.use('/api/search', searchRouter);
 app.use('/api/friends', friendsRouter);
+app.use('/api/code', codeRouter);
 
 app.use(globalMiddleware);
 
