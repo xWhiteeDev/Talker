@@ -1,8 +1,8 @@
 import {BACKEND_ENDPOINT} from "../../cfg";
-import type {TAPIMethod} from "../../types/lib/types";
+import type {IEmitResponse, TAPIMethod} from "../../types/lib/types";
 import {EmitError} from "../Error/EmitError";
 
-async function emitServer<T>(url: string, method: TAPIMethod, data?: unknown): Promise<T> {
+async function emitServer<T>(url: string, method: TAPIMethod, data?: unknown): Promise<IEmitResponse<T>> {
     try {
         const result = await fetch(BACKEND_ENDPOINT + url, {
             method,
@@ -14,9 +14,9 @@ async function emitServer<T>(url: string, method: TAPIMethod, data?: unknown): P
             const statusMessage: string = result.statusText;
             throw new EmitError(statusCode, statusMessage);
         }
-        return (await result.json()) as T;
+        return (await result.json()) as IEmitResponse<T>;
     } catch (error) {
-        throw error
+        throw error;
     }
 
 
