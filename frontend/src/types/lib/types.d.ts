@@ -1,6 +1,6 @@
 export type TAPIMethod = 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE';
 
-export interface IEmitResponse {
-    status: number;
-    message: string;
+export interface IEmitResponse<T> {
+    message:string;
+    data:T
 }
