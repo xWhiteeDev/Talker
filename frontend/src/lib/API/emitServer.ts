@@ -2,23 +2,30 @@ import {BACKEND_ENDPOINT} from "../../cfg";
 import type {IEmitResponse, TAPIMethod} from "../../types/lib/types";
 import {EmitError} from "../Error/EmitError";
 
-async function emitServer<T>(url: string, method: TAPIMethod, data?: unknown): Promise<IEmitResponse<T>> {
+async function readErrorMessage(res: Response): Promise<string> {
     try {
-        const result = await fetch(BACKEND_ENDPOINT + url, {
-            method,
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify(data)
-        });
-        if (!result.ok) {
-            const statusCode: number = result.status;
-            const statusMessage: string = result.statusText;
-            throw new EmitError(statusCode, statusMessage);
+        const body: unknown = await res.json();
+        if (typeof body === 'string') return body;
+        if (typeof body === 'object' && body !== null) {
+            const b = body as Record<string, unknown>;
+            if (typeof b['error'] === 'string') return b['error'];
+            if (typeof b['message'] === 'string') return b['message'];
         }
-        return (await result.json()) as IEmitResponse<T>;
-    } catch (error) {
-        throw error;
+    } catch {}
+    return res.statusText || 'Server error, try again later';
+}
+
+async function emitServer<T>(url: string, method: TAPIMethod, data?: unknown): Promise<IEmitResponse<T>> {
+    const result = await fetch(BACKEND_ENDPOINT + url, {
+        method,
+        headers: data !== undefined ? { 'Content-Type': 'application/json' } : undefined,
+        body: data !== undefined ? JSON.stringify(data) : undefined,
+    });
+
+    if (!result.ok) {
+        throw new EmitError(result.status, await readErrorMessage(result));
     }
 
-
+    return (await result.json()) as IEmitResponse<T>;
 }
 export default emitServer;
