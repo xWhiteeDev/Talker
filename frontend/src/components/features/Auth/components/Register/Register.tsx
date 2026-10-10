@@ -24,7 +24,7 @@ function Register() {
   const renderCurrentStep = () => {
     const steps: Record<TSteps, React.JSX.Element> = {
       personal: <PersonalStep setStep={setStep} setPersonal={setPersonal} personal={personalData} />,
-      account: <AccountStep setStep={setStep} setAccount={setAccount} account={accountData} />,
+      account: <AccountStep setStep={setStep} personal={personalData} setAccount={setAccount} account={accountData} />,
       confirmation: <ConfirmationStep account={accountData} personal={personalData} />,
     };
     return steps[step]

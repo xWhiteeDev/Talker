@@ -2,7 +2,7 @@ import Button from '../../../../../../../renew/Components/Button/Button';
 import CustomText from '../../../../../../../renew/Components/CustomText/CustomText';
 import FlexContainer from '../../../../../../../renew/Components/FlexContainer/FlexContainer';
 import Input from '../../../../../../../renew/Components/Input/Input';
-import type { IAccount, TSteps } from '../../types';
+import type { IAccount, IPersonal, TSteps } from '../../types';
 import { useRef, useState, type Dispatch, type SetStateAction } from 'react';
 import { ACCOUNT_INPUTS, isEmailTaken } from './accountStep.service';
 import { EmitError } from '../../../../../../../lib/Error/EmitError';
@@ -13,6 +13,7 @@ interface IAccountStepProps {
   setStep(steps: TSteps): void;
   setAccount: Dispatch<SetStateAction<IAccount>>;
   account: IAccount;
+  personal:IPersonal
 }
 
 type TCausedElement = 'email' | 'password' | 'repassword' | 'none';
@@ -57,7 +58,6 @@ function AccountStep(props: IAccountStepProps) {
     }
     setError(null);
     const email: string | undefined = props.account.email?.trim().toLowerCase();
-
     if (!email || email.length < PARAMETERS_REQUIREMENTS.EMAIL.MIN) {
       setError({ caused: 'email', message: 'Invalid email' });
       return;
@@ -77,7 +77,7 @@ function AccountStep(props: IAccountStepProps) {
         setError({ caused: 'email', message: 'Invalid data' });
         return;
       }
-      const result = await emitServer<boolean>('/api/code/verifyCode', 'POST', { email });
+      const result = await emitServer<boolean>('/api/code/verifyCode', 'POST', { email, password:props.account.password, firstName:props.personal.firstName,lastName:props.personal.lastName,birthdayDate:props.personal.birthdayDate});
       if (result) {
         props.setStep('confirmation');
       }
@@ -92,6 +92,7 @@ function AccountStep(props: IAccountStepProps) {
       lastTimeClicked.current = Date.now();
     }
   };
+
 
   const updateField = (field: keyof IAccount, value: string) => {
     props.setAccount((prev) => ({ ...prev, [field]: value }));

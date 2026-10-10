@@ -5,7 +5,7 @@ export const PARAMETERS_REQUIREMENTS = {
     },
     EMAIL: {MIN: 4, MAX: 32},
     PASSWORD: {MIN: 5, MAX: 64},
-    CODE:4,
+    CODE:6,
     LIVINGPLACE:{min:4,max:12},
     MIN_AGE:16
 
