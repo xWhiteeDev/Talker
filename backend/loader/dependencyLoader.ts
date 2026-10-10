@@ -62,4 +62,4 @@ export const searchController = new SearchController(searchService);
 
 const codeRepository = new CodeRepository(dbPool);
 const codeService = new CodeService(codeRepository);
-export const codeController = new CodeController(codeService, Emailer);
+export const codeController = new CodeController(codeService, Emailer,accountService);
