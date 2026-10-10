@@ -1,4 +1,4 @@
-import type { RowDataPacket } from 'mysql2/promise';
+import type {RowDataPacket} from 'mysql2/promise';
 
 export interface IAccountRepository {
   findWithCredentials(email: string): Promise<IAccountRow | null>;
@@ -28,6 +28,8 @@ export interface IAccountRow extends RowDataPacket {
   created_at: string;
   email: string;
   password: string;
+  status: TVerification;
+
 }
 
 export interface IUser {
@@ -46,6 +48,8 @@ export interface IAccountInsertDTO {
   birthdayDate: string;
   firstName: string;
   lastName: string;
+  status: TVerification;
+
 }
 export interface IAccountUpdateDTO extends Partial<IAccountInsertDTO> {
   email: string;
@@ -54,3 +58,5 @@ export interface IAccountUpdateDTO extends Partial<IAccountInsertDTO> {
 export interface currentUser {
   id: number;
 }
+
+type TVerification = 'unverified' | 'verified' | 'suspended';

@@ -43,7 +43,7 @@ export class AccountRepository implements IAccountRepository {
     return result.affectedRows > 0;
   }
   async update(data: IAccountUpdateDTO): Promise<boolean> {
-    const allowedKeys: (keyof IAccountUpdateDTO)[] = ['password', 'birthdayDate', 'firstName', 'lastName'];
+    const allowedKeys: (keyof IAccountUpdateDTO)[] = ['password', 'birthdayDate', 'firstName', 'lastName','status'];
     const queries: string[] = [];
     const queryValues = {} as Record<keyof IAccountUpdateDTO | 'email', unknown>;
 

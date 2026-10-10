@@ -19,8 +19,21 @@ export class CodeRepository implements ICodeRepository {
         return result.affectedRows > 0;
     }
     async update(email: string, type: TCodeType, updateDocument: ICodeUpdateDTO): Promise<boolean> {
-        const query: string = 'UPDATE code SET code=:code, expiresAt=:expiresAt, attempts=:attempts WHERE email=:email AND type=:type';
-        const [result] = await this.dbPool.execute<ResultSetHeader>(query, {email, type, ...updateDocument});
+        const allowedKeys: (keyof ICodeUpdateDTO)[] = ['attempts', 'code', 'expiresAt'];
+        const queryKeys: string[] = [];
+        const queryParams: Partial<Record<keyof ICodeUpdateDTO, unknown>> = {};
+        let key: keyof ICodeUpdateDTO;
+        for (key in updateDocument) {
+            if (!allowedKeys.includes(key)) {
+                continue;
+            }
+            queryKeys.push(`${key}=:${key}`);
+            queryParams[key] = updateDocument[key];
+        }
+        if (queryKeys.length === 0 || Object.keys(queryParams).length === 0) return false;
+        const fullQuery: string = queryKeys.join(',');
+        const query: string = `UPDATE code SET ${fullQuery} WHERE email=:email AND type=:type`;
+        const [result] = await this.dbPool.execute<ResultSetHeader>(query, {email, type, ...queryParams as any});
         return result.affectedRows > 0;
     }
     async isAnyExist(email: string, type: TCodeType): Promise<boolean> {
