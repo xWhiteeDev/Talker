@@ -10,10 +10,10 @@ import PersonalStep from './steps/PersonalStep/PersonalStep';
 function Register() {
   const [step, setStep] = useState<TSteps>('personal');
   const [personalData, setPersonal] = useState<IPersonal>({
-    firstName: '', 
-    lastName: '',
-    birthdayDate: '',
-    livingPlace: '',
+    firstName: null, 
+    lastName: null,
+    birthdayDate: null,
+    livingPlace: null,
     gender: 'Prefer not to say',
   });
   const [accountData, setAccount] = useState<IAccount>({
