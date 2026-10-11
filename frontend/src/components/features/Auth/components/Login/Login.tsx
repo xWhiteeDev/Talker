@@ -8,8 +8,10 @@ import CustomLink from '../../../../../renew/Components/CustomLink/CustomLink';
 import { useNavigate } from 'react-router-dom';
 import { Icon } from '../../../../../renew/Components/Icon/Icon';
 import Logo from '../../../../generic/UI/Logo/Logo';
-import { useState } from 'react';
-import { PARAMETERS_REQUIREMENTS } from '../../../../../cfg';
+import React, { useState } from 'react';
+import { ACCOUNT_CONFIG } from '../../../../../configurations/account.config';
+import emitServer from '../../../../../lib/API/emitServer';
+import type { ICurrentUser } from '../../../../../types/lib/types';
 
 const features = {
   chat: 'Chat with your friends with no limits!',
@@ -19,15 +21,40 @@ const features = {
   news: 'Stay up to date with what matters to you.',
 } as const;
 
-interface ILogin {
-  email: string;
-  password: string;
-}
+
 
 function Login() {
   const navigator = useNavigate();
   const [showcase, setShowcase] = useState<keyof typeof features>();
   const [loginData, setLoginData] = useState<ILogin>({ email: '', password: '' });
+
+  const handleSubmitLoginForm = async (e: React.SubmitEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const email: string = loginData.email.trim().toLowerCase();
+    const password: string = loginData.password;
+    if (
+      !email ||
+      email.length < ACCOUNT_CONFIG.EMAIL.MIN ||
+      email.length > ACCOUNT_CONFIG.EMAIL.MAX ||
+      !ACCOUNT_CONFIG.EMAIL.REGEX.test(email)
+    ) {
+      return false;
+    }
+    if (!password || password.length < ACCOUNT_CONFIG.PASSWORD.MIN) return false;
+    const payload = {
+      email: email,
+      password: password,
+    };
+    const signResult = await emitServer<ILoginResponse>('/api/auth/signin', 'POST', payload);
+    if (signResult.success) {
+      if (signResult.data?.status === 'unverified') {
+        console.log('You are unverified!')
+      }
+      //Move into home
+      //Auth setContext
+    }
+  };
+
   return (
     <>
       <div className={style.container}>
@@ -110,35 +137,37 @@ function Login() {
                 itemsAlignPosition="center"
               />
             </div>
-            <FlexContainer width="100%" height="auto" gap="0.2rem" alignItems="center" direction="column">
-              <Input
-                icon="email"
-                iconAspectRatio="1/1"
-                iconWidth="7%"
-                fontSize="1.45rem"
-                type="email"
-                width="18vw"
-                height="6vh"
-                placeholder="E-mail"
-                minLength={PARAMETERS_REQUIREMENTS.EMAIL.MIN}
-                maxLength={PARAMETERS_REQUIREMENTS.EMAIL.MAX}
-                value={loginData.email}
-                onInput={(value) => setLoginData((prev) => ({ ...prev, email: value }))}
-              />
-              <Input
-                icon="password"
-                iconAspectRatio="1/1"
-                value={loginData.password}
-                iconWidth="7%"
-                fontSize="1.45em"
-                type="password"
-                width="18vw"
-                height="6vh"
-                placeholder="Password"
-                minLength={PARAMETERS_REQUIREMENTS.PASSWORD.MIN}
-                maxLength={PARAMETERS_REQUIREMENTS.PASSWORD.MAX}
-                onInput={(value) => setLoginData((prev) => ({ ...prev, password: value }))}
-              />
+            <FlexContainer width="100%" height="30%" gap="0.2rem" alignItems="center" justifyContent="center" direction="column">
+              <form id="login-form" onSubmit={handleSubmitLoginForm}>
+                <Input
+                  icon="email"
+                  iconAspectRatio="1/1"
+                  iconWidth="7%"
+                  fontSize="1.15rem"
+                  type="email"
+                  width="18vw"
+                  height="6vh"
+                  placeholder="E-mail"
+                  minLength={ACCOUNT_CONFIG.EMAIL.MIN}
+                  maxLength={ACCOUNT_CONFIG.EMAIL.MAX}
+                  value={loginData.email}
+                  onInput={(value) => setLoginData((prev) => ({ ...prev, email: value }))}
+                />
+                <Input
+                  icon="password"
+                  iconAspectRatio="1/1"
+                  value={loginData.password}
+                  iconWidth="7%"
+                  fontSize="1.15rem"
+                  type="password"
+                  width="18vw"
+                  height="6vh"
+                  placeholder="Password"
+                  minLength={ACCOUNT_CONFIG.PASSWORD.MIN}
+                  maxLength={ACCOUNT_CONFIG.PASSWORD.MAX}
+                  onInput={(value) => setLoginData((prev) => ({ ...prev, password: value }))}
+                />
+              </form>
             </FlexContainer>
 
             <Checkbox text="Remember me" fontSize="1.2rem" />
@@ -161,6 +190,8 @@ function Login() {
               itemsJustifyPosition="center"
               itemsAlignPosition="center"
               gap="0.4rem"
+              form="login-form"
+              type="submit"
             />
             <Button
               width="14vw"
