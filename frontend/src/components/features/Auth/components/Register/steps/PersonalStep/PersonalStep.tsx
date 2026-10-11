@@ -6,6 +6,7 @@ import style from './PersonalStep.module.css';
 import { isPersonalDataValid } from '../../registerService';
 import type { IPersonal, TSteps } from '../../types';
 import type { Dispatch, SetStateAction } from 'react';
+import { PERSONAL_CONFIG } from '../../../../../../../configurations/personal.config';
 
 interface IPersonalStepProps {
   setStep(steps: TSteps): void;
@@ -35,6 +36,8 @@ function PersonalStep(props: IPersonalStepProps) {
     >
       <FlexContainer gap="0.8rem" width="100%" height="auto" alignItems="center" justifyContent="center" direction="column">
         <Input
+          minLength={PERSONAL_CONFIG.FIRST_NAME.MIN}
+          maxLength={PERSONAL_CONFIG.FIRST_NAME.MAX}
           fontSize="1rem"
           required
           type="text"
@@ -42,10 +45,12 @@ function PersonalStep(props: IPersonalStepProps) {
           width="18vw"
           height="6vh"
           placeholder="First name"
-          value={props.personal.firstName}
+          value={props.personal.firstName ?? ''}
           onInput={(v) => updateField('firstName', v)}
         />
         <Input
+          minLength={PERSONAL_CONFIG.LAST_NAME.MIN}
+          maxLength={PERSONAL_CONFIG.LAST_NAME.MAX}
           fontSize="1rem"
           required
           type="text"
@@ -53,18 +58,20 @@ function PersonalStep(props: IPersonalStepProps) {
           height="6vh"
           placeholder="Last name"
           fontWeight="600"
-          value={props.personal.lastName}
+          value={props.personal.lastName ?? ''}
           onInput={(v) => updateField('lastName', v)}
         />
       </FlexContainer>
       <FlexContainer gap="1rem" width="100%" height="auto" alignItems="flex-start" justifyContent="center" direction="row">
         <Input
+          minLength={PERSONAL_CONFIG.LIVING_PLACE.MIN}
+          maxLength={PERSONAL_CONFIG.LIVING_PLACE.MAX}
           fontSize="0.9rem"
           type="text"
           width="8.5vw"
           height="5vh"
           placeholder="Where do you live?"
-          value={props.personal.livingPlace}
+          value={props.personal.livingPlace ?? ''}
           fontWeight="600"
           onInput={(v) => updateField('livingPlace', v)}
         />
@@ -88,16 +95,16 @@ function PersonalStep(props: IPersonalStepProps) {
           width="18vw"
           height="5vh"
           required
-          value={props.personal.birthdayDate}
+          value={props.personal.birthdayDate ?? ''}
           onInput={(v) => updateField('birthdayDate', v)}
         />
       </FlexContainer>
       <Button
         icon="arrow_r"
-        iconHeight='100%'
-        iconAspectRatio='1/1'
+        iconHeight="100%"
+        iconAspectRatio="1/1"
         itemsJustifyPosition="center"
-        itemsAlignPosition='center'
+        itemsAlignPosition="center"
         fontSize="1.2rem"
         text="Next step"
         width="9vw"
