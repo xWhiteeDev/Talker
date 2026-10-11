@@ -1,10 +1,10 @@
-import type { NextFunction, Request, Response } from 'express';
+import type {NextFunction, Request, Response} from 'express';
 import jwt from 'jsonwebtoken';
-import { configDotenv } from 'dotenv';
-import { ErrorHandler } from '../handlers/errorHandler.js';
-import type { DecodedPayload } from './types.js';
-import { ReqValid } from '../services/Validation.js';
-import type { IObjectRequirements } from '../services/types.js';
+import {configDotenv} from 'dotenv';
+import {ErrorHandler} from '../handlers/errorHandler.js';
+import type {DecodedPayload} from './types.js';
+import {ReqValid} from '../services/Validation.js';
+import type {IObjectRequirements} from '../services/types.js';
 
 configDotenv();
 
@@ -23,7 +23,7 @@ export function isDataValid(requirements: IObjectRequirements) {
       return true;
     } catch (error) {
       next(error);
-      return false
+      return false;
     }
   };
 }
@@ -38,7 +38,7 @@ export function isRefreshTokenValid() {
     if (decoded['tokenType'] !== 'refresh') {
       throw new ErrorHandler('Unauthorised without refresh token', 401, true);
     }
-    req.currentUser = { id: decoded.id };
+    req.currentUser = {id: decoded.id};
     next();
   };
 }
@@ -53,7 +53,22 @@ export function isAccessTokenActive() {
     if (decoded['tokenType'] !== 'access') {
       throw new ErrorHandler('Wrong token', 400, true);
     }
-    req.currentUser = { id: decoded.id };
+    req.currentUser = {id: decoded.id};
+    next();
+  };
+}
+
+export function verifyConfirmationRequest(config: IObjectRequirements) {
+  return async (req: Request, _res: Response, next: NextFunction) => {
+    const accessToken: string = req.cookies['accessToken'];
+    if (accessToken) {
+      throw new ErrorHandler('Forbidden', 403)
+    }
+    const confirmationContent: Record<string, unknown> = req.body;
+    const validationResult: boolean = ReqValid.validateObject(confirmationContent, config);
+    if (!validationResult) {
+      throw new ErrorHandler('Bad request', 400);
+    }
     next();
   };
 }
