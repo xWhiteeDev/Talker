@@ -1,9 +1,22 @@
-import type {currentUser, otherUser} from "./dependencies/Account/types.ts";
+import type {ICurrentUser} from "./dependencies/Account/types.ts";
+
+
+
+
+interface IResponseJSONDeclaration {
+    success: boolean;
+    data?: unknown;
+    message?:string
+}
+
 
 declare module 'express' {
     interface Request {
-        currentUser?:currentUser;
-        otherUserId?: number
+        currentUser?: ICurrentUser;
+        otherUserId?: number;
+    }
+    interface Response {
+        json(declaration: IResponseJSONDeclaration);
     }
 }
 
