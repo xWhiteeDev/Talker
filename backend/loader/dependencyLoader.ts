@@ -18,20 +18,19 @@ import {CommentsController} from '../dependencies/Comments/CommentsController.js
 import {CommentReactionRepository} from '../dependencies/CommentReaction/CommentReactionRepository.js';
 import {CommentReactionService} from '../dependencies/CommentReaction/CommentReactionService.js';
 import {CommentReactionController} from '../dependencies/CommentReaction/CommentReactionController.js';
-import {ProfileService} from '../dependencies/Profile/profileService.js';
-import {ProfileController} from '../dependencies/Profile/profileController.js';
 import {SearchService} from '../dependencies/Search/searchService.js';
 import {SearchController} from '../dependencies/Search/searchController.js';
 import {CodeRepository} from '../dependencies/Code/codeRepository.js';
-import {CodeService} from '../dependencies/Code/codeSerivce.js';
+import {CodeService} from '../dependencies/Code/codeService.js';
 import {CodeController} from '../dependencies/Code/codeController.js';
 import {Emailer} from '../services/Resend/Resend.js';
+import {PersonalRepository} from '../dependencies/Personal/PersonalRepository.js';
+import {PersonalService} from '../dependencies/Personal/PersonalService.js';
 
 export const dbPool = createPool();
 const accountRepository = new AccountRepository(dbPool);
 const accountService = new AccountService(accountRepository);
-export const authService = new AuthService(accountService);
-export const authController = new AuthController(authService);
+
 const friendsRepository = new friendshipRepository(dbPool);
 const friendsService = new friendshipService(friendsRepository);
 export const friendsController = new friendshipController(friendsService);
@@ -52,14 +51,16 @@ const commentReactionRepository = new CommentReactionRepository(dbPool);
 const commentReactionService = new CommentReactionService(commentReactionRepository);
 export const commentReactionController = new CommentReactionController(commentReactionService, postService, commentsService);
 
-export const profileService = new ProfileService(accountService, postService, friendsService);
-
-export const profileController = new ProfileController(profileService);
-
 const searchService = new SearchService(accountService);
 export const searchController = new SearchController(searchService);
 
+const personalRepository = new PersonalRepository(dbPool);
+const personalService = new PersonalService(personalRepository);
+
 
 const codeRepository = new CodeRepository(dbPool);
-const codeService = new CodeService(codeRepository);
-export const codeController = new CodeController(codeService, Emailer,accountService);
+const codeService = new CodeService(codeRepository, accountService, Emailer);
+
+export const authService = new AuthService(accountService, personalService, codeService, Emailer);
+export const authController = new AuthController(authService);
+export const codeController = new CodeController(codeService);
