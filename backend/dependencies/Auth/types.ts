@@ -1,10 +1,45 @@
 import type {NextFunction, Response, Request} from 'express';
-import type {IAccountInsertDTO, IUser} from '../Account/types.js';
+import type {TAccountStatus, TGender} from '../../types/unions.js';
+
+export interface ILogin {
+  email: string;
+  password: string;
+}
+interface IAccount {
+  email: string;
+  id: number;
+  status:TAccountStatus
+}
+
+export interface IServerPersonalData {
+  firstName: string;
+  lastName: string;
+  livingPlace: string | null;
+  gender: TGender;
+  birthdayDate: string;
+}
+
+export interface IServerAccountData {
+  email: string;
+  password: string;
+  repassword: string;
+}
+
+export interface IServerAccountRegisterData {
+  personal: IServerPersonalData;
+  account: IServerAccountData;
+}
+
+export interface IUserAuthorizationPassport {
+  personal: IServerPersonalData;
+  account: IAccount;
+}
+
 
 export interface IAuthService {
-  signUp(document: IAccountInsertDTO): Promise<boolean | null>;
+  signUp(document:IServerAccountRegisterData): Promise<boolean | null>;
 
-  signIn(document: ILogin): Promise<IUser | null>;
+  signIn(document: ILogin): Promise<IUserAuthorizationPassport & {refreshToken: string, accessToken: string;} | null>;
   signNewToken(userId: number, tokenType: 'access' | 'refresh'): string;
   isAuthorized(id: number): Promise<IUserAuthorizationPassport | null>;
   isEmailTaken(email: string): Promise<boolean>;
@@ -14,21 +49,5 @@ export interface IAuthController {
   signIn(req: Request, res: Response, next: NextFunction): Promise<boolean>;
   isAuthorized(req: Request, res: Response, next: NextFunction): Promise<boolean>;
 }
-export interface ILogin {
-  email: string;
-  password: string;
-}
-export interface IUserRegisterPayload {
-  email: string;
-  password: string;
-  birthdayDate: string;
-  firstName: string;
-  lastName: string;
-}
-export interface IUserAuthorizationPassport {
-  username: string;
-  email: string;
-  birthDate: string;
-  joinedAt: string;
-  id: number;
-}
+
+

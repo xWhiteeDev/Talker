@@ -1,10 +1,8 @@
 import type {NextFunction, Request, Response} from 'express';
 import {configDotenv} from 'dotenv';
 import {ErrorHandler} from '../../handlers/errorHandler.js';
-import type {IAuthController, IAuthService, ILogin, IUserAuthorizationPassport, IUserRegisterPayload} from './types.js';
-import type {currentUser} from '../Account/types.js';
-import {generateRandomCode} from '../../helpers/char.js';
-import {Emailer} from '../../services/Resend/Resend.js';
+import type {IAuthController, IAuthService, ILogin, IServerAccountRegisterData} from './types.js';
+import type {ICurrentUser} from '../Account/types.js';
 
 configDotenv();
 export class AuthController implements IAuthController {
@@ -12,31 +10,21 @@ export class AuthController implements IAuthController {
   }
   async createUser(req: Request, res: Response, next: NextFunction): Promise<boolean> {
     try {
-      const userPayload: IUserRegisterPayload | undefined = req.body.data;
-      if (
-        !userPayload ||
-        !userPayload.password ||
-        !userPayload.email ||
-        !userPayload.birthdayDate ||
-        !userPayload.firstName ||
-        !userPayload.lastName
-      ) {
-        throw new ErrorHandler('Failed to create account', 400, false);
-      }
-      const result = await this.authService.signUp(req.body.data);
-      if (!result) {
-        throw new ErrorHandler('Failed to create account', 400, false);
-      }
-      res.status(200).json({success: true, data: result});
+      const data: IServerAccountRegisterData = req.body;
+      await this.authService.signUp(data);
+      res.status(200).json({success: true, message: 'Account created!'});
       return true;
     } catch (error) {
+      res.status(500).json({success: false, message: 'unk'});
+
       next(error);
       return false;
     }
   }
   async signIn(req: Request, res: Response, next: NextFunction): Promise<boolean> {
     try {
-      const data: ILogin | undefined = req.body.data;
+      const data: ILogin | undefined = req.body;
+
       if (!data || !data.email || !data.password) {
         throw new ErrorHandler('Failed to sign in', 400, true);
       }
@@ -44,35 +32,27 @@ export class AuthController implements IAuthController {
         email: data.email,
         password: data.password,
       });
-
       if (!signResult) {
         throw new ErrorHandler('Failed to sign in', 400, false);
       }
-      res.cookie('accessToken', signResult.access, {
+      res.cookie('accessToken', signResult.accessToken, {
         httpOnly: true,
         sameSite: 'lax',
         secure: true,
         maxAge: 5 * 60 * 1000,
       });
-      res.cookie('refreshToken', signResult.refresh, {
+      res.cookie('refreshToken', signResult.refreshToken, {
         httpOnly: true,
         sameSite: 'lax',
         secure: true,
         maxAge: 60000 * 60 * 24 * 7,
       });
       if (!req.currentUser) {
-        req.currentUser = {} as currentUser;
+        req.currentUser = {} as ICurrentUser;
       }
-      const currentUserPayload: IUserAuthorizationPassport = {
-        username: signResult.username,
-        email: signResult.email,
-        birthDate: signResult.birthDate,
-        joinedAt: signResult.joinedAt,
-        id: signResult.id,
-      };
-      req['currentUser'] = currentUserPayload;
-      res.status(200).json({success: true, data: currentUserPayload});
-
+      const currentUserPayload: ICurrentUser = {id: signResult.account.id};
+      req.currentUser = currentUserPayload;
+      res.status(200).json({success: true, data: {currentUserPayload, verified: signResult.account.status}, message: 'Logged in!'});
       return true;
     } catch (error) {
       next(error);
@@ -84,15 +64,15 @@ export class AuthController implements IAuthController {
       next(new ErrorHandler('Unauthorized', 401, true));
       return false;
     }
-    const {id} = req.currentUser;
-    const signedToken = this.authService.signNewToken(id, 'access');
+    const payload = req.currentUser;
+    const signedToken = this.authService.signNewToken(payload.id, 'access');
     res.cookie('accessToken', signedToken, {
       httpOnly: true,
       sameSite: 'lax',
       secure: true,
       maxAge: 5 * 60 * 1000,
     });
-    res.status(200).json({success: true, data: {id}});
+    res.status(200).json({success: true, data: payload.id});
     return true;
   }
   async isAuthorized(req: Request, res: Response, next: NextFunction): Promise<boolean> {
@@ -100,19 +80,13 @@ export class AuthController implements IAuthController {
       if (!req.currentUser) {
         throw new ErrorHandler('Unauthorized', 401, true);
       }
-      const user = await this.authService.isAuthorized(+req.currentUser.id);
+      const user = await this.authService.isAuthorized(req.currentUser.id);
       if (!user) {
         throw new ErrorHandler('User is not authorized', 401);
       }
-      const currentUserPayload = {
-        username: user.username,
-        email: user.email,
-        birthDate: user.birthDate,
-        joinedAt: user.joinedAt,
-        id: user.id,
-      };
-      req['currentUser'] = currentUserPayload;
-      res.status(200).json({success: true, data: currentUserPayload});
+      const payload: ICurrentUser = {id: user.account.id};
+      req.currentUser = payload;
+      res.status(200).json({success: true, data: payload});
       return true;
     } catch (error) {
       next(error);
@@ -123,22 +97,16 @@ export class AuthController implements IAuthController {
     try {
       const email = req.query['email'];
       if (typeof email !== 'string') {
-        res.status(400).json({message: 'Email was expected as string!'});
+        res.status(400).json({success: false, message: 'Email was expected as string!'});
         return false;
       }
-      const result = await this.authService.isEmailTaken(email);
-      res.status(200).json({message: 'ok', data: result});
+      await this.authService.isEmailTaken(email);
+      res.status(200).json({success: true});
+      return true;
     } catch (error) {
       next(error);
       return false;
     }
   }
-  async generateCode(req: Request, res: Response, next: NextFunction) {
-    try {
-      const generatedCode = generateRandomCode(4);
-      await Emailer.send('Confirm your account', `<h1>Your special code for activating account arrived!</h1><span>That code will be only available for 10 minutes</span><br><br/><span><strong>Your code is: ${generatedCode}</strong></span>`, 'whiteedev@proton.me');
-    } catch (error) {
 
-    }
-  }
 }
