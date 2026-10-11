@@ -3,28 +3,22 @@ import type {RowDataPacket} from 'mysql2/promise';
 export interface IAccountRepository {
   findWithCredentials(email: string): Promise<IAccountRow | null>;
   findById(id: number): Promise<IAccountRow | null>;
-
-  insert(data: IAccountInsertDTO): Promise<boolean>;
+  insert(data: IAccountInsertDTO): Promise<number>;
   update(data: IAccountUpdateDTO): Promise<boolean>;
   delete(email: string): Promise<boolean>;
   isExist(email: string): Promise<boolean>;
-  findByCriteria(firstString?: string, lastString?: string): Promise<IAccountRow[] | null>;
 }
 
 export interface IAccountService {
   findUserWithCredentials(email: string): Promise<IAccountRow | null>;
   findUserById(id: number): Promise<IAccountRow | null>;
-  insertUser(document: IAccountInsertDTO): Promise<boolean>;
+  insertUser(document: IAccountInsertDTO): Promise<number | null>;
   updateUser(document: IAccountUpdateDTO): Promise<boolean>;
   deleteUser(email: string): Promise<boolean>;
   isUserExist(email: string): Promise<boolean>;
-  findUserByCriteria(firstString?: string, lastString?: string): Promise<IAccountRow[] | null>;
 }
 export interface IAccountRow extends RowDataPacket {
   id: number;
-  firstName: string;
-  lastName: string;
-  birthdayDate: string;
   created_at: string;
   email: string;
   password: string;
@@ -32,30 +26,16 @@ export interface IAccountRow extends RowDataPacket {
 
 }
 
-export interface IUser {
-  username: string;
-  birthDate: string;
-  joinedAt: string;
-  email: string;
-  id: number;
-  access: string;
-  refresh: string;
-}
-
 export interface IAccountInsertDTO {
   email: string;
   password: string;
-  birthdayDate: string;
-  firstName: string;
-  lastName: string;
   status: TVerification;
-
 }
 export interface IAccountUpdateDTO extends Partial<IAccountInsertDTO> {
   email: string;
 }
 
-export interface currentUser {
+export interface ICurrentUser {
   id: number;
 }
 
