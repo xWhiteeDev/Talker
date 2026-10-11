@@ -6,14 +6,15 @@ import type { IAccount, IPersonal, TSteps } from '../../types';
 import { useRef, useState, type Dispatch, type SetStateAction } from 'react';
 import { ACCOUNT_INPUTS, isEmailTaken } from './accountStep.service';
 import { EmitError } from '../../../../../../../lib/Error/EmitError';
-import { BRUTE_FORCE, PARAMETERS_REQUIREMENTS } from '../../../../../../../cfg';
 import emitServer from '../../../../../../../lib/API/emitServer';
+import { ACCOUNT_CONFIG } from '../../../../../../../configurations/account.config';
+import { BRUTE_FORCE_CONFIG } from '../../../../../../../configurations/bruteForce.config';
 
 interface IAccountStepProps {
   setStep(steps: TSteps): void;
   setAccount: Dispatch<SetStateAction<IAccount>>;
   account: IAccount;
-  personal:IPersonal
+  personal: IPersonal;
 }
 
 type TCausedElement = 'email' | 'password' | 'repassword' | 'none';
@@ -46,24 +47,24 @@ function AccountStep(props: IAccountStepProps) {
       bruteForceAttemps.current = 0;
     }
 
-    if (bruteForceAttemps.current >= BRUTE_FORCE.MAX_ATTEMPTS) {
+    if (bruteForceAttemps.current >= BRUTE_FORCE_CONFIG.MAX_ATTEMPTS) {
       setBruteForceProtectionActive(true);
       setError({ caused: 'none', message: 'Too many attempts, wait a moment.' });
       setTimeout(() => {
         bruteForceAttemps.current = 0;
         setBruteForceProtectionActive(false);
         setError(null);
-      }, BRUTE_FORCE.BRUTE_FORCE_PROTECTION_MAX_TIME);
+      }, BRUTE_FORCE_CONFIG.BRUTE_FORCE_PROTECTION_MAX_TIME);
       return;
     }
     setError(null);
     const email: string | undefined = props.account.email?.trim().toLowerCase();
-    if (!email || email.length < PARAMETERS_REQUIREMENTS.EMAIL.MIN) {
+    if (!email || email.length < ACCOUNT_CONFIG.EMAIL.MIN) {
       setError({ caused: 'email', message: 'Invalid email' });
       return;
     }
-    if (props.account.password && props.account.password.length < PARAMETERS_REQUIREMENTS.PASSWORD.MIN) {
-      setError({ caused: 'password', message: `Password is too short! Min: ${PARAMETERS_REQUIREMENTS.PASSWORD.MIN}` });
+    if (props.account.password && props.account.password.length < ACCOUNT_CONFIG.PASSWORD.MIN) {
+      setError({ caused: 'password', message: `Password is too short! Min: ${ACCOUNT_CONFIG.PASSWORD.MIN}` });
       return;
     }
     if (props.account.repassword && props.account.repassword !== props.account.password) {
@@ -72,13 +73,11 @@ function AccountStep(props: IAccountStepProps) {
     }
     setLoading(true);
     try {
-      const existingEmail = await isEmailTaken(email);
-      if (existingEmail) {
-        setError({ caused: 'email', message: 'Invalid data' });
-        return;
-      }
-      const result = await emitServer<boolean>('/api/code/verifyCode', 'POST', { email, password:props.account.password, firstName:props.personal.firstName,lastName:props.personal.lastName,birthdayDate:props.personal.birthdayDate});
-      if (result) {
+      const result = await emitServer('/api/auth/signup', 'POST', {
+        account: props.account,
+        personal: props.personal,
+      });
+      if (result.success) {
         props.setStep('confirmation');
       }
     } catch (err) {
@@ -92,7 +91,6 @@ function AccountStep(props: IAccountStepProps) {
       lastTimeClicked.current = Date.now();
     }
   };
-
 
   const updateField = (field: keyof IAccount, value: string) => {
     props.setAccount((prev) => ({ ...prev, [field]: value }));
