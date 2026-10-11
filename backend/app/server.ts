@@ -8,7 +8,6 @@ import { authRouter } from '../routes/auth/authRoute.js';
 import { postRouter } from '../routes/post/postRoute.js';
 import { commentReactionRouter, postReactionRouter } from '../routes/reaction/reactionRoute.js';
 import { commmentRouter } from '../routes/comment/commentRoute.js';
-import { profileRouter } from '../routes/profile/profileRoute.js';
 import { searchRouter } from '../routes/search/searchRoute.js';
 import { friendsRouter } from '../routes/friends/friendsRoute.js';
 import jwt from 'jsonwebtoken';
@@ -23,17 +22,17 @@ const cfg = {
 function globalMiddleware(err: Error, _req: Request, res: Response, _next: NextFunction) {
   if (err instanceof ErrorHandler) {
     if (!err.isOperational) {
-      res.status(500).json({ success: false, code: 500, message: 'Internal server error' });
+      res.status(500).json({ success: false, message: 'Internal server error' });
     } else {
-      res.status(err.code).json({ success: false, code: err.code, message: err.message });
+      res.status(err.code).json({ success: false, message: err.message });
     }
     return;
   }
   if (err instanceof jwt.TokenExpiredError || err instanceof jwt.JsonWebTokenError) {
-    res.status(401).json({ success: false, code: 401, message: 'Invalid or expired token' });
+    res.status(401).json({ success: false, message: 'Invalid or expired token' });
     return;
   }
-  res.status(500).json({ success: false, code: 500, message: 'Internal server error' });
+  res.status(500).json({ success: false, message: 'Internal server error' });
 }
 
 const app = express();
@@ -54,7 +53,6 @@ app.use('/api/posts', postRouter);
 app.use('/api/postReactions', postReactionRouter);
 app.use('/api/comments', commmentRouter);
 app.use('/api/commentReactions', commentReactionRouter);
-app.use('/api/profile', profileRouter);
 app.use('/api/search', searchRouter);
 app.use('/api/friends', friendsRouter);
 app.use('/api/code', codeRouter);
