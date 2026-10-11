@@ -2,12 +2,12 @@ import { useState } from 'react';
 import FlexContainer from '../../../../../../../renew/Components/FlexContainer/FlexContainer';
 import Input from '../../../../../../../renew/Components/Input/Input';
 import Button from '../../../../../../../renew/Components/Button/Button';
-import { PARAMETERS_REQUIREMENTS } from '../../../../../../../cfg';
 import CustomText from '../../../../../../../renew/Components/CustomText/CustomText';
 import type { IAccount, IPersonal } from '../../types';
 import emitServer from '../../../../../../../lib/API/emitServer';
 import { EmitError } from '../../../../../../../lib/Error/EmitError';
-import {useNavigate} from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { ACCOUNT_CONFIG } from '../../../../../../../configurations/account.config';
 
 interface IConfirmationStep {
   account: IAccount;
@@ -15,44 +15,49 @@ interface IConfirmationStep {
 }
 
 function ConfirmationStep(props: IConfirmationStep) {
-  const [code, setCode] = useState<string>('');
-  const isCodeValid = code.trim().length === PARAMETERS_REQUIREMENTS.CODE;
+  const [code, setCode] = useState<string | null>(null);
+  const isCodeValid = code && code.trim().length >= ACCOUNT_CONFIG.CODE.MIN && code.trim().length <= ACCOUNT_CONFIG.CODE.MAX;
   const [message, setMessage] = useState<string | null>(null);
-  const [isResendButtonDisabdled,setResendButtonDisabled] = useState<boolean>(false);
-  const nav = useNavigate()
+  const [isResendButtonDisabled, setResendButtonDisabled] = useState<boolean>(false);
+  const nav = useNavigate();
   const confirmAccount = async () => {
     try {
       const res = await emitServer<boolean>('/api/code/confirmCode', 'POST', {
         email: props.account.email?.trim().toLowerCase(),
         code: code,
       });
-      if (res.data) {
-        nav('/signin')
+      if (res.success) {
+        nav('/signin');
         //TODO:NOTIFICATION FOR USER
       }
     } catch (error) {
       if (error instanceof EmitError) {
         setMessage(error.message);
+        setCode(null);
       }
     }
   };
-  const sendCodeAgain = async() => {
-    if (isResendButtonDisabdled) return
+  const sendCodeAgain = async () => {
+    if (isResendButtonDisabled) return;
     try {
-      const result = await emitServer<boolean>('/api/code/verifyCode', 'POST', {
+      const result = await emitServer<boolean>('/api/code/resendCode', 'POST', {
         email: props.account.email?.trim().toLowerCase(),
-
       });
-      if (result.data) {
+
+      setMessage('');
+
+      if (result.success) {
         setResendButtonDisabled(true);
-        setCode('')
-        setTimeout(()=>{
-          setResendButtonDisabled(false)
-        },60000)
+        setCode('');
+        setTimeout(() => {
+          setResendButtonDisabled(false);
+        }, 60000);
+      } else {
+        throw new Error(result.message);
       }
     } catch (error) {
-      if (error instanceof EmitError) {
-        setMessage(error.message);
+      if (error instanceof EmitError || error instanceof Error) {
+        setMessage(`${error.message}`);
       }
     }
   };
@@ -69,8 +74,8 @@ function ConfirmationStep(props: IConfirmationStep) {
         color="black"
       />
       <Input
-        minLength={PARAMETERS_REQUIREMENTS.CODE}
-        maxLength={PARAMETERS_REQUIREMENTS.CODE}
+        minLength={ACCOUNT_CONFIG.CODE.MIN}
+        maxLength={ACCOUNT_CONFIG.CODE.MAX}
         fontSize="1rem"
         type="text"
         fontWeight="600"
@@ -80,12 +85,12 @@ function ConfirmationStep(props: IConfirmationStep) {
         inputMode="numeric"
         autoComplete="one-time-code"
         onInput={(v) => setCode(v)}
-        value={code}
+        value={code ?? ''}
       />
       <Button
         width="12vw"
         height="5vh"
-        text={"I didn't receive any code"}
+        text={'Resend code'}
         backgroundColor="#c6c6ca38"
         padding="1rem"
         color="black"
@@ -97,7 +102,7 @@ function ConfirmationStep(props: IConfirmationStep) {
         fontWeight="600"
         fontSize="0.8rem"
         gap="1rem"
-        disabled={isResendButtonDisabdled}
+        disabled={isResendButtonDisabled}
         onClick={sendCodeAgain}
       />
       <Button
@@ -118,7 +123,7 @@ function ConfirmationStep(props: IConfirmationStep) {
         disabled={!isCodeValid}
         onClick={confirmAccount}
       />
-      <div style={{ color: 'red' }}>{message}</div>
+      <div style={{ width: 'auto', height: '2.5vh', color: 'red' }}>{message}</div>
     </FlexContainer>
   );
 }
