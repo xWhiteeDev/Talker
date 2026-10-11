@@ -1,4 +1,5 @@
-import {PARAMETERS_REQUIREMENTS} from "../../../../../cfg";
+import {ACCOUNT_CONFIG} from "../../../../../configurations/account.config";
+import {PERSONAL_CONFIG} from "../../../../../configurations/personal.config";
 import {Validify} from "../../../../../services/Validify";
 import type {IAccount, IPersonal} from "./types";
 
@@ -15,36 +16,38 @@ export function getAge(birthdayDate: Date, currentDate: Date) {
 
 
 export function isPersonalDataValid(data: IPersonal) {
+    if (!data.firstName || !data.lastName) return false;
     return (Validify.validateString(data.firstName, {
-        minLength: PARAMETERS_REQUIREMENTS.PERSONAL.FIRST_NAME.MIN,
-        maxLength: PARAMETERS_REQUIREMENTS.PERSONAL.FIRST_NAME.MAX,
+        minLength: PERSONAL_CONFIG.FIRST_NAME.MIN,
+        maxLength: PERSONAL_CONFIG.FIRST_NAME.MAX,
         canBeNull: false,
         regex: /^[^0-9]*$/,
     }) && Validify.validateString(data.lastName, {
-        minLength: PARAMETERS_REQUIREMENTS.PERSONAL.LAST_NAME.MIN,
-        maxLength: PARAMETERS_REQUIREMENTS.PERSONAL.LAST_NAME.MAX,
+        minLength: PERSONAL_CONFIG.LAST_NAME.MIN,
+        maxLength: PERSONAL_CONFIG.LAST_NAME.MAX,
         canBeNull: false,
         regex: /^[^0-9]*$/,
-    }) && data.livingPlace != undefined && data.gender != undefined && data.birthdayDate != undefined && getAge(new Date(data.birthdayDate), new Date()) >= PARAMETERS_REQUIREMENTS.MIN_AGE && getAge(new Date(data.birthdayDate), new Date()) <= 99);
+    }) && data.birthdayDate != undefined && getAge(new Date(data.birthdayDate), new Date()) >= PERSONAL_CONFIG.BIRTHDAY.MIN_AGE && getAge(new Date(data.birthdayDate), new Date()) <= PERSONAL_CONFIG.BIRTHDAY.MAX_AGE);
 }
 
 
 export function isAccountDataValid(data: IAccount) {
-    return !!(
+    if (!data.email || !data.password || !data.repassword) return false;
+    return (
         Validify.validateString(data.email, {
-            minLength: PARAMETERS_REQUIREMENTS.EMAIL.MIN,
-            maxLength: PARAMETERS_REQUIREMENTS.EMAIL.MAX,
+            minLength: ACCOUNT_CONFIG.EMAIL.MIN,
+            maxLength: ACCOUNT_CONFIG.EMAIL.MAX,
             trimmed: true,
             regex: /[^@]+@[^@]+\.[^@]+/
         }) &&
         Validify.validateString(data.password, {
-            minLength: PARAMETERS_REQUIREMENTS.PASSWORD.MIN,
-            maxLength: PARAMETERS_REQUIREMENTS.PASSWORD.MAX,
+            minLength: ACCOUNT_CONFIG.PASSWORD.MIN,
+            maxLength: ACCOUNT_CONFIG.PASSWORD.MAX,
             trimmed: true,
         }) &&
         Validify.validateString(data.repassword, {
-            minLength: PARAMETERS_REQUIREMENTS.PASSWORD.MIN,
-            maxLength: PARAMETERS_REQUIREMENTS.PASSWORD.MAX,
+            minLength: ACCOUNT_CONFIG.PASSWORD.MIN,
+            maxLength: ACCOUNT_CONFIG.PASSWORD.MAX,
             trimmed: true,
         }) && Validify.validateString(data.password, {expectedValues: [data.repassword]})
     );
