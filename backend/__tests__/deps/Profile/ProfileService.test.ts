@@ -1,5 +1,5 @@
 import {describe, expect, it, vi} from "vitest";
-import {ProfileService} from "../../../dependencies/Profile/profileService.js";
+import {ProfileService} from "../../../dependencies/Profile#1/profileService.js";
 
 const fakeAccount = {
     id: 5,

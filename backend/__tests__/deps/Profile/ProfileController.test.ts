@@ -1,5 +1,5 @@
 import {describe, expect, it, vi} from "vitest";
-import {ProfileController} from "../../../dependencies/Profile/profileController.js";
+import {ProfileController} from "../../../dependencies/Profile#1/profileController.js";
 
 function createHttpMock(overrides: {}) {
     return {
