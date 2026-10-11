@@ -1,0 +1,4 @@
+export const BRUTE_FORCE_CONFIG = {
+    MAX_ATTEMPTS:6,
+    BRUTE_FORCE_PROTECTION_MAX_TIME:60000
+} as const
