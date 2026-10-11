@@ -1,9 +1,9 @@
 interface IPersonal {
-  firstName: string;
-  lastName: string;
-  livingPlace: string;
+  firstName: string | null;
+  lastName: string | null;
+  livingPlace: string | null;
   gender: string;
-  birthdayDate: string;
+  birthdayDate: string | null;
 }
 
 interface IAccount {
@@ -13,4 +13,4 @@ interface IAccount {
 }
 type TSteps = 'personal' | 'account' | 'confirmation';
 
-export {IPersonal,IAccount,TSteps}
+export {IPersonal, IAccount, TSteps};
