@@ -14,36 +14,18 @@ export class AccountRepository implements IAccountRepository {
     if (result.length === 0) return null;
     return result[0] ?? null;
   }
-  async findByCriteria(firstString?: string, lastString?: string): Promise<IAccountRow[] | null> {
-
-    let query: string | undefined = undefined;
-    if (firstString && lastString) {
-      query = 'SELECT CONCAT(firstName," ", lastName) as fullName, id FROM accounts WHERE ((firstName=:firstString AND lastName=:lastString) OR (lastName=:firstString AND firstName=:lastString))';
-    } else if (firstString && !lastString) {
-      query = 'SELECT CONCAT(firstName, " ", lastName) as fullName, id FROM accounts WHERE firstName=:firstString OR lastName=:firstString';
-    } else if (lastString && !firstString) {
-      query = 'SELECT CONCAT(firstName, " ", lastName) as fullName, id FROM accounts WHERE lastName=:lastString OR firstName=:lastString';
-    }
-    if (query) {
-      const [result] = await this.pool.query<IAccountRow[]>(query, {firstString, lastString});
-      if (result.length === 0) return null;
-      return result;
-    } else {return null;}
-
-  }
   async isExist(email: string): Promise<boolean> {
     const [result] = await this.pool.query<RowDataPacket[]>('SELECT 1 FROM accounts WHERE email=:email', {email});
     return result.length > 0;
   }
-  async insert(data: IAccountInsertDTO): Promise<boolean> {
+  async insert(data: IAccountInsertDTO): Promise<number> {
     const [result] = await this.pool.execute<ResultSetHeader>(
-      'INSERT INTO accounts (email,password,birthdayDate,firstName,lastName) VALUES (:email,:password,:birthdayDate,:firstName,:lastName)',
-      {...data},
+      'INSERT INTO accounts (email,password,status) VALUES (:email,:password,:status)', {...data},
     );
-    return result.affectedRows > 0;
+    return result.insertId;
   }
   async update(data: IAccountUpdateDTO): Promise<boolean> {
-    const allowedKeys: (keyof IAccountUpdateDTO)[] = ['password', 'birthdayDate', 'firstName', 'lastName','status'];
+    const allowedKeys: (keyof IAccountUpdateDTO)[] = ['password', 'status'];
     const queries: string[] = [];
     const queryValues = {} as Record<keyof IAccountUpdateDTO | 'email', unknown>;
 
