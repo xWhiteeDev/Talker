@@ -1,4 +1,4 @@
-import mysql, { type Pool } from 'mysql2/promise';
+import mysql, {type Pool} from 'mysql2/promise';
 import dotEnv from 'dotenv';
 dotEnv.config();
 
@@ -10,6 +10,8 @@ const cfg = {
   waitForConnections: true,
   connectionLimit: 15,
   namedPlaceholders: true,
+  dateStrings: true
+
 };
 
 export function createPool(): Pool {
@@ -29,6 +31,7 @@ export function createPool(): Pool {
     waitForConnections: cfg.waitForConnections,
     connectionLimit: cfg.connectionLimit,
     namedPlaceholders: cfg.namedPlaceholders,
+    dateStrings:cfg.dateStrings
   });
   return pool;
 }
