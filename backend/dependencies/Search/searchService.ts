@@ -17,10 +17,10 @@ class SearchService implements ISearchService {
         new ErrorHandler('First text or last Text not provided', 400);
         return null;
       }
-      const result = await this.accountService.findUserByCriteria(firstText, lastText);
+      const result = null;
+      console.log('Search service todo')
       if (!result) {
-        new ErrorHandler('Result not fount', 404);
-        return null;
+       throw new ErrorHandler('Result not found', 404);
       }
       return result;
     } catch (error) {
