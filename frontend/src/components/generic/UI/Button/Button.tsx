@@ -6,6 +6,7 @@ interface ButtonProps {
   type?: "submit" | "reset" | "button";
   additionalStyle?: React.CSSProperties;
   onClick?: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
+  form?:string
 }
 
 export default function Button({
@@ -14,11 +15,13 @@ export default function Button({
   isDisabled,
   type,
   additionalStyle,
+  form
 }: ButtonProps) {
   return (
     <button
       className={style.global}
       type={type}
+      form={form}
       style={{
         border: "2px solid #0202023f",
         outline: "none",
