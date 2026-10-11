@@ -2,58 +2,74 @@ import express, {type Request} from 'express';
 import {authController} from '../../loader/dependencyLoader.js';
 import {isDataValid, isRefreshTokenValid, isAccessTokenActive} from '../../middleware/middleware.js';
 import type {IObjectRequirements} from '../../services/types.js';
+import {ACCOUNT_CONFIG} from '../../configurations/account.config.js';
+import {PERSONAL_CONFIG} from '../../configurations/personal.config.js';
 
 export const authRouter = express.Router();
 
 const registerConfig: IObjectRequirements = {
-  email: {
-    type: 'string',
+  personal: {
+    type: 'object',
     requirements: {
-      minLength: 5,
-      maxLength: 100,
-      canBeNull: false
-    },
-  },
-  password: {
-    type: 'string',
-    requirements: {
-      minLength: 5,
-      maxLength: 100,
-      canBeNull: false
+      firstName: {
+        type: 'string',
+        requirements: {
+          minLength: PERSONAL_CONFIG.FIRST_NAME.MIN,
+          maxLength: PERSONAL_CONFIG.FIRST_NAME.MAX,
+          regex: PERSONAL_CONFIG.FIRST_NAME.REGEX,
+          canBeNull: false
 
+        }
+      },
+      lastName: {
+        type: 'string',
+        requirements: {
+          minLength: PERSONAL_CONFIG.LAST_NAME.MIN,
+          maxLength: PERSONAL_CONFIG.LAST_NAME.MAX,
+          regex: PERSONAL_CONFIG.LAST_NAME.REGEX,
+          canBeNull: false,
+        }
+      },
+      livingPlace: {
+        type: 'string',
+        requirements: {
+          minLength: PERSONAL_CONFIG.LIVING_PLACE.MIN,
+          maxLength: PERSONAL_CONFIG.LIVING_PLACE.MAX,
+          canBeNull: true
+        }
+      },
+      birthdayDate: {
+        type: 'string',
+        requirements: {
+          canBeNull: true
+        }
+      },
+      gender: {
+        type: 'string',
+        requirements: {
+          canBeNull: true
+        }
+      }
     },
-  },
-  firstName: {
-    type: 'string',
-    requirements: {
-      minLength: 2,
-      maxLength: 34,
-      canBeNull: false
-    },
-  },
-  lastName: {
-    type: 'string',
-    requirements: {
-      minLength: 2,
-      maxLength: 34,
-      canBeNull: false
-    },
-  },
+  }
 };
 
 const loginConfig: IObjectRequirements = {
   email: {
     type: 'string',
     requirements: {
-      minLength: 6,
-      maxLength: 100,
+      minLength: ACCOUNT_CONFIG.EMAIL.MIN,
+      maxLength: ACCOUNT_CONFIG.EMAIL.MAX,
+      regex:ACCOUNT_CONFIG.EMAIL.REGEX,
+      canBeNull:false
     },
   },
   password: {
     type: 'string',
     requirements: {
-      minLength: 5,
-      maxLength: 100,
+      minLength: ACCOUNT_CONFIG.PASSWORD.MIN,
+      maxLength: ACCOUNT_CONFIG.PASSWORD.MAX,
+      canBeNull:false
     },
   },
 };
@@ -61,13 +77,13 @@ const loginConfig: IObjectRequirements = {
 
 authRouter.get('/', async (req, res, next) => {
   await authController.isEmailTaken(req, res, next);
-
 });
-authRouter.post('/register', isDataValid(registerConfig), async (req, res, next) => {
+
+authRouter.post('/signup', async (req, res, next) => {
   await authController.createUser(req, res, next);
 });
 
-authRouter.post('/login', isDataValid(loginConfig), async (req, res, next) => {
+authRouter.post('/signin', async (req, res, next) => {
   await authController.signIn(req, res, next);
 });
 authRouter.post('/logout', isAccessTokenActive(), async (_req, res, _next) => {
