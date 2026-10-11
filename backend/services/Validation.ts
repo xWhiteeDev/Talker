@@ -35,7 +35,7 @@ export class ReqValid {
         if (requirement.type === 'object') {
           passed = ReqValid.validationMethods.object(
             toValidate[requirementKey] as Record<string, unknown>,
-            requirement.requirements,
+            requirement.requirements
           );
         }
         if (!passed) {
@@ -65,7 +65,7 @@ export class ReqValid {
     return true;
   }
   static validateString(toValidate: string, requirements: IStringRequirements): boolean {
-    if (typeof toValidate !== 'string' || (!requirements.canBeNull && toValidate == null)) {
+    if (typeof toValidate !== 'string') {
       console.error('Value is not a string!');
       return false;
     }
