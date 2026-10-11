@@ -1,6 +1,7 @@
-import {BACKEND_ENDPOINT} from "../../cfg";
 import type {IEmitResponse, TAPIMethod} from "../../types/lib/types";
 import {EmitError} from "../Error/EmitError";
+
+
 
 async function readErrorMessage(res: Response): Promise<string> {
     try {
@@ -11,16 +12,16 @@ async function readErrorMessage(res: Response): Promise<string> {
             if (typeof b['error'] === 'string') return b['error'];
             if (typeof b['message'] === 'string') return b['message'];
         }
-    } catch {}
+    } catch { }
     return res.statusText || 'Server error, try again later';
 }
 
 async function emitServer<T>(url: string, method: TAPIMethod, data?: unknown): Promise<IEmitResponse<T>> {
-    const result = await fetch(BACKEND_ENDPOINT + url, {
+    const result = await fetch("http://localhost:3000" + url, {
         method,
-        headers: data !== undefined ? { 'Content-Type': 'application/json' } : undefined,
+        headers: data !== undefined ? {'Content-Type': 'application/json'} : undefined,
         body: data !== undefined ? JSON.stringify(data) : undefined,
-    });
+    }); //TODO MOVE ENDPOINT TO ENV
 
     if (!result.ok) {
         throw new EmitError(result.status, await readErrorMessage(result));
