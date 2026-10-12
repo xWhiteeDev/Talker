@@ -3,12 +3,14 @@ import CustomText from '../../../../../renew/Components/CustomText/CustomText';
 import style from './Register.module.css';
 import type { IAccount, IPersonal, TSteps } from './types';
 import AccountStep from './steps/AccountStep/AccountStep';
-import ConfirmationStep from './steps/ConfirmationStep/ConfirmationStep';
+import ConfirmationStep from '../ConfirmationStep/ConfirmationStep';
 import PersonalStep from './steps/PersonalStep/PersonalStep';
+import {useNavigate} from 'react-router-dom';
 
 
 function Register() {
   const [step, setStep] = useState<TSteps>('personal');
+  const nav = useNavigate()
   const [personalData, setPersonal] = useState<IPersonal>({
     firstName: null, 
     lastName: null,
@@ -25,7 +27,7 @@ function Register() {
     const steps: Record<TSteps, React.JSX.Element> = {
       personal: <PersonalStep setStep={setStep} setPersonal={setPersonal} personal={personalData} />,
       account: <AccountStep setStep={setStep} personal={personalData} setAccount={setAccount} account={accountData} />,
-      confirmation: <ConfirmationStep account={accountData} personal={personalData} />,
+      confirmation: (accountData.email ? <ConfirmationStep email={accountData.email} onConfirmed={()=> nav('/signin')}  /> : <div>Missing email</div>)
     };
     return steps[step]
   };

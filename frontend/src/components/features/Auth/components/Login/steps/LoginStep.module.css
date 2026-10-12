@@ -1,0 +1,90 @@
+.container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  width: 100%;
+  height: 100%;
+}
+.welcomeContainer {
+  display: flex;
+  justify-self: center;
+  align-items: center;
+  grid-column: 1/2;
+  width: 80%;
+  height: 100%;
+}
+.serviceLogo {
+  display: flex;
+  align-self: center;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  grid-column: 2/3;
+  height: 50%;
+}
+.bar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  grid-row: 2/3;
+  grid-column: 3/4;
+  background-color: rgba(247, 247, 247, 0.507);
+  border-top-left-radius: 20px;
+  border-bottom-left-radius: 20px;
+  justify-self: flex-end;
+  width: 10%;
+  height: 60%;
+  border: 2px solid #65d18e;
+  gap: 2rem;
+}
+
+.methodsContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.3em;
+  width: 50%;
+  height: 35%;
+  border-bottom: 1px solid gray;
+}
+.loginContainer {
+  display: flex;
+  align-items: center;
+
+  width: 100%;
+  height: 20%;
+}
+.loginContainer form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.additionalText {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  grid-row: 2/3;
+  grid-column: 3/4;
+  justify-self: flex-start;
+  width: 76%;
+  height: 60%;
+}
+.featureShowcase {
+  animation: fade-in 200ms ease;
+  text-wrap: balance;
+
+  transform: perspective(900px) translate3d(20px, 0, 20px) rotateY(-20deg);
+}
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

@@ -1,11 +1,13 @@
 interface ILogin {
-  email: string;
-  password: string;
+  email: string | null;
+  password: string | null;
 }
-
+interface IUserPayload {
+  id: number;
+}
 interface ILoginResponse {
-    id:number;
-    status:TStatus
+  currentUserPayload:IUserPayload;
+  verified:TAccountStatus
 }
 
-type TAccountStatus = 'unverified' | 'verified' | 'suspended'
+type TAccountStatus = 'unverified' | 'verified' | 'suspended';

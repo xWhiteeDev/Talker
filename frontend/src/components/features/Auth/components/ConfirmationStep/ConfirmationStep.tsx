@@ -1,34 +1,30 @@
 import { useState } from 'react';
-import FlexContainer from '../../../../../../../renew/Components/FlexContainer/FlexContainer';
-import Input from '../../../../../../../renew/Components/Input/Input';
-import Button from '../../../../../../../renew/Components/Button/Button';
-import CustomText from '../../../../../../../renew/Components/CustomText/CustomText';
-import type { IAccount, IPersonal } from '../../types';
-import emitServer from '../../../../../../../lib/API/emitServer';
-import { EmitError } from '../../../../../../../lib/Error/EmitError';
-import { useNavigate } from 'react-router-dom';
-import { ACCOUNT_CONFIG } from '../../../../../../../configurations/account.config';
+import FlexContainer from '../../../../../renew/Components/FlexContainer/FlexContainer';
+import Input from '../../../../../renew/Components/Input/Input';
+import Button from '../../../../../renew/Components/Button/Button';
+import CustomText from '../../../../../renew/Components/CustomText/CustomText';
+import emitServer from '../../../../../lib/API/emitServer';
+import { EmitError } from '../../../../../lib/Error/EmitError';
+import { ACCOUNT_CONFIG } from '../../../../../configurations/account.config';
 
-interface IConfirmationStep {
-  account: IAccount;
-  personal: IPersonal;
+interface IConfirmationProps {
+  email: string;
+  onConfirmed: () => void;
 }
 
-function ConfirmationStep(props: IConfirmationStep) {
+function ConfirmationStep(props:IConfirmationProps) {
   const [code, setCode] = useState<string | null>(null);
   const isCodeValid = code && code.trim().length >= ACCOUNT_CONFIG.CODE.MIN && code.trim().length <= ACCOUNT_CONFIG.CODE.MAX;
   const [message, setMessage] = useState<string | null>(null);
   const [isResendButtonDisabled, setResendButtonDisabled] = useState<boolean>(false);
-  const nav = useNavigate();
   const confirmAccount = async () => {
     try {
       const res = await emitServer<boolean>('/api/code/confirmCode', 'POST', {
-        email: props.account.email?.trim().toLowerCase(),
+        email: props.email?.trim().toLowerCase(),
         code: code,
       });
       if (res.success) {
-        nav('/signin');
-        //TODO:NOTIFICATION FOR USER
+        props.onConfirmed()
       }
     } catch (error) {
       if (error instanceof EmitError) {
@@ -41,7 +37,7 @@ function ConfirmationStep(props: IConfirmationStep) {
     if (isResendButtonDisabled) return;
     try {
       const result = await emitServer<boolean>('/api/code/resendCode', 'POST', {
-        email: props.account.email?.trim().toLowerCase(),
+        email: props.email?.trim().toLowerCase(),
       });
 
       setMessage('');
@@ -67,8 +63,8 @@ function ConfirmationStep(props: IConfirmationStep) {
         textAlign="center"
         text={
           <span>
-            System sent into <b>{props.account.email}</b> a <b>code</b>. Write this code below in input to verify your account. If
-            you don't see any e-mail from us - Check spam folder or others
+            System sent into <b>{props.email}</b> a <b>code</b>. Write this code below in input to verify your account. If you don't see
+            any e-mail from us - Check spam folder or others
           </span>
         }
         color="black"
