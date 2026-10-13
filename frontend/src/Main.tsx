@@ -7,6 +7,8 @@ import './Main.css';
 import type { IBasicUserInfo } from './types/components/IUser';
 import Login from './components/features/Auth/components/Login/Login.tsx';
 import Register from './components/features/Auth/components/Register/Register.tsx';
+import { ProtectedRoute } from './renew/Components/ProtectedRoute/ProtectedRoute.tsx';
+import Home from './components/features/Home/Home.tsx';
 
 const root = document.getElementById('root');
 const routes = createBrowserRouter([
@@ -21,8 +23,16 @@ const routes = createBrowserRouter([
       {
         path: '/signup',
         element: <Register />,
-      }
-    ]
+      },
+      {
+        path: '/home',
+        element: (
+          <ProtectedRoute>
+            <Home />
+          </ProtectedRoute>
+        ),
+      },
+    ],
   },
 ]);
 

@@ -1,0 +1,16 @@
+.loadingContainer {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(228, 228, 228, 0.055);
+    width: 100vw;
+    height: 100vh;
+    gap:0.5rem
+}
+.text {
+    display: flex;
+    padding-bottom: 1rem;
+    flex-direction: column;
+}
