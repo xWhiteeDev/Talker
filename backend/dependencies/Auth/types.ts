@@ -1,5 +1,6 @@
 import type {NextFunction, Response, Request} from 'express';
 import type {TAccountStatus, TGender} from '../../types/unions.js';
+import type {IPersonal} from '../Personal/types.js';
 
 export interface ILogin {
   email: string;
@@ -8,7 +9,7 @@ export interface ILogin {
 interface IAccount {
   email: string;
   id: number;
-  status:TAccountStatus
+  status: TAccountStatus;
 }
 
 export interface IServerPersonalData {
@@ -34,14 +35,20 @@ export interface IUserAuthorizationPassport {
   personal: IServerPersonalData;
   account: IAccount;
 }
+export interface ISignInPayload {
+  personal: Omit<IPersonal, 'birthdayDate' | 'livingPlace'>;
+  account: Omit<IAccount, 'email'>;
+  refreshToken: string;
+  accessToken: string;
+}
 
 
 export interface IAuthService {
-  signUp(document:IServerAccountRegisterData): Promise<boolean | null>;
+  signUp(document: IServerAccountRegisterData): Promise<boolean | null>;
 
-  signIn(document: ILogin): Promise<IUserAuthorizationPassport & {refreshToken: string, accessToken: string;} | null>;
+  signIn(document: ILogin): Promise<ISignInPayload| null>;
   signNewToken(userId: number, tokenType: 'access' | 'refresh'): string;
-  isAuthorized(id: number): Promise<IUserAuthorizationPassport | null>;
+  isAuthorized(id: number): Promise<number | null>;
   isEmailTaken(email: string): Promise<boolean>;
 }
 export interface IAuthController {
