@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 import {configDotenv} from 'dotenv';
 import type {IAccountService} from '../Account/types.js';
 import {ErrorHandler} from '../../handlers/errorHandler.js';
-import type {IAuthService, ILogin, IServerAccountRegisterData, IUserAuthorizationPassport} from './types.js';
+import type {IAuthService, ILogin, IServerAccountRegisterData, ISignInPayload} from './types.js';
 import type {IPersonalService} from '../Personal/types.js';
 import type {ICodeInsertDTO, ICodeService} from '../Code/types.js';
 import {generateRandomCode} from '../../helpers/char.js';
@@ -15,7 +15,7 @@ configDotenv();
 export class AuthService implements IAuthService {
   constructor(private accountService: IAccountService, private personalService: IPersonalService, private codeService: ICodeService, private Emailer: IResend) {
   }
-  async signIn(document: ILogin): Promise<IUserAuthorizationPassport & {refreshToken: string, accessToken: string;} | null> {
+  async signIn(document: ILogin): Promise<ISignInPayload | null> {
     const existingUser = await this.accountService.findUserWithCredentials(document.email);
     if (!existingUser) {
       throw new ErrorHandler('Invalid data', 400);
@@ -36,21 +36,23 @@ export class AuthService implements IAuthService {
       process.env['TALKER_SERVER_JWT_REFRESH_SECRET']!,
       {expiresIn: '7d'},
     );
-    const userPayload: IUserAuthorizationPassport = {
+    const userPayload: ISignInPayload = {
       personal: {
-        firstName: existingPersonalRow.first_name,
-        lastName: existingPersonalRow.last_name,
-        birthdayDate: existingPersonalRow.birth_date,
-        livingPlace: existingPersonalRow.living_place,
+        id: existingPersonalRow.id,
+        userId: existingPersonalRow.userId,
+        firstName: existingPersonalRow.firstName,
+        lastName: existingPersonalRow.lastName,
+        birthDate: existingPersonalRow.birthDate,
         gender: existingPersonalRow.gender
       },
       account: {
-        email: document.email,
         id: existingUser.id,
         status:existingUser.status
       },
+      refreshToken: refreshToken,
+      accessToken: accessToken
     };
-    return {...userPayload, accessToken: refreshToken, refreshToken: accessToken}; //TODO
+    return userPayload;
   }
   async signUp(document: IServerAccountRegisterData): Promise<boolean> {
     const isAccountAlreadyExist: boolean = await this.accountService.isUserExist(document.account.email);
@@ -98,11 +100,8 @@ export class AuthService implements IAuthService {
   async isEmailTaken(email: string) {
     return (await this.accountService.isUserExist(email));
   }
-  async isAuthorized(id: number): Promise<IUserAuthorizationPassport | null> {
+  async isAuthorized(id: number): Promise<number | null> {
     const existingUser = await this.accountService.findUserById(id);
-
-    if (!existingUser) return null;
-    console.log('isAuthorized TODO');
-    return null; //TODO
+    return existingUser ? existingUser.id : null;
   }
 }
