@@ -1,12 +1,12 @@
 import {type ResultSetHeader, type Pool} from "mysql2/promise";
-import type {IPersonal, IPersonalInsertDTO, IPersonalRepository, IPersonalRow, IPersonalUpdateDTO} from "./types.js";
+import type {IPersonalInsertDTO, IPersonalRepository, IPersonalRow, IPersonalUpdateDTO} from "./types.js";
 
 export class PersonalRepository implements IPersonalRepository {
     constructor(private db: Pool) { }
-    async getByUserId(userId: number): Promise<IPersonal | undefined> {
+    async getByUserId(userId: number): Promise<IPersonalRow | null> {
         const query = 'SELECT * FROM personal WHERE user_id=:userId';
         const [[result]] = await this.db.query<IPersonalRow[]>(query, {userId});
-        return result;
+        return result ?? null;
     }
     async insert(document: IPersonalInsertDTO): Promise<boolean> {
         const query: string = 'INSERT INTO personal (user_id,first_name,last_name,birth_date,living_place,gender) VALUES (:user_id,:first_name,:last_name,:birth_date,:living_place,:gender)';
