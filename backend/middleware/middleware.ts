@@ -11,13 +11,13 @@ configDotenv();
 export function isDataValid(requirements: IObjectRequirements) {
   return (req: Request, _res: Response, next: NextFunction) => {
     try {
-      const data = req.body.data;
+      const data = req.body;
       if (!data) {
         throw new Error('No data provided');
       }
       const isValid = ReqValid.validateObject(data, requirements);
       if (!isValid) {
-        throw new ErrorHandler('Provided data is not valid!', 400);
+        throw new ErrorHandler('Provided data is not valid!', 400,true);
       }
       next();
       return true;

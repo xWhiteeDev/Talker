@@ -85,7 +85,7 @@ authRouter.post('/signup', isDataValid(registerConfig), async (req, res, next) =
   await authController.createUser(req, res, next);
 });
 
-authRouter.post('/signin', isDataValid(loginConfig), async (req, res, next) => {
+authRouter.post('/signin',isDataValid(loginConfig), async (req, res, next) => {
   await authController.signIn(req, res, next);
 });
 authRouter.post('/logout', isAccessTokenActive(), async (_req, res, _next) => {
