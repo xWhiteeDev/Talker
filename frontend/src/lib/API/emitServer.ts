@@ -19,6 +19,7 @@ async function readErrorMessage(res: Response): Promise<string> {
 async function emitServer<T>(url: string, method: TAPIMethod, data?: unknown): Promise<IEmitResponse<T>> {
     const result = await fetch("http://localhost:3000" + url, {
         method,
+        credentials: 'include',
         headers: data !== undefined ? {'Content-Type': 'application/json'} : undefined,
         body: data !== undefined ? JSON.stringify(data) : undefined,
     }); //TODO MOVE ENDPOINT TO ENV
