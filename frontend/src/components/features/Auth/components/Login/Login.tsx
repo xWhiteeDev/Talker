@@ -41,9 +41,10 @@ function Login() {
         setStep('confirmation');
       } else if (signResult.data?.verified === 'verified') {
         console.log('Actually verified');
+        nav('/home')
+        //SET AUTH CONTEXT
+        // SHOW NOTIFICATION 
       }
-      //Move into home
-      //Auth setContext
     }
   };
 
