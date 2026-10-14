@@ -3,7 +3,8 @@ interface ILogin {
   password: string | null;
 }
 interface IUserPayload {
-  id: number;
+  firstName:string;
+  lastName:string;
 }
 interface ILoginResponse {
   currentUserPayload:IUserPayload;

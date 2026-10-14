@@ -25,6 +25,9 @@ export class AuthService implements IAuthService {
     if (!comparedPassword) {
       throw new ErrorHandler('Invalid data', 400);
     }
+    if (existingUser.status === 'unverified') {
+      throw new ErrorHandler('Unverified', 403);
+    }
     const existingPersonalRow = await this.personalService.getPersonal(existingUser.id);
     if (!existingPersonalRow) return null;
     const accessToken: string = jwt.sign(
@@ -47,8 +50,9 @@ export class AuthService implements IAuthService {
         gender: existingPersonalRow.gender
       },
       account: {
-        id: existingUser.id,
-        status:existingUser.status
+        status: existingUser.status,
+        firstName: existingPersonalRow.firstName,
+        lastName: existingPersonalRow.lastName
       },
       refreshToken: refreshToken,
       accessToken: accessToken

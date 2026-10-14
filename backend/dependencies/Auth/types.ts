@@ -35,10 +35,11 @@ export interface IUserAuthorizationPassport {
   personal: IServerPersonalData;
   account: IAccount;
 }
+
 export interface ISignInPayload {
   personal: Omit<IPersonal, 'birthdayDate' | 'livingPlace'>;
-  account: Omit<IAccount, 'email'>;
-  refreshToken: string;
+  account: Pick<IAccount & IServerPersonalData, 'status' | 'firstName' | 'lastName'>;
+  refreshToken: string; 
   accessToken: string;
 }
 
