@@ -1,10 +1,11 @@
-export type Types = 'string' | 'number' | 'object' | 'array';
+export type TValidationType = 'string' | 'number' | 'object' | 'array' | 'date';
 
-export type RequirementsMap = {
+export type TRequirementsMap = {
   string: IStringRequirements;
   number: INumberRequirements;
   array: IArrayRequirements;
   object: IObjectRequirements;
+  date:IDateRequirements
 };
 
 export type TValueMap = {
@@ -12,17 +13,18 @@ export type TValueMap = {
   number: number;
   array: any[];
   object: Record<string, unknown>;
+  date:string;
 };
 
 export type TRequirements = {
-  [K in Types]: {
+  [K in TValidationType]: {
     type: K;
-    requirements: RequirementsMap[K];
+    requirements: TRequirementsMap[K];
   };
-}[Types];
+}[TValidationType];
 
 export type TValidationHandler = {
-  [K in Types]: (toValidate: TValueMap[K], requirement: RequirementsMap[K]) => boolean;
+  [K in TValidationType]: (toValidate: TValueMap[K], requirement: TRequirementsMap[K]) => boolean;
 };
 
 export interface INumberRequirements {
@@ -44,6 +46,11 @@ export interface IArrayRequirements {
   canBeNull?: boolean;
 }
 
+export interface IDateRequirements {
+  minAge:number;
+  maxAge:number;
+  canBeNull?:boolean
+}
 export interface IObjectRequirements {
   [key: string]: TRequirements;
 }
