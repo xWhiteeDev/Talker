@@ -1,7 +1,5 @@
 import CustomText from '../../../../../renew/Components/CustomText/CustomText';
 import style from './Login.module.css';
-import { Icon } from '../../../../../renew/Components/Icon/Icon';
-import Logo from '../../../../generic/UI/Logo/Logo';
 import React, { useState } from 'react';
 import { ACCOUNT_CONFIG } from '../../../../../configurations/account.config';
 import emitServer from '../../../../../lib/API/emitServer';
@@ -9,6 +7,8 @@ import { LoginStep } from './steps/LoginStep';
 import { useNavigate } from 'react-router-dom';
 import type { features } from './Login.service';
 import ConfirmationStep from '../ConfirmationStep/ConfirmationStep';
+import { useAuth } from '../../../../../hooks/useAuth';
+import { EmitError } from '../../../../../lib/Error/EmitError';
 
 type TLoggingSteps = 'login' | 'confirmation';
 
@@ -17,6 +17,9 @@ function Login() {
   const nav = useNavigate();
   const [loginData, setLoginData] = useState<ILogin>({ email: null, password: null });
   const [step, setStep] = useState<TLoggingSteps>('login');
+
+  const { setLogged } = useAuth();
+
   const handleSubmitLoginForm = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!loginData.email || !loginData.password) return false;
@@ -35,15 +38,29 @@ function Login() {
       email: email,
       password: password,
     };
-    const signResult = await emitServer<ILoginResponse>('/api/auth/signin', 'POST', payload);
-    if (signResult.success) {
-      if (signResult.data?.verified === 'unverified') {
-        setStep('confirmation');
-      } else if (signResult.data?.verified === 'verified') {
-        console.log('Actually verified');
-        nav('/home')
-        //SET AUTH CONTEXT
-        // SHOW NOTIFICATION 
+    try {
+      const result = await setLogged(payload.email, payload.password);
+      switch (result) {
+        case 'unverified':
+          setStep('confirmation');
+          break;
+        case 'ok':
+          console.log('Actually verified');
+          nav('/');
+          break;
+        case 'suspended':
+          console.log('Account suspended, TODO');
+          break;
+        case 'error':
+          console.error('Error spotted TODO');
+          break;
+      }
+    } catch (error) {
+      if (error instanceof EmitError) {
+        if (error.statusCode == 403) {
+          setStep('confirmation');
+          console.log('test')
+        }
       }
     }
   };
@@ -62,7 +79,7 @@ function Login() {
       )}
       {step === 'confirmation' && loginData.email && loginData.password && (
         <div className={style.confirmationFixture}>
-          <CustomText text="One more thing." color='black' fontSize='1.4rem' fontWeight='600'/>
+          <CustomText text="One more thing." color="black" fontSize="1.4rem" fontWeight="600" />
           <ConfirmationStep email={loginData.email} onConfirmed={() => console.log('Confirmed email in login step')} />
         </div>
       )}
