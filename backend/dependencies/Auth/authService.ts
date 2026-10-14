@@ -10,6 +10,7 @@ import {generateRandomCode} from '../../helpers/char.js';
 import {ACCOUNT_CONFIG} from '../../configurations/account.config.js';
 import type {IResend} from '../../services/Resend/type.js';
 import {confirmationEmail} from '../../services/Resend/templates/email.template.js';
+import {ACCESS_TOKEN, REFRESH_TOKEN} from './cfg/cookie.js';
 
 configDotenv();
 export class AuthService implements IAuthService {
@@ -29,12 +30,12 @@ export class AuthService implements IAuthService {
     const accessToken: string = jwt.sign(
       {id: existingUser.id, tokenType: 'access'},
       process.env['TALKER_SERVER_JWT_ACCESS_SECRET']!,
-      {expiresIn: '5m'},
+      {expiresIn: Math.floor(ACCESS_TOKEN.maxAge / 1000)},
     );
     const refreshToken: string = jwt.sign(
       {id: existingUser.id, tokenType: 'refresh'},
       process.env['TALKER_SERVER_JWT_REFRESH_SECRET']!,
-      {expiresIn: '7d'},
+      {expiresIn: Math.floor(REFRESH_TOKEN.maxAge / 1000)},
     );
     const userPayload: ISignInPayload = {
       personal: {

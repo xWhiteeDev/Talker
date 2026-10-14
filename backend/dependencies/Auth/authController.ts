@@ -3,6 +3,7 @@ import {configDotenv} from 'dotenv';
 import {ErrorHandler} from '../../handlers/errorHandler.js';
 import type {IAuthController, IAuthService, ILogin, IServerAccountRegisterData} from './types.js';
 import type {ICurrentUser} from '../Account/types.js';
+import {ACCESS_TOKEN, REFRESH_TOKEN} from './cfg/cookie.js';
 
 configDotenv();
 export class AuthController implements IAuthController {
@@ -23,11 +24,7 @@ export class AuthController implements IAuthController {
   }
   async signIn(req: Request, res: Response, next: NextFunction): Promise<boolean> {
     try {
-      const data: ILogin | undefined = req.body;
-
-      if (!data || !data.email || !data.password) {
-        throw new ErrorHandler('Failed to sign in', 400, true);
-      }
+      const data: ILogin = req.body;
       const signResult = await this.authService.signIn({
         email: data.email,
         password: data.password,
@@ -35,24 +32,9 @@ export class AuthController implements IAuthController {
       if (!signResult) {
         throw new ErrorHandler('Failed to sign in', 400, false);
       }
-      res.cookie('accessToken', signResult.accessToken, {
-        httpOnly: true,
-        sameSite: 'lax',
-        secure: true,
-        maxAge: 5 * 60 * 1000,
-      });
-      res.cookie('refreshToken', signResult.refreshToken, {
-        httpOnly: true,
-        sameSite: 'lax',
-        secure: true,
-        maxAge: 60000 * 60 * 24 * 7,
-      });
-      if (!req.currentUser) {
-        req.currentUser = {} as ICurrentUser;
-      }
-      const currentUserPayload: ICurrentUser = {id: signResult.account.id};
-      req.currentUser = currentUserPayload;
-      res.status(200).json({success: true, data: {currentUserPayload, verified: signResult.account.status}, message: 'Logged in!'});
+      res.cookie('accessToken', signResult.accessToken, ACCESS_TOKEN);
+      res.cookie('refreshToken', signResult.refreshToken, REFRESH_TOKEN);
+      res.status(200).json({success: true, data: {id: signResult.account.id, verified: signResult.account.status}, message: 'Logged in!'});
       return true;
     } catch (error) {
       next(error);
@@ -76,6 +58,7 @@ export class AuthController implements IAuthController {
     return true;
   }
   async isAuthorized(req: Request, res: Response, next: NextFunction): Promise<boolean> {
+
     try {
       if (!req.currentUser) {
         throw new ErrorHandler('Unauthorized', 401, true);
