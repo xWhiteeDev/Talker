@@ -1,6 +1,6 @@
 interface IResendConfiguration {
-    from: string;
-    API_KEY: string;
+    from: string | null;
+    API_KEY: string | null;
 }
 interface IResend {
     send(subject: string, htmlContent: string,plainText: string, to: string): Promise<boolean>;
