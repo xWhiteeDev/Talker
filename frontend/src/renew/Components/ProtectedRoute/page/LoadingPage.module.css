@@ -1,16 +1,27 @@
+@keyframes opening {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 .loadingContainer {
-    position: absolute;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    background-color: rgba(228, 228, 228, 0.055);
-    width: 100vw;
-    height: 100vh;
-    gap:0.5rem
+  opacity: 0;
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(228, 228, 228, 0);
+  width: 100vw;
+  height: 100vh;
+  gap: 0.5rem;
+  animation: opening 0.5s linear 1s 1 forwards;
 }
 .text {
-    display: flex;
-    padding-bottom: 1rem;
-    flex-direction: column;
+  display: flex;
+  padding-bottom: 1rem;
+  flex-direction: column;
 }
