@@ -1,16 +1,16 @@
 import type { Dispatch, SetStateAction } from 'react';
-import { ACCOUNT_CONFIG } from '../../../../../../configurations/account.config';
-import Button from '../../../../../../renew/Components/Button/Button';
-import Checkbox from '../../../../../../renew/Components/Checkbox/Checkbox';
-import CustomLink from '../../../../../../renew/Components/CustomLink/CustomLink';
-import FlexContainer from '../../../../../../renew/Components/FlexContainer/FlexContainer';
-import Input from '../../../../../../renew/Components/Input/Input';
+import { ACCOUNT_CONFIG } from '../../../../../../../configurations/account.config';
+import Button from '../../../../../../../renew/Components/Button/Button';
+import Checkbox from '../../../../../../../renew/Components/Checkbox/Checkbox';
+import CustomLink from '../../../../../../../renew/Components/CustomLink/CustomLink';
+import FlexContainer from '../../../../../../../renew/Components/FlexContainer/FlexContainer';
+import Input from '../../../../../../../renew/Components/Input/Input';
 import style from './LoginStep.module.css';
 import type React from 'react';
-import Logo from '../../../../../generic/UI/Logo/Logo';
-import CustomText from '../../../../../../renew/Components/CustomText/CustomText';
-import { features } from '../Login.service';
-import { Icon } from '../../../../../../renew/Components/Icon/Icon';
+import Logo from '../../../../../../generic/UI/Logo/Logo';
+import CustomText from '../../../../../../../renew/Components/CustomText/CustomText';
+import { features } from '../../Login.service';
+import { Icon } from '../../../../../../../renew/Components/Icon/Icon';
 
 interface ILoginData {
   email: string | null;
@@ -111,6 +111,7 @@ export function LoginStep(props: ILoginStepProps) {
                 width="18vw"
                 height="8vh"
                 placeholder="E-mail"
+                autoComplete='user-email'
                 minLength={ACCOUNT_CONFIG.EMAIL.MIN}
                 maxLength={ACCOUNT_CONFIG.EMAIL.MAX}
                 value={props.loginData.email ?? ''}
@@ -120,6 +121,7 @@ export function LoginStep(props: ILoginStepProps) {
                 icon="password"
                 iconAspectRatio="1/1"
                 value={props.loginData.password ?? ''}
+                autoComplete='current-password'
                 iconWidth="7%"
                 fontSize="1.15rem"
                 type="password"

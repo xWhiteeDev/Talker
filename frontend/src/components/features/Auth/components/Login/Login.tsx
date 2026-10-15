@@ -2,15 +2,15 @@ import CustomText from '../../../../../renew/Components/CustomText/CustomText';
 import style from './Login.module.css';
 import React, { useState } from 'react';
 import { ACCOUNT_CONFIG } from '../../../../../configurations/account.config';
-import emitServer from '../../../../../lib/API/emitServer';
-import { LoginStep } from './steps/LoginStep';
 import { useNavigate } from 'react-router-dom';
 import type { features } from './Login.service';
 import ConfirmationStep from '../ConfirmationStep/ConfirmationStep';
 import { useAuth } from '../../../../../hooks/useAuth';
 import { EmitError } from '../../../../../lib/Error/EmitError';
+import { LoginStep } from './steps/LoginStep/LoginStep';
+import { WelcomeScreen } from './steps/WelcomeScreen/WelcomeScreen';
 
-type TLoggingSteps = 'login' | 'confirmation';
+type TLoggingSteps = 'login' | 'confirmation' | 'welcomeScreen';
 
 function Login() {
   const [showcase, setShowcase] = useState<keyof typeof features>('add_user');
@@ -40,31 +40,63 @@ function Login() {
     };
     try {
       const result = await setLogged(payload.email, payload.password);
-      switch (result) {
-        case 'unverified':
-          setStep('confirmation');
-          break;
+      console.log(`RESULT RETURN: ${JSON.stringify(result)}`)
+      switch (result.status) {
         case 'ok':
+          if (!result.welcomeSeen) {
+            setStep('welcomeScreen');
+            return true;
+          }
           console.log('Actually verified');
           nav('/');
           break;
         case 'suspended':
           console.log('Account suspended, TODO');
           break;
-        case 'error':
-          console.error('Error spotted TODO');
-          break;
       }
     } catch (error) {
       if (error instanceof EmitError) {
         if (error.statusCode == 403) {
           setStep('confirmation');
-          console.log('test')
+          console.log('test');
         }
       }
     }
   };
-
+  const handleConfirmAccount = async () => {
+    if (!loginData.email || !loginData.password) {
+      //TODO:Notification here
+      return false;
+    }
+    try {
+      const userAuthorizationStatus = await setLogged(loginData.email, loginData.password);
+      switch (userAuthorizationStatus.status) {
+        case 'unverified':
+          nav('/signin');
+          break;
+        case 'suspended':
+          //TODO:Notification here
+          nav('/signin');
+          break;
+        case 'ok':
+          if (!userAuthorizationStatus.welcomeSeen) {
+            setStep('welcomeScreen');
+            return true;
+          }
+          nav('/');
+          break;
+      }
+      return true;
+    } catch (error) {
+      if (error instanceof EmitError) {
+        if (error.statusCode === 403) {
+          //TODO:Notification here
+          console.error('Confirmation: Spotted an error when tried to sign in again');
+        }
+      }
+      return false;
+    }
+  };
   return (
     <>
       {showcase && step == 'login' && (
@@ -80,9 +112,10 @@ function Login() {
       {step === 'confirmation' && loginData.email && loginData.password && (
         <div className={style.confirmationFixture}>
           <CustomText text="One more thing." color="black" fontSize="1.4rem" fontWeight="600" />
-          <ConfirmationStep email={loginData.email} onConfirmed={() => console.log('Confirmed email in login step')} />
+          <ConfirmationStep email={loginData.email} onConfirmed={handleConfirmAccount} />
         </div>
       )}
+      {step === 'welcomeScreen' && <WelcomeScreen />}
     </>
   );
 }
