@@ -7,6 +7,7 @@ export interface IAccountRepository {
   update(data: IAccountUpdateDTO): Promise<boolean>;
   delete(email: string): Promise<boolean>;
   isExist(email: string): Promise<boolean>;
+
 }
 
 export interface IAccountService {
@@ -16,6 +17,7 @@ export interface IAccountService {
   updateUser(document: IAccountUpdateDTO): Promise<boolean>;
   deleteUser(email: string): Promise<boolean>;
   isUserExist(email: string): Promise<boolean>;
+  markWelcomeSeen(email: string, state: boolean): Promise<boolean>;
 }
 export interface IAccountRow extends RowDataPacket {
   id: number;
@@ -23,6 +25,7 @@ export interface IAccountRow extends RowDataPacket {
   email: string;
   password: string;
   status: TVerification;
+  welcome_seen: boolean;
 
 }
 
@@ -32,6 +35,7 @@ export interface IAccountInsertDTO {
   status: TVerification;
 }
 export interface IAccountUpdateDTO extends Partial<IAccountInsertDTO> {
+  welcome_seen?: boolean;
   email: string;
 }
 
