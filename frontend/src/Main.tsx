@@ -7,19 +7,23 @@ import Register from './components/features/Auth/components/Register/Register.ts
 import { ProtectedRoute } from './renew/Components/ProtectedRoute/ProtectedRoute.tsx';
 import Home from './components/features/Home/Home.tsx';
 import { AuthLayout } from './contexts/AuthContext/AuthLayout.tsx';
+import { GuestOnlyRoute } from './renew/Components/ProtectedRoute/GuestOnlyRoute.tsx';
 
 const root = document.getElementById('root');
 const routes = createBrowserRouter([
   {
-    element: <AuthLayout />, 
+    element: <AuthLayout />,
     children: [
-      { path: '/signin', element: <Login /> }, 
-      { path: '/signup', element: <Register /> }, 
       {
-        element: <ProtectedRoute />, 
+        element: <GuestOnlyRoute />, 
         children: [
-          { path: '/', element: <Home /> }, 
+          { path: '/signin', element: <Login /> },
+          { path: '/signup', element: <Register /> },
         ],
+      },
+      {
+        element: <ProtectedRoute />,
+        children: [{ path: '/', element: <Home /> }],
       },
     ],
   },
