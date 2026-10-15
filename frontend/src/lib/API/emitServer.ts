@@ -17,12 +17,12 @@ async function readErrorMessage(res: Response): Promise<string> {
 }
 
 async function emitServer<T>(url: string, method: TAPIMethod, data?: unknown): Promise<IEmitResponse<T>> {
-    const result = await fetch("http://localhost:3000" + url, {
+    const result = await fetch(import.meta.env.VITE_SERVER_ENDPOINT + url, {
         method,
         credentials: 'include',
         headers: data !== undefined ? {'Content-Type': 'application/json'} : undefined,
         body: data !== undefined ? JSON.stringify(data) : undefined,
-    }); //TODO MOVE ENDPOINT TO ENV
+    }); 
 
     if (!result.ok) {
         throw new EmitError(result.status, await readErrorMessage(result));
