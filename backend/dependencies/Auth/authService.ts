@@ -52,7 +52,8 @@ export class AuthService implements IAuthService {
       account: {
         status: existingUser.status,
         firstName: existingPersonalRow.firstName,
-        lastName: existingPersonalRow.lastName
+        lastName: existingPersonalRow.lastName,
+        welcomeSeen: existingUser.welcome_seen
       },
       refreshToken: refreshToken,
       accessToken: accessToken

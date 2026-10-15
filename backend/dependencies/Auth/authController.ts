@@ -34,7 +34,7 @@ export class AuthController implements IAuthController {
       }
       res.cookie('accessToken', signResult.accessToken, ACCESS_TOKEN);
       res.cookie('refreshToken', signResult.refreshToken, REFRESH_TOKEN);
-      res.status(200).json({success: true, data: {verified: signResult.account.status, firstName: signResult.account.firstName, lastName: signResult.account.lastName}, message: 'Logged in!'});
+      res.status(200).json({success: true, data: {verified: signResult.account.status, welcomeSeen: signResult.account.welcomeSeen, firstName: signResult.account.firstName, lastName: signResult.account.lastName}, message: 'Logged in!'});
       return true;
     } catch (error) {
       if (error instanceof ErrorHandler) {
