@@ -10,6 +10,7 @@ interface IAccount {
   email: string;
   id: number;
   status: TAccountStatus;
+  welcomeSeen:boolean
 }
 
 export interface IServerPersonalData {
@@ -38,7 +39,7 @@ export interface IUserAuthorizationPassport {
 
 export interface ISignInPayload {
   personal: Omit<IPersonal, 'birthdayDate' | 'livingPlace'>;
-  account: Pick<IAccount & IServerPersonalData, 'status' | 'firstName' | 'lastName'>;
+  account: Pick<IAccount & IServerPersonalData, 'status' | 'firstName' | 'lastName'  | 'welcomeSeen'>;
   refreshToken: string; 
   accessToken: string;
 }
