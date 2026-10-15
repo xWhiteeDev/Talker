@@ -6,7 +6,7 @@ export class AccountService implements IAccountService {
     constructor(private accountRepository: IAccountRepository) {
     }
     async insertUser(data: IAccountInsertDTO): Promise<number | null> {
-        const existingAccount = await this.accountRepository.isExist(data.email)
+        const existingAccount = await this.accountRepository.isExist(data.email);
         if (existingAccount) {
             return null;
         }
@@ -53,5 +53,10 @@ export class AccountService implements IAccountService {
         const result = await this.accountRepository.delete(email);
         return result;
     }
-
+    async markWelcomeSeen(email: string, state: boolean): Promise<boolean> {
+        const existingUser = await this.accountRepository.isExist(email);
+        if (!existingUser) return false;
+        const result = await this.accountRepository.update({email: email, welcome_seen: state});
+        return result;
+    }
 }

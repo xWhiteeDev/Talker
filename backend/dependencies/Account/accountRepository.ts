@@ -25,7 +25,7 @@ export class AccountRepository implements IAccountRepository {
     return result.insertId;
   }
   async update(data: IAccountUpdateDTO): Promise<boolean> {
-    const allowedKeys: (keyof IAccountUpdateDTO)[] = ['password', 'status'];
+    const allowedKeys: (keyof IAccountUpdateDTO)[] = ['password', 'status', 'welcome_seen'];
     const queries: string[] = [];
     const queryValues = {} as Record<keyof IAccountUpdateDTO | 'email', unknown>;
 
