@@ -4,6 +4,7 @@ import {isDataValid, isRefreshTokenValid, isAccessTokenActive} from '../../middl
 import type {IObjectRequirements} from '../../services/types.js';
 import {ACCOUNT_CONFIG} from '../../configurations/account.config.js';
 import {PERSONAL_CONFIG} from '../../configurations/personal.config.js';
+import type {TGender} from '../../types/unions.js';
 
 export const authRouter = express.Router();
 
@@ -41,18 +42,42 @@ const registerConfig: IObjectRequirements = {
       birthdayDate: {
         type: 'date',
         requirements: {
-          minAge:16,
-          maxAge:99,
-          canBeNull:true
-        } //TODO: TO CHECK LATER
+          minAge: 16,
+          maxAge: 99,
+          canBeNull: true
+        }
       },
       gender: {
         type: 'string',
         requirements: {
-          canBeNull: true
+          canBeNull: true,
+          expectedValues: ['Prefer not to say', 'female', 'male'] as TGender[]
         }
       }
-    },
+    }
+  },
+  account: {
+    type: 'object',
+    requirements: {
+      email: {
+        type: 'string',
+        requirements: {
+          minLength: ACCOUNT_CONFIG.EMAIL.MIN,
+          maxLength: ACCOUNT_CONFIG.EMAIL.MAX,
+          regex: ACCOUNT_CONFIG.EMAIL.REGEX,
+          canBeNull: false
+        }
+      },
+      password: {
+        type: 'string',
+        requirements: {
+          minLength: ACCOUNT_CONFIG.PASSWORD.MIN,
+          maxLength: ACCOUNT_CONFIG.PASSWORD.MAX,
+          canBeNull: false,
+          maxBytes:ACCOUNT_CONFIG.PASSWORD.MAX_BYTES
+        }
+      }
+    }
   }
 };
 
@@ -85,7 +110,7 @@ authRouter.post('/signup', isDataValid(registerConfig), async (req, res, next) =
   await authController.createUser(req, res, next);
 });
 
-authRouter.post('/signin',isDataValid(loginConfig), async (req, res, next) => {
+authRouter.post('/signin', isDataValid(loginConfig), async (req, res, next) => {
   await authController.signIn(req, res, next);
 });
 authRouter.post('/logout', isAccessTokenActive(), async (_req, res, _next) => {
