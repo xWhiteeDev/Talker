@@ -61,39 +61,38 @@ export class AuthService implements IAuthService {
     return userPayload;
   }
   async signUp(document: IServerAccountRegisterData): Promise<boolean> {
-    const isAccountAlreadyExist: boolean = await this.accountService.isUserExist(document.account.email);
-    if (isAccountAlreadyExist) return false;
-    try {
-      const insertId = await this.accountService.insertUser({email: document.account.email, password: document.account.password, status: 'unverified'});
-      if (insertId == null) return false;
-      const insertingPersonalities = await this.personalService.insertPersonal({
-        user_id: insertId,
-        first_name: document.personal.firstName,
-        last_name: document.personal.lastName,
-        birth_date: document.personal.birthdayDate,
-        living_place: document.personal.livingPlace,
-        gender: document.personal.gender
-      });
-
-      if (insertId == null || !insertingPersonalities) {
-        return false;
-      }
-      const generatedCode = generateRandomCode(ACCOUNT_CONFIG.CODE.MAX);
-      const codeInsertPayload: ICodeInsertDTO = {
-        email: document.account.email,
-        type: 'verification',
-        code: generatedCode,
-        expires_at: Date.now() + 5 * 60_000,
-        attempts: 0
-      };
-      await this.codeService.insertCode(codeInsertPayload);
-      const confirmation = confirmationEmail(generatedCode, 5);
-      await this.Emailer.send(confirmation.subject, confirmation.html, confirmation.text, document.account.email.trim().toLowerCase());
-      return true;
-    } catch (error) {
-      console.log(error);
-      return false;
+    const existingEmail: boolean = await this.accountService.isUserExist(document.account.email);
+    if (existingEmail) {
+      throw new ErrorHandler('Failed to create an account!', 400);
+    };
+    const insertId = await this.accountService.insertUser({email: document.account.email, password: document.account.password, status: 'unverified'});
+    if (insertId == null) {
+      throw new ErrorHandler('Failed to create an account!', 400);
     }
+    const insertingPersonalities = await this.personalService.insertPersonal({
+      user_id: insertId,
+      first_name: document.personal.firstName,
+      last_name: document.personal.lastName,
+      birth_date: document.personal.birthdayDate,
+      living_place: document.personal.livingPlace,
+      gender: document.personal.gender
+    });
+
+    if (!insertingPersonalities) {
+      throw new ErrorHandler('Failed to save personal data', 500, false);
+    }
+    const generatedCode = generateRandomCode(ACCOUNT_CONFIG.CODE.MAX);
+    const codeInsertPayload: ICodeInsertDTO = {
+      email: document.account.email,
+      type: 'verification',
+      code: generatedCode,
+      expires_at: Date.now() + 5 * 60_000,
+      attempts: 0
+    };
+    await this.codeService.insertCode(codeInsertPayload);
+    const confirmation = confirmationEmail(generatedCode, 5);
+    await this.Emailer.send(confirmation.subject, confirmation.html, confirmation.text, document.account.email.trim().toLowerCase());
+    return true;
   }
   signNewToken(userId: number, tokenType: 'access' | 'refresh'): string {
     const secret = {
