@@ -50,17 +50,15 @@ const corsOptions = {
 };
 
 const rateLimiter = rateLimit({
-  windowMs: Number(process.env['TALKER_SERVER_RATE_LIMITER_WINDOW_MS']) ?? 900000,
-  limit: Number(process.env['TALKER_SERVER_RATE_LIMITER_LIMIT']) ?? 100,
+  windowMs: Number(process.env['TALKER_SERVER_RATE_LIMITER_WINDOW_MS'] ?? 900000),
+  limit: Number(process.env['TALKER_SERVER_RATE_LIMITER_LIMIT'] ?? 100),
   standardHeaders: true,
   legacyHeaders: false,
   ipv6Subnet: 56,
 });
 
 
-app.use(globalMiddleware);
 app.use(rateLimiter);
-
 app.use(cors(corsOptions));
 app.use(helmet());
 app.use(express.json());
@@ -73,6 +71,7 @@ app.use('/api/commentReactions', commentReactionRouter);
 app.use('/api/search', searchRouter);
 app.use('/api/friends', friendsRouter);
 app.use('/api/code', codeRouter);
+app.use(globalMiddleware);
 
 
 app.listen(cfg.serverPort, (err) => {
