@@ -1,18 +1,22 @@
 import express from 'express';
-import type { NextFunction, Request, Response } from 'express';
+import type {NextFunction, Request, Response} from 'express';
 import dotEnv from 'dotenv';
 import cors from 'cors';
 import cookieparser from 'cookie-parser';
-import { ErrorHandler } from '../handlers/errorHandler.js';
-import { authRouter } from '../routes/auth/authRoute.js';
-import { postRouter } from '../routes/post/postRoute.js';
-import { commentReactionRouter, postReactionRouter } from '../routes/reaction/reactionRoute.js';
-import { commmentRouter } from '../routes/comment/commentRoute.js';
-import { searchRouter } from '../routes/search/searchRoute.js';
-import { friendsRouter } from '../routes/friends/friendsRoute.js';
+import {ErrorHandler} from '../handlers/errorHandler.js';
+import {authRouter} from '../routes/auth/authRoute.js';
+import {postRouter} from '../routes/post/postRoute.js';
+import {commentReactionRouter, postReactionRouter} from '../routes/reaction/reactionRoute.js';
+import {commmentRouter} from '../routes/comment/commentRoute.js';
+import {searchRouter} from '../routes/search/searchRoute.js';
+import {friendsRouter} from '../routes/friends/friendsRoute.js';
 import jwt from 'jsonwebtoken';
 import {codeRouter} from '../routes/code/codeRoute.js';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
 dotEnv.config();
+
+
 const cfg = {
   serverPort: process.env['TALKER_SERVER_PORT'] ?? 3000,
   connectionMessage: process.env['TALKER_SERVER_CONNECTION_SUCCEED'] ?? '✨ Connection established✨',
@@ -22,17 +26,17 @@ const cfg = {
 function globalMiddleware(err: Error, _req: Request, res: Response, _next: NextFunction) {
   if (err instanceof ErrorHandler) {
     if (!err.isOperational) {
-      res.status(500).json({ success: false, message: 'Internal server error' });
+      res.status(500).json({success: false, message: 'Internal server error'});
     } else {
-      res.status(err.code).json({ success: false, message: err.message });
+      res.status(err.code).json({success: false, message: err.message});
     }
     return;
   }
   if (err instanceof jwt.TokenExpiredError || err instanceof jwt.JsonWebTokenError) {
-    res.status(401).json({ success: false, message: 'Invalid or expired token' });
+    res.status(401).json({success: false, message: 'Invalid or expired token'});
     return;
   }
-  res.status(500).json({ success: false, message: 'Internal server error' });
+  res.status(500).json({success: false, message: 'Internal server error'});
 }
 
 const app = express();
@@ -45,7 +49,20 @@ const corsOptions = {
   optionsSuccessStatus: 204,
 };
 
+const rateLimiter = rateLimit({
+  windowMs: Number(process.env['TALKER_SERVER_RATE_LIMITER_WINDOW_MS']) ?? 900000,
+  limit: Number(process.env['TALKER_SERVER_RATE_LIMITER_LIMIT']) ?? 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+  ipv6Subnet: 56,
+});
+
+
+app.use(globalMiddleware);
+app.use(rateLimiter);
+
 app.use(cors(corsOptions));
+app.use(helmet());
 app.use(express.json());
 app.use(cookieparser());
 app.use('/api/auth', authRouter);
@@ -57,7 +74,6 @@ app.use('/api/search', searchRouter);
 app.use('/api/friends', friendsRouter);
 app.use('/api/code', codeRouter);
 
-app.use(globalMiddleware);
 
 app.listen(cfg.serverPort, (err) => {
   if (err) {
