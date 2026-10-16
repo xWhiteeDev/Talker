@@ -11,13 +11,11 @@ export class AuthController implements IAuthController {
   }
   async createUser(req: Request, res: Response, next: NextFunction): Promise<boolean> {
     try {
-      const data: IServerAccountRegisterData = req.body;
-      await this.authService.signUp(data);
+      const registerPackage: IServerAccountRegisterData = req.body;
+      await this.authService.signUp(registerPackage);
       res.status(200).json({success: true, message: 'Account created!'});
       return true;
     } catch (error) {
-      res.status(500).json({success: false, message: 'unk'});
-
       next(error);
       return false;
     }
@@ -37,9 +35,6 @@ export class AuthController implements IAuthController {
       res.status(200).json({success: true, data: {verified: signResult.account.status, welcomeSeen: signResult.account.welcomeSeen, firstName: signResult.account.firstName, lastName: signResult.account.lastName}, message: 'Logged in!'});
       return true;
     } catch (error) {
-      if (error instanceof ErrorHandler) {
-        console.error(error.code, error.message);
-      }
       next(error);
       return false;
     }
@@ -49,7 +44,7 @@ export class AuthController implements IAuthController {
       next(new ErrorHandler('Unauthorized', 401, true));
       return false;
     }
-    const payload = req.currentUser;
+    const payload: ICurrentUser = req.currentUser;
     const signedToken = this.authService.signNewToken(payload.id, 'access');
     res.cookie('accessToken', signedToken, {
       httpOnly: true,
@@ -86,11 +81,12 @@ export class AuthController implements IAuthController {
         res.status(400).json({success: false, message: 'Email was expected as string!'});
         return false;
       }
-      await this.authService.isEmailTaken(email);
-      res.status(200).json({success: true});
-      return true;
+      const result = await this.authService.isEmailTaken(email);
+      res.status(result ? 200 : 400).json({success: result});
+      return result;
     } catch (error) {
       next(error);
+
       return false;
     }
   }
