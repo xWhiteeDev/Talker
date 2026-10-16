@@ -45,15 +45,12 @@ export class Validify {
       return false;
     }
     if (!requirements.canBeNull && toValidate == null) {
-      console.error(`Validated ${toValidate} is null but cannot be.`);
       return false;
     }
     if (requirements.min && toValidate < requirements.min) {
-      console.error(`Validated ${toValidate} is too low`);
       return false;
     }
     if (requirements.max && toValidate > requirements.max) {
-      console.error(`Validated ${toValidate} is too high`);
       return false;
     }
     return true;
@@ -69,13 +66,11 @@ export class Validify {
     if (requirements.expectedValues && !requirements.expectedValues.includes(toValidate)) {
       return false;
     }
-
+    if (requirements.maxBytes && new TextEncoder().encode(toValidate).byteLength > requirements.maxBytes) return false;
     if (requirements.minLength && toValidate.length < requirements.minLength) {
-      console.error(`Validated ${toValidate} is too short`);
       return false;
     }
     if (requirements.maxLength && toValidate.length > requirements.maxLength) {
-      console.error(`Validated ${toValidate} is too long`);
       return false;
     }
     if (requirements.regex) {
@@ -86,7 +81,6 @@ export class Validify {
   static validateArray(toValidate: unknown[], requirements: IArrayRequirements) {
     if (!Array.isArray(toValidate)) return false;
     if (!requirements.canBeNull && toValidate == null) {
-      console.error(`Validated ${toValidate} is null but cannot be.`);
       return false;
     }
     if (requirements.minElements && toValidate.length < requirements.minElements) return false;
