@@ -5,8 +5,9 @@ export const ACCOUNT_CONFIG = {
         REGEX:/^[^\s@]+@[^\s@]+\.[^\s@]+$/
     },
     PASSWORD:{
-        MIN:5,
-        MAX:254
+        MIN:8,
+        MAX:72,
+        MAX_BYTES:72
     },
     CODE:{
         MIN: 6,

@@ -39,6 +39,7 @@ export interface IStringRequirements {
   expectedValues?: string[];
   regex?: RegExp;
   canBeNull?: boolean;
+  maxBytes?:number
 }
 export interface IArrayRequirements {
   minElements?: number;

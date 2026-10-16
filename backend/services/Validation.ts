@@ -58,6 +58,7 @@ export class ReqValid {
     if (requirements.expectedValues && !requirements.expectedValues.includes(toValidate)) return false;
     if (requirements.minLength !== undefined && toValidate.length < requirements.minLength) return false;
     if (requirements.maxLength !== undefined && toValidate.length > requirements.maxLength) return false;
+    if (requirements.maxBytes && Buffer.byteLength(toValidate, 'utf8') > requirements.maxBytes) return false
     if (requirements.regex) return requirements.regex.test(toValidate);
 
     return true;
