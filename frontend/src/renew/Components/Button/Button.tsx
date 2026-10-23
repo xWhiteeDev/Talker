@@ -1,33 +1,6 @@
-import type { ReactNode } from 'react';
-import type { TButtonType, TFlexPosition, TTextAlign } from '../../Interfaces/Unions';
 import style from './Button.module.css';
-import type { IconName } from '../Icon';
 import { Icon } from '../Icon/Icon';
-import FlexContainer from '../FlexContainer/FlexContainer';
-interface IButtonProps {
-  width: string;
-  height: string;
-  backgroundColor: string;
-  submitFor?: string;
-  text?: string | ReactNode;
-  type?: TButtonType;
-  color?: string;
-  fontSize?: string;
-  border?: string;
-  fontWeight?: string;
-  padding?: string;
-  textAlign?: TTextAlign;
-  form?: string;
-  icon?: IconName;
-  iconWidth?: string;
-  iconHeight?: string;
-  iconAspectRatio?: string;
-  itemsAlignPosition?: TFlexPosition;
-  itemsJustifyPosition?: TFlexPosition;
-  gap?:string
-  disabled?: boolean;
-  onClick?: () => void;
-}
+import type { IButtonProps } from './types';
 
 function Button(props: IButtonProps) {
   return (
@@ -48,11 +21,13 @@ function Button(props: IButtonProps) {
         opacity: props.disabled ? 0.5 : 1,
         textAlign: props.textAlign,
         fontSize: props.fontSize,
+        boxShadow: props.withoutShadow ? 'none' : '6px 4px 6px 2px rgba(0, 0, 0, 0.541)',
         color: props.color,
         fontWeight: props.fontWeight,
         padding: props.padding,
-        gap:props.gap
-        
+        gap: props.gap,
+        borderRadius: props.borderRadius,
+        aspectRatio: props.aspectRatio,
       }}
     >
       {props.icon && (
