@@ -3,6 +3,7 @@ import emitServer from '../../lib/API/emitServer';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from './AuthContext';
 import type { IAuthLoginResponse, IAuthorizedUser, IAuthorizationResult } from './types';
+import {debugAvatar} from '../../renew/Assets/debug';
 
 export function AuthContextProvider({ children }: React.PropsWithChildren) {
   const [isLogin, setLoginState] = useState<boolean>(false);
@@ -14,15 +15,18 @@ export function AuthContextProvider({ children }: React.PropsWithChildren) {
     (async () => {
       try {
         const sessionResult = await emitServer<IAuthLoginResponse>('/api/auth/isAuth', 'GET');
+        console.log(sessionResult)
         if (sessionResult.success && sessionResult.data) {
           setLoginState(true);
           setUser({
             firstName: sessionResult.data.firstName,
             lastName: sessionResult.data.lastName,
             welcomeSeen: sessionResult.data.welcomeSeen,
+            avatarUrl:debugAvatar
           });
         }
       } catch (error) {
+        console.error(error)
       } finally {
         setLoading(false);
       }
@@ -42,7 +46,7 @@ export function AuthContextProvider({ children }: React.PropsWithChildren) {
     if (verified === 'suspended') return { status: 'suspended' };
 
     setLoginState(true);
-    setUser({ firstName, lastName, welcomeSeen });
+    setUser({ firstName, lastName, welcomeSeen, avatarUrl:debugAvatar });
     return { status: 'ok', welcomeSeen };
   }
   async function logout(): Promise<boolean> {
@@ -63,7 +67,17 @@ export function AuthContextProvider({ children }: React.PropsWithChildren) {
   }
 
   return (
-    <AuthContext.Provider value={{ user: user, setLogged: setLogged, logout: logout, isLogin: isLogin, isLoading: isLoading }}>
+    <AuthContext.Provider
+      value={{
+        user: user,
+        setLogged: setLogged,
+        logout: logout,
+        isLogin: isLogin,
+        isLoading: isLoading,
+        setUser: setUser,
+        setLoginState,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
