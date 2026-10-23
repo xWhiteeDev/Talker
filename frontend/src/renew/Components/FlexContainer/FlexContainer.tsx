@@ -8,13 +8,61 @@ interface IContainerProps {
   direction?: TFlexDirection;
   alignItems?: TFlexPosition;
   gap?: string;
+  padding?: string;
   backgroundColor?: string;
+  borderRadius?: string;
+  border?: string;
+  margin?: string;
+  minHeight?: string;
+  maxHeight?: string;
+  borderLeft?: string;
+  overflowY?: React.CSSProperties['overflowY'];
   children?: any;
 }
 
-function FlexContainer({ width, height, position, children, backgroundColor, justifyContent, alignItems, gap,direction }: IContainerProps) {
+function FlexContainer({
+  width,
+  margin,
+  height,
+  position,
+  children,
+  backgroundColor,
+  justifyContent,
+  alignItems,
+  gap,
+  direction,
+  padding,
+  borderRadius,
+  border,
+  minHeight,
+  maxHeight,
+  borderLeft,
+  overflowY,
+}: IContainerProps) {
   return (
-    <div style={{ gap, width, height, position, backgroundColor, display: 'flex', justifyContent, alignItems, flexDirection:direction }}>{children}</div>
+    <div
+      style={{
+        gap,
+        width,
+        margin,
+        height,
+        position,
+        backgroundColor,
+        display: 'flex',
+        justifyContent,
+        alignItems,
+        flexDirection: direction,
+        padding,
+        borderRadius,
+        border,
+        minHeight,
+        maxHeight,
+        borderLeft,
+        overflowY: overflowY,
+      }}
+    >
+      {children}
+    </div>
   );
 }
 export default FlexContainer;
