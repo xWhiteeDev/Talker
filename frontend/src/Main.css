@@ -5,9 +5,8 @@ body {
   height: 100%;
   margin: 0;
   overflow: hidden;
-      background-image: linear-gradient(322deg, rgba(187, 245, 254, 1) 0%, rgba(219, 219, 219, 0.61) 100%);
+  background-color: rgb(240, 240, 240);
   font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
-
 }
 
 @font-face {
@@ -16,6 +15,8 @@ body {
   font-weight: normal;
   font-style: normal;
 }
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
