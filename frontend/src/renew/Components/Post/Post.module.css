@@ -1,0 +1,44 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  min-height: 2vh;
+  height: auto;
+  max-height: 40vh;
+  border-top: 1px solid gray;
+}
+.optionsContainer {
+  position: absolute;
+  right: 0;
+}
+.content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 3vh;
+  height: auto;
+  max-height: 24vh;
+  font-size: 1.2rem;
+}
+.content span {
+  margin-left: 0.6rem;
+}
+.interactions {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  height: 4.5vh;
+}
+.interactions div {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.user {
+  display: flex;
+  flex-direction: row;
+  background-color: red;
+  width: 100%;
+  height: min-content;
+}
