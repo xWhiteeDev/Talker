@@ -2,12 +2,12 @@ import { createRoot } from 'react-dom/client';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 
 import './Main.css';
-import Login from './components/features/Auth/components/Login/Login.tsx';
-import Register from './components/features/Auth/components/Register/Register.tsx';
+import Login from './renew/Pages/Auth/components/Login/Login.tsx';
+import Register from './renew/Pages/Auth/components/Register/Register.tsx';
 import { ProtectedRoute } from './renew/Components/ProtectedRoute/ProtectedRoute.tsx';
-import Home from './components/features/Home/Home.tsx';
 import { AuthLayout } from './contexts/AuthContext/AuthLayout.tsx';
 import { GuestOnlyRoute } from './renew/Components/ProtectedRoute/GuestOnlyRoute.tsx';
+import Home from './renew/Pages/Home/Home.tsx';
 
 const root = document.getElementById('root');
 const routes = createBrowserRouter([
