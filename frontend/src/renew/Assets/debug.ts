@@ -1,0 +1,1 @@
+export const debugAvatar = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ8__FgzsSuGr1kRWq-htGtEsYZJbmZpNPz-kyvXo1xelYOw8Onqjx6Vio&s=10'
