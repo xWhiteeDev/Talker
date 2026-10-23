@@ -1,0 +1,29 @@
+.container {
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  flex-direction: column;
+  width: 100%;
+  min-height: 7vh;
+  height: auto;
+  flex-shrink: 0;
+  max-height: 32vh;
+  padding: 1rem;
+  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.349);
+}
+.avatarContainer {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+
+.textArea {
+  position: relative;
+
+  width: 90%;
+  height: auto;
+  max-height: 35vh;
+  font-size: 1.4rem;
+  white-space: wrap;
+  overflow-y: auto !important;
+}
