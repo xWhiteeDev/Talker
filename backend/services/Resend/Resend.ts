@@ -35,7 +35,7 @@ class Resend implements IResend {
             html: htmlContent,
             text: plainText
         });
-        if (error) {
+         if (error) {
             throw new Error(error.message);
         }
         return true;
