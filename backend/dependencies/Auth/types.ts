@@ -13,6 +13,12 @@ interface IAccount {
   welcomeSeen:boolean
 }
 
+export interface ISessionPayload {
+  firstName:string;
+  lastName:string;
+  id:number
+}
+
 export interface IServerPersonalData {
   firstName: string;
   lastName: string;
@@ -50,7 +56,7 @@ export interface IAuthService {
 
   signIn(document: ILogin): Promise<ISignInPayload| null>;
   signNewToken(userId: number, tokenType: 'access' | 'refresh'): string;
-  isAuthorized(id: number): Promise<number | null>;
+  isAuthorized(id: number): Promise<ISessionPayload | null>;
   isEmailTaken(email: string): Promise<boolean>;
 }
 export interface IAuthController {

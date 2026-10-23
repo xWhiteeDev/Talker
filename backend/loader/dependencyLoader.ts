@@ -26,6 +26,7 @@ import {CodeController} from '../dependencies/Code/codeController.js';
 import {Emailer} from '../services/Resend/Resend.js';
 import {PersonalRepository} from '../dependencies/Personal/PersonalRepository.js';
 import {PersonalService} from '../dependencies/Personal/PersonalService.js';
+import {TransactionRunner} from '../database/helper/transactionRunner.js';
 
 export const dbPool = createPool();
 const accountRepository = new AccountRepository(dbPool);
@@ -60,7 +61,8 @@ const personalService = new PersonalService(personalRepository);
 
 const codeRepository = new CodeRepository(dbPool);
 const codeService = new CodeService(codeRepository, accountService, Emailer);
+const transactionRunner = new TransactionRunner(dbPool);
 
-export const authService = new AuthService(accountService, personalService, codeService, Emailer);
+export const authService = new AuthService(accountService, personalService, codeService, Emailer, transactionRunner);
 export const authController = new AuthController(authService);
 export const codeController = new CodeController(codeService);

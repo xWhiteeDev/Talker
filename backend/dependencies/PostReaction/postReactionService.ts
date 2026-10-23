@@ -1,8 +1,9 @@
-import { ErrorHandler } from '../../handlers/errorHandler.js';
-import type { IPostReactionRepository, IPostReactionsService, PostReactionInsertDTO, PostReactionRow } from './types.js';
+import type {TExecutor} from '../../database/helper/transactionRunner.js';
+import {ErrorHandler} from '../../handlers/errorHandler.js';
+import type {IPostReactionRepository, IPostReactionsService, PostReactionInsertDTO, PostReactionRow} from './types.js';
 
 export class PostReactionService implements IPostReactionsService {
-  constructor(private PostReactionRepository: IPostReactionRepository) {}
+  constructor(private PostReactionRepository: IPostReactionRepository) { }
   async findPostReactions(postId: number): Promise<PostReactionRow[]> {
     const result = await this.PostReactionRepository.findByPostId(postId);
     if (result.length === 0) {
@@ -31,35 +32,35 @@ export class PostReactionService implements IPostReactionsService {
     }
     return result;
   }
-  async insertPostReaction(dto: PostReactionInsertDTO): Promise<boolean> {
+  async insertPostReaction(dto: PostReactionInsertDTO, executor?: TExecutor): Promise<boolean> {
     const existingReaction = await this.PostReactionRepository.findByAuthorInPost(dto.authorId, dto.postId);
     if (existingReaction) {
       await this.PostReactionRepository.delete(dto.authorId, dto.postId);
       if (existingReaction.type === dto.type) return true;
     }
-    const result = await this.PostReactionRepository.insert(dto);
+    const result = await this.PostReactionRepository.insert(dto, executor);
     if (!result) {
       throw new ErrorHandler('Operation failed', 400);
     }
     return result;
   }
-  async updateReactionType(reactionId: number, newType: string): Promise<boolean> {
+  async updateReactionType(reactionId: number, newType: string, executor?: TExecutor): Promise<boolean> {
     const existingResult = await this.PostReactionRepository.findById(reactionId);
     if (!existingResult) {
       throw new ErrorHandler('Field not found', 400);
     }
-    const result = await this.PostReactionRepository.updateType(reactionId, newType);
+    const result = await this.PostReactionRepository.updateType(reactionId, newType, executor);
     if (!result) {
       throw new ErrorHandler('Operation failed', 400);
     }
     return result;
   }
-  async deleteUserReactionInPost(userId: number, postId: number): Promise<boolean> {
+  async deleteUserReactionInPost(userId: number, postId: number, executor?: TExecutor): Promise<boolean> {
     const existingResult = await this.PostReactionRepository.findByAuthorInPost(userId, postId);
     if (!existingResult) {
       throw new ErrorHandler('Field not found', 400);
     }
-    const result = await this.PostReactionRepository.delete(userId, postId);
+    const result = await this.PostReactionRepository.delete(userId, postId, executor);
     if (!result) {
       throw new ErrorHandler('Operation failed', 400);
     }

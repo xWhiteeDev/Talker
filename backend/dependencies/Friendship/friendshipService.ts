@@ -1,3 +1,4 @@
+import type {TExecutor} from '../../database/helper/transactionRunner.js';
 import {ErrorHandler} from '../../handlers/errorHandler.js';
 import type {
   IFriendshipService,
@@ -30,15 +31,15 @@ export class friendshipService implements IFriendshipService {
     const relations = await this.FriendRepository.findAllAcceptedRelations(userId);
     return relations ?? null;
   }
-  async insertRelation(dto: FriendsRelationInsertDTO): Promise<boolean> {
+  async insertRelation(dto: FriendsRelationInsertDTO, executor?: TExecutor): Promise<boolean> {
     if (dto.userId === dto.friendId) throw new ErrorHandler('Cannot add yourself as friend', 400);
 
     const existingRelation = await this.FriendRepository.findRelationBetween(dto.userId, dto.friendId);
     if (existingRelation) throw new ErrorHandler('Relation found with exact user', 400);
-    const result = await this.FriendRepository.insert(dto);
+    const result = await this.FriendRepository.insert(dto, executor);
     return result;
   }
-  async updateRelation(userId: number, friendId: number, dto: FriendsRelationUpdateDTO): Promise<boolean> {
+  async updateRelation(userId: number, friendId: number, dto: FriendsRelationUpdateDTO, executor?: TExecutor): Promise<boolean> {
     const allowedStatuses = ['accepted', 'pending'];
     if (dto.status && !allowedStatuses.includes(dto.status)) {
       return false;
@@ -46,7 +47,7 @@ export class friendshipService implements IFriendshipService {
     const existingRelation = await this.FriendRepository.findRelationBetween(userId, friendId);
     if (!existingRelation) throw new ErrorHandler('Relation not found with exact user', 400);
     if (existingRelation.userId === userId) throw new ErrorHandler('Cannot accept yourself', 403);
-    const result = await this.FriendRepository.update(userId, friendId, dto);
+    const result = await this.FriendRepository.update(userId, friendId, dto, executor);
     return result;
   }
   async acceptRelation(userId: number, otherId: number): Promise<boolean> {

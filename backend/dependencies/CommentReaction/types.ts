@@ -1,4 +1,5 @@
 import type {RowDataPacket} from "mysql2/promise";
+import type {TExecutor} from "../../database/helper/transactionRunner.js";
 
 export interface ICommentReactionRepository {
     findById(id: number): Promise<CommentReactionRow | undefined>;
@@ -7,9 +8,9 @@ export interface ICommentReactionRepository {
     findByType(type: string, postId: number): Promise<CommentReactionRow[]>;
     findByAuthorInComment(authorId: number, postId: number): Promise<CommentReactionRow | undefined>;
 
-    insert(dto: CommentReactionInsertDTO): Promise<boolean>;
-    updateType(reactionId: number, newType: string): Promise<boolean>;
-    delete(authorId: number, reactionId: number): Promise<boolean>;
+    insert(dto: CommentReactionInsertDTO, executor: TExecutor): Promise<boolean>;
+    updateType(reactionId: number, newType: string, executor: TExecutor): Promise<boolean>;
+    delete(authorId: number, reactionId: number, executor: TExecutor): Promise<boolean>;
 }
 
 export interface ICommentReactionsService {
@@ -17,9 +18,9 @@ export interface ICommentReactionsService {
     findCommentReactionsByType(commentId: number, type: string): Promise<CommentReactionRow[] | undefined>;
     findAllUserReactions(userId: number): Promise<CommentReactionRow[] | undefined>;
     findUserReactionInComment(userId: number, commentId: number): Promise<CommentReactionRow | undefined>;
-    insertCommentReaction(dto: CommentReactionInsertDTO): Promise<boolean>;
-    updateReactionType(reactionId: number, newType: string): Promise<boolean>;
-    deleteUserReactionInComment(userId: number, commentId: number): Promise<boolean>;
+    insertCommentReaction(dto: CommentReactionInsertDTO, executor?: TExecutor): Promise<boolean>;
+    updateReactionType(reactionId: number, newType: string, executor?: TExecutor): Promise<boolean>;
+    deleteUserReactionInComment(userId: number, commentId: number, executor?: TExecutor): Promise<boolean>;
 }
 
 export interface CommentReactionRow extends RowDataPacket {
@@ -27,9 +28,9 @@ export interface CommentReactionRow extends RowDataPacket {
     author_id: number;
     type: string;
     comment_id: number;
-    created_at:string
+    created_at: string;
 }
-export interface CommentReactionInsertDTO  {
+export interface CommentReactionInsertDTO {
     author_id: number;
     type: string;
     comment_id: number;

@@ -6,6 +6,7 @@ import {generateRandomCode} from "../../helpers/char.js";
 import {ACCOUNT_CONFIG} from "../../configurations/account.config.js";
 import {confirmationEmail} from "../../services/Resend/templates/email.template.js";
 import type {IAccountService} from "../Account/types.js";
+import type {TExecutor} from "../../database/helper/transactionRunner.js";
 config();
 export class CodeService implements ICodeService {
     constructor(private codeRepository: ICodeRepository, private accountService: IAccountService, private Emailer: IResend) {
@@ -20,16 +21,16 @@ export class CodeService implements ICodeService {
         const result = await this.codeRepository.getAllFor(email);
         return result;
     }
-    async insertCode(document: ICodeInsertDTO): Promise<boolean> {
+    async insertCode(document: ICodeInsertDTO, executor?: TExecutor): Promise<boolean> {
         const existingCode: boolean = await this.codeRepository.isAnyExist(document.email, document.type);
         if (existingCode) {
             await this.updateCode(document.email, document.type, {
                 code: document.code, attempts: 0, expires_at: document.expires_at,
-            });
+            }, executor);
             return true;
         }
         const hashedCode = await bcrypt.hash(document.code, 12);
-        const result = await this.codeRepository.insert({...document, code: hashedCode});
+        const result = await this.codeRepository.insert({...document, code: hashedCode}, executor);
         return result;
     }
     async isCodeValid(email: string, type: TCodeType, code: string): Promise<boolean> {
@@ -47,26 +48,26 @@ export class CodeService implements ICodeService {
         const isCodeCorrect = await bcrypt.compare(code, existingRow.code);
         if (!isCodeCorrect) {
             await this.codeRepository.deleteWhenExhausted(email, type);
-            return false;
+            return false
         }
         return await this.codeRepository.delete(email, type);
     }
-    async updateCode(email: string, type: TCodeType, updateDocument: ICodeUpdateDTO): Promise<boolean> {
+    async updateCode(email: string, type: TCodeType, updateDocument: ICodeUpdateDTO, executor?: TExecutor): Promise<boolean> {
         const existingCode: boolean = await this.codeRepository.isAnyExist(email, type);
         if (!existingCode || !updateDocument.code) {
             return false;
         }
         const hashedCode = await bcrypt.hash(updateDocument.code, 12);
-        const result = await this.codeRepository.update(email, type, {...updateDocument, code: hashedCode});
+        const result = await this.codeRepository.update(email, type, {...updateDocument, code: hashedCode}, executor);
         return result;
     }
 
-    async deleteCode(email: string, type: TCodeType): Promise<boolean> {
+    async deleteCode(email: string, type: TCodeType, executor?: TExecutor): Promise<boolean> {
         const existingCode: boolean = await this.codeRepository.isAnyExist(email, type);
         if (!existingCode) {
             return false;
         }
-        const result = await this.codeRepository.delete(email, type);
+        const result = await this.codeRepository.delete(email, type, executor);
         return result;
     }
     async resendCode(email: string, type: TCodeType): Promise<boolean> {

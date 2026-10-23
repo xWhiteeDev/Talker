@@ -1,14 +1,14 @@
 
 import {ErrorHandler} from "../../handlers/errorHandler.js";
-import type {currentUser} from "../Account/types.js";
-import type { IPostService, PostInsertDTO} from "./types.js";
+import type {ICurrentUser} from "../Account/types.js";
+import type {IPostService, PostInsertDTO} from "./types.js";
 import type {Request, Response, NextFunction} from 'express';
 export class PostController {
     constructor(private PostService: IPostService) { }
 
     async fetchLatestPosts(req: Request, res: Response, next: NextFunction) {
         try {
-            const user: currentUser | undefined = req.currentUser;
+            const user: ICurrentUser | undefined = req.currentUser;
             if (!user) {
                 next(new ErrorHandler('User does not have their identifier', 400));
                 return false;
@@ -22,12 +22,13 @@ export class PostController {
             return result;
         } catch (error) {
             next(error);
+            console.error(error)
             return false;
         }
     }
     async getSpecifiedPost(req: Request, res: Response, next: NextFunction) {
         try {
-            const user: currentUser | undefined = req.currentUser;
+            const user: ICurrentUser | undefined = req.currentUser;
             const params = req.params;
             if (!user) {
                 next(new ErrorHandler('User does not have their identifier', 400));
@@ -49,25 +50,24 @@ export class PostController {
             return false;
         }
     }
-    async insertNewPost(req: Request, res: Response, next: NextFunction) {
+    async insertNewPost(req: Request, res: Response, next: NextFunction): Promise<boolean> {
         try {
-            const user: currentUser | undefined = req.currentUser;
+            const user: ICurrentUser | undefined = req.currentUser;
             if (!user) {
-                throw new ErrorHandler('User does not have their identifier', 400)
+                throw new ErrorHandler('User does not have their identifier', 400);
             }
-            const data = req.body.data;
+            const data = req.body;
+            console.log(data);
             const payload: PostInsertDTO = {
                 authorId: user.id,
-                content: data.content,
-                visible_for: data.visible_for,
+                text: data.text,
+                visible_for: data.visibleFor,
             };
-            const insertingResult = await this.PostService.insertPost(payload);
-            if (!insertingResult) {
-               throw new ErrorHandler('Insert action goes wrong', 500)
-            }
-            res.status(200).json({success: true, data: insertingResult});
-            return insertingResult;
+            const newPostPayload = await this.PostService.insertPost(payload, user.id);
+            res.status(200).json({success: true, data: newPostPayload});
+            return true;
         } catch (error) {
+            console.error(error);
             next(error);
             return false;
         }

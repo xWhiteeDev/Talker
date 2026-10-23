@@ -1,9 +1,10 @@
-import { ErrorHandler } from '../../handlers/errorHandler.js';
-import type { CommentReactionRepository } from './CommentReactionRepository.js';
-import type { CommentReactionInsertDTO, CommentReactionRow, ICommentReactionsService } from './types.js';
+import type {TExecutor} from '../../database/helper/transactionRunner.js';
+import {ErrorHandler} from '../../handlers/errorHandler.js';
+import type {CommentReactionRepository} from './CommentReactionRepository.js';
+import type {CommentReactionInsertDTO, CommentReactionRow, ICommentReactionsService} from './types.js';
 
 export class CommentReactionService implements ICommentReactionsService {
-  constructor(private CommentReactionRepository: CommentReactionRepository) {}
+  constructor(private CommentReactionRepository: CommentReactionRepository) { }
   async findCommentReactions(commentId: number): Promise<CommentReactionRow[]> {
     const result = await this.CommentReactionRepository.findByCommentId(commentId);
     if (result.length === 0) {
@@ -32,35 +33,35 @@ export class CommentReactionService implements ICommentReactionsService {
     }
     return result;
   }
-  async insertCommentReaction(dto: CommentReactionInsertDTO): Promise<boolean> {
+  async insertCommentReaction(dto: CommentReactionInsertDTO, executor?: TExecutor): Promise<boolean> {
     const existingReaction = await this.CommentReactionRepository.findByAuthorInComment(dto.author_id, dto.comment_id);
     if (existingReaction) {
       await this.CommentReactionRepository.delete(dto.author_id, dto.comment_id);
       if (existingReaction.type === dto.type) return true;
     }
-    const result = await this.CommentReactionRepository.insert(dto);
+    const result = await this.CommentReactionRepository.insert(dto, executor);
     if (!result) {
       throw new ErrorHandler('Operation failed', 400);
     }
     return result;
   }
-  async updateReactionType(reactionId: number, newType: string): Promise<boolean> {
+  async updateReactionType(reactionId: number, newType: string, executor?: TExecutor): Promise<boolean> {
     const existingResult = await this.CommentReactionRepository.findById(reactionId);
     if (!existingResult) {
       throw new ErrorHandler('Field not found', 400);
     }
-    const result = await this.CommentReactionRepository.updateType(reactionId, newType);
+    const result = await this.CommentReactionRepository.updateType(reactionId, newType, executor);
     if (!result) {
       throw new ErrorHandler('Operation failed', 400);
     }
     return result;
   }
-  async deleteUserReactionInComment(userId: number, commentId: number): Promise<boolean> {
+  async deleteUserReactionInComment(userId: number, commentId: number, executor?: TExecutor): Promise<boolean> {
     const existingResult = await this.CommentReactionRepository.findByAuthorInComment(userId, commentId);
     if (!existingResult) {
       throw new ErrorHandler('Field not found', 400);
     }
-    const result = await this.CommentReactionRepository.delete(userId, commentId);
+    const result = await this.CommentReactionRepository.delete(userId, commentId, executor);
     if (!result) {
       throw new ErrorHandler('Operation failed', 400);
     }

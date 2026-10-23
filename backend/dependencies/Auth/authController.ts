@@ -1,7 +1,7 @@
 import type {NextFunction, Request, Response} from 'express';
 import {configDotenv} from 'dotenv';
 import {ErrorHandler} from '../../handlers/errorHandler.js';
-import type {IAuthController, IAuthService, ILogin, IServerAccountRegisterData} from './types.js';
+import type {IAuthController, IAuthService, ILogin, IServerAccountRegisterData, ISessionPayload} from './types.js';
 import type {ICurrentUser} from '../Account/types.js';
 import {ACCESS_TOKEN, REFRESH_TOKEN} from './cfg/cookie.js';
 
@@ -61,11 +61,15 @@ export class AuthController implements IAuthController {
       if (!req.currentUser) {
         throw new ErrorHandler('Unauthorized', 401, true);
       }
-      const userId: number | null = await this.authService.isAuthorized(req.currentUser.id);
-      if (userId == null) {
+      const user: ISessionPayload | null = await this.authService.isAuthorized(req.currentUser.id);
+      if (user == null) {
         throw new ErrorHandler('User is not authorized', 401);
       }
-      const payload: ICurrentUser = {id: userId};
+      const payload: ISessionPayload = {
+        id: user.id,
+        firstName: user.firstName,
+        lastName: user.lastName
+      };
       req.currentUser = payload;
       res.status(200).json({success: true, data: payload});
       return true;

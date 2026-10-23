@@ -1,11 +1,12 @@
 import bcrypt from "bcryptjs";
 import type {IAccountInsertDTO, IAccountRepository, IAccountRow, IAccountService, IAccountUpdateDTO} from "./types.js";
 import {ErrorHandler} from "../../handlers/errorHandler.js";
+import type {TExecutor} from "../../database/helper/transactionRunner.js";
 
 export class AccountService implements IAccountService {
     constructor(private accountRepository: IAccountRepository) {
     }
-    async insertUser(data: IAccountInsertDTO): Promise<number | null> {
+    async insertUser(data: IAccountInsertDTO, executor: TExecutor): Promise<number | null> {
         const existingAccount = await this.accountRepository.isExist(data.email);
         if (existingAccount) {
             return null;
@@ -16,10 +17,10 @@ export class AccountService implements IAccountService {
         } catch (error) {
             throw error;
         }
-        const result = await this.accountRepository.insert(payload);
+        const result = await this.accountRepository.insert(payload, executor);
         return result;
     }
-    async updateUser(data: IAccountUpdateDTO): Promise<boolean> {
+    async updateUser(data: IAccountUpdateDTO, executor: TExecutor): Promise<boolean> {
         const existingUser = await this.accountRepository.isExist(data.email);
         if (!existingUser) {
             throw new ErrorHandler("User not exist", 400);
@@ -32,7 +33,7 @@ export class AccountService implements IAccountService {
                 throw error;
             }
         }
-        return await this.accountRepository.update(payload);
+        return await this.accountRepository.update(payload, executor);
 
     }
     async findUserWithCredentials(email: string): Promise<IAccountRow | null> {
@@ -47,16 +48,16 @@ export class AccountService implements IAccountService {
         const result = await this.accountRepository.isExist(email);
         return result;
     }
-    async deleteUser(email: string): Promise<boolean> {
+    async deleteUser(email: string, executor: TExecutor): Promise<boolean> {
         const existingUser = await this.accountRepository.isExist(email);
         if (!existingUser) return false;
-        const result = await this.accountRepository.delete(email);
+        const result = await this.accountRepository.delete(email, executor);
         return result;
     }
-    async markWelcomeSeen(email: string, state: boolean): Promise<boolean> {
+    async markWelcomeSeen(email: string, state: boolean, executor: TExecutor): Promise<boolean> {
         const existingUser = await this.accountRepository.isExist(email);
         if (!existingUser) return false;
-        const result = await this.accountRepository.update({email: email, welcome_seen: state});
+        const result = await this.accountRepository.update({email: email, welcome_seen: state}, executor);
         return result;
     }
 }

@@ -1,6 +1,7 @@
 import type {RowDataPacket} from "mysql2";
 import type {Response, Request, NextFunction} from "express";
 import type {IPersonal, TGender} from "../Personal/types.js";
+import type {TExecutor} from "../../database/helper/transactionRunner.ts";
 export type TCodeType = 'verification' | 'forgotten_password';
 export interface ICode {
     email: string;
@@ -12,20 +13,20 @@ export interface ICode {
 export interface ICodeRepository {
     get(email: string, type: TCodeType): Promise<ICode | undefined>;
     getAllFor(email: string): Promise<ICode[] | undefined>;
-    insert(document: ICodeInsertDTO): Promise<boolean>;
-    update(email: string, type: TCodeType, updateDocument: ICodeUpdateDTO): Promise<boolean>;
+    insert(document: ICodeInsertDTO, executor?: TExecutor): Promise<boolean>;
+    update(email: string, type: TCodeType, updateDocument: ICodeUpdateDTO, executor?: TExecutor): Promise<boolean>;
     isAnyExist(email: string, type: TCodeType): Promise<boolean>;
-    reserveAttempt(email: string, type: TCodeType): Promise<boolean>;
-    deleteWhenExhausted(email: string, type: TCodeType): Promise<boolean>;
-    delete(email: string, type: TCodeType): Promise<boolean>;
+    reserveAttempt(email: string, type: TCodeType, executor?: TExecutor): Promise<boolean>;
+    deleteWhenExhausted(email: string, type: TCodeType, executor?: TExecutor): Promise<boolean>;
+    delete(email: string, type: TCodeType, executor?: TExecutor): Promise<boolean>;
 
 }
 export interface ICodeService {
     getCodeRow(email: string, type: TCodeType): Promise<ICode | undefined>;
     getAllCodesFor(email: string): Promise<ICode[] | undefined>;
-    insertCode(document: ICodeInsertDTO): Promise<boolean>;
-    updateCode(email: string, type: TCodeType, updateDocument: ICodeUpdateDTO): Promise<boolean>;
-    deleteCode(email: string, type: TCodeType): Promise<boolean>;
+    insertCode(document: ICodeInsertDTO, executor?: TExecutor): Promise<boolean>;
+    updateCode(email: string, type: TCodeType, updateDocument: ICodeUpdateDTO, executor?: TExecutor): Promise<boolean>;
+    deleteCode(email: string, type: TCodeType, executor?: TExecutor): Promise<boolean>;
     isCodeValid(email: string, type: TCodeType, code: string): Promise<boolean>;
     resendCode(email: string, type: TCodeType): Promise<boolean>;
     confirmCode(email: string, type: TCodeType, code: string): Promise<boolean>;

@@ -1,12 +1,13 @@
 import type { NextFunction, Response, Request } from 'express';
 import type { RowDataPacket } from 'mysql2';
+import type {TExecutor} from '../../database/helper/transactionRunner.js';
 
 export interface IFriendshipRepository {
   findById(id: number): Promise<FriendsRelation | undefined>;
   findByUserId(userId: number): Promise<FriendsRelation[] | undefined>;
-  insert(dto: FriendsRelationInsertDTO): Promise<boolean>;
-  update(userId: number, otherId: number, dto: FriendsRelationUpdateDTO): Promise<boolean>;
-  delete(userId: number, otherId: number): Promise<boolean>;
+  insert(dto: FriendsRelationInsertDTO, executor?:TExecutor): Promise<boolean>;
+  update(userId: number, otherId: number, dto: FriendsRelationUpdateDTO, executor?:TExecutor): Promise<boolean>;
+  delete(userId: number, otherId: number, executor?:TExecutor): Promise<boolean>;
   findRelationBetween(userId: number, otherId: number, status?: string): Promise<FriendsRelationRow | undefined>;
   findAllAcceptedRelations(requestedId: number): Promise<IAcceptedRelationRow[] | undefined>;
 }
@@ -15,8 +16,8 @@ export interface IFriendshipService {
   findRelationByUserId(id: number): Promise<FriendsRelation[]  | null>;
   findRelationBetween(userId: number, otherId: number, status?: string): Promise<FriendsRelation | null>;
   findAllAcceptedRelations(userId: number): Promise<IAcceptedRelationRow[] | null>;
-  insertRelation(dto: FriendsRelationInsertDTO): Promise<boolean>;
-  updateRelation(userId: number, otherId: number, dto: FriendsRelationUpdateDTO): Promise<boolean>;
+  insertRelation(dto: FriendsRelationInsertDTO, executor:TExecutor): Promise<boolean>;
+  updateRelation(userId: number, otherId: number, dto: FriendsRelationUpdateDTO, executor:TExecutor): Promise<boolean>;
   removeRelation(userId: number, otherId: number): Promise<boolean>;
   acceptRelation(userId: number, otherId: number): Promise<boolean>;
 }

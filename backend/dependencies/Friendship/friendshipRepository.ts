@@ -39,25 +39,25 @@ export class friendshipRepository implements IFriendshipRepository {
     return result
   }
 
-  async insert(dto: FriendsRelationInsertDTO): Promise<boolean> {
+  async insert(dto: FriendsRelationInsertDTO, executor:Pool = this.pool): Promise<boolean> {
     const query: string = 'INSERT INTO friendships (userId,friendId,status) VALUES (:userId,:friendId,:status)';
-    const [result] = await this.pool.execute<ResultSetHeader>(query, {
+    const [result] = await executor.execute<ResultSetHeader>(query, {
       userId: dto.userId,
       friendId: dto.friendId,
       status: dto.status,
     });
     return result.affectedRows > 0;
   }
-  async update(userId: number, otherId: number, { status }: FriendsRelationUpdateDTO): Promise<boolean> {
+  async update(userId: number, otherId: number, { status }: FriendsRelationUpdateDTO, executor:Pool = this.pool): Promise<boolean> {
     const query: string =
       'UPDATE friendships SET status=:status WHERE(userId=:userId AND friendId=:otherId) OR (userId=:otherId and friendId=:userId)';
-    const [result] = await this.pool.execute<ResultSetHeader>(query, { userId, otherId, status });
+    const [result] = await executor.execute<ResultSetHeader>(query, { userId, otherId, status });
     return result.affectedRows > 0;
   }
-  async delete(userId: number, otherId: number): Promise<boolean> {
+  async delete(userId: number, otherId: number, executor:Pool = this.pool): Promise<boolean> {
     const query: string =
       'DELETE FROM friendships WHERE(userId=:userId AND friendId=:otherId) OR (userId=:otherId and friendId=:userId)';
-    const [result] = await this.pool.execute<ResultSetHeader>(query, { userId, otherId });
+    const [result] = await executor.execute<ResultSetHeader>(query, { userId, otherId });
     return result.affectedRows > 0;
   }
 }

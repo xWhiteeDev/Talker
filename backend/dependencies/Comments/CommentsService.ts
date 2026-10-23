@@ -1,3 +1,4 @@
+import type {TExecutor} from '../../database/helper/transactionRunner.js';
 import type { CommentInsertDTO, CommentRow, FoundComment, ICommentsRepository, ICommentsService } from './types.js';
 
 export class CommentsService implements ICommentsService {
@@ -30,22 +31,22 @@ export class CommentsService implements ICommentsService {
     }
     return result;
   }
-  async insertComment(dto: CommentInsertDTO): Promise<boolean> {
-    const result = await this.CommentsRepository.insertDocument(dto);
+  async insertComment(dto: CommentInsertDTO, executor?:TExecutor): Promise<boolean> {
+    const result = await this.CommentsRepository.insertDocument(dto,executor);
     if (!result) {
       return false;
     }
     return result;
   }
-  async updateCommentContent(commentId: number, newContent: string): Promise<boolean> {
-    const result = await this.CommentsRepository.updateContent(commentId, newContent);
+  async updateCommentContent(commentId: number, newContent: string, executor?:TExecutor): Promise<boolean> {
+    const result = await this.CommentsRepository.updateContent(commentId, newContent,executor);
     if (!result) {
       return false;
     }
     return result;
   }
-  async deleteComment(commentId: number): Promise<boolean> {
-    const result = await this.CommentsRepository.deleteDocument(commentId);
+  async deleteComment(commentId: number, executor?:TExecutor): Promise<boolean> {
+    const result = await this.CommentsRepository.deleteDocument(commentId,executor);
     if (!result) {
       return false;
     }

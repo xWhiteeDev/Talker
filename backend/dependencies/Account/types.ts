@@ -1,11 +1,14 @@
 import type {RowDataPacket} from 'mysql2/promise';
+import type {TExecutor} from '../../database/helper/transactionRunner.js';
+
+
 
 export interface IAccountRepository {
   findWithCredentials(email: string): Promise<IAccountRow | null>;
   findById(id: number): Promise<IAccountRow | null>;
-  insert(data: IAccountInsertDTO): Promise<number>;
-  update(data: IAccountUpdateDTO): Promise<boolean>;
-  delete(email: string): Promise<boolean>;
+  insert(data: IAccountInsertDTO, executor: TExecutor): Promise<number>;
+  update(data: IAccountUpdateDTO, executor: TExecutor): Promise<boolean>;
+  delete(email: string, executor: TExecutor): Promise<boolean>;
   isExist(email: string): Promise<boolean>;
 
 }
@@ -13,11 +16,11 @@ export interface IAccountRepository {
 export interface IAccountService {
   findUserWithCredentials(email: string): Promise<IAccountRow | null>;
   findUserById(id: number): Promise<IAccountRow | null>;
-  insertUser(document: IAccountInsertDTO): Promise<number | null>;
-  updateUser(document: IAccountUpdateDTO): Promise<boolean>;
-  deleteUser(email: string): Promise<boolean>;
+  insertUser(document: IAccountInsertDTO, executor?: TExecutor): Promise<number | null>;
+  updateUser(document: IAccountUpdateDTO, executor?: TExecutor): Promise<boolean>;
+  deleteUser(email: string, executor?: TExecutor): Promise<boolean>;
   isUserExist(email: string): Promise<boolean>;
-  markWelcomeSeen(email: string, state: boolean): Promise<boolean>;
+  markWelcomeSeen(email: string, state: boolean, executor?: TExecutor): Promise<boolean>;
 }
 export interface IAccountRow extends RowDataPacket {
   id: number;

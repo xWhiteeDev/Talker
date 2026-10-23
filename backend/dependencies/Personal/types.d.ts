@@ -1,6 +1,6 @@
 import type {RowDataPacket} from "mysql2";
 import type {Response, Request, NextFunction} from "express";
-
+import type {TExecutor} from '../../database/helper/types.d.ts'
 export type TGender = 'female' | 'male' | 'Prefer not to say';
 
 export interface IPersonalRow extends RowDataPacket {
@@ -24,17 +24,17 @@ export interface IPersonal {
 }
 export interface IPersonalRepository {
     getByUserId(userId: number): Promise<IPersonalRow | null>;
-    insert(document: IPersonalRowInsertDTO): Promise<boolean>;
-    update(userId: number, updateDocument: IPersonalpdateDTO): Promise<boolean>;
+    insert(document: IPersonalRowInsertDTO, executor?:TExecutor): Promise<boolean>;
+    update(userId: number, updateDocument: IPersonalpdateDTO, executor?:TExecutor): Promise<boolean>;
     isAnyExist(userId: number): Promise<boolean>;
-    delete(userId: number): Promise<boolean>;
+    delete(userId: number, executor?:TExecutor): Promise<boolean>;
 }
 
 export interface IPersonalService {
     getPersonal(userId: number): Promise<IPersonal | null>;
-    insertPersonal(document: IPersonalRowInsertDTO): Promise<boolean>;
-    updatePersonal(userId: number, updateDocument: IPersonalRowUpdateDTO): Promise<boolean>;
-    deletePersonal(userId: number): Promise<boolean>;
+    insertPersonal(document: IPersonalRowInsertDTO, executor?:TExecutor): Promise<boolean>;
+    updatePersonal(userId: number, updateDocument: IPersonalRowUpdateDTO, executor?:TExecutor): Promise<boolean>;
+    deletePersonal(userId: number, executor?:TExecutor): Promise<boolean>;
 }
 
 export interface IPersonalController {

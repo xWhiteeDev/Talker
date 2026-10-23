@@ -8,12 +8,12 @@ export class PersonalRepository implements IPersonalRepository {
         const [[result]] = await this.db.query<IPersonalRow[]>(query, {userId});
         return result ?? null;
     }
-    async insert(document: IPersonalInsertDTO): Promise<boolean> {
+    async insert(document: IPersonalInsertDTO, executor: Pool = this.db): Promise<boolean> {
         const query: string = 'INSERT INTO personal (user_id,first_name,last_name,birth_date,living_place,gender) VALUES (:user_id,:first_name,:last_name,:birth_date,:living_place,:gender)';
-        const [result] = await this.db.execute<ResultSetHeader>(query, {...document});
+        const [result] = await executor.execute<ResultSetHeader>(query, {...document});
         return result.affectedRows > 0;
     }
-    async update(userId: number, updateDocument: IPersonalUpdateDTO): Promise<boolean> {
+    async update(userId: number, updateDocument: IPersonalUpdateDTO, executor: Pool = this.db): Promise<boolean> {
         const allowedKeys: (keyof IPersonalUpdateDTO)[] = ['birth_date', 'first_name', 'last_name', 'living_place', 'gender'] as const;
         let key: keyof IPersonalUpdateDTO;
         const queryKeys: string[] = [];
@@ -26,7 +26,7 @@ export class PersonalRepository implements IPersonalRepository {
         if (queryKeys.length === 0) return false;
         const fullQuery = queryKeys.join(',');
         const query = `UPDATE personal SET ${fullQuery} WHERE user_id=:userId`;
-        const [result] = await this.db.execute<ResultSetHeader>(query, {...params as any});
+        const [result] = await executor.execute<ResultSetHeader>(query, {...params as any});
         return result.affectedRows > 0;
     }
     async isAnyExist(userId: number): Promise<boolean> {
@@ -34,9 +34,9 @@ export class PersonalRepository implements IPersonalRepository {
         const [result] = await this.db.query<IPersonalRow[]>(query, {userId});
         return result.length > 0;
     }
-    async delete(userId: number): Promise<boolean> {
+    async delete(userId: number, executor: Pool = this.db): Promise<boolean> {
         const query: string = 'DELETE  FROM personal WHERE user_id=:userId';
-        const [result] = await this.db.query(query, {userId});
+        const [result] = await executor.query(query, {userId});
         return !!result;
     }
 

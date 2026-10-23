@@ -1,16 +1,17 @@
-import type { ResultSetHeader, Pool } from 'mysql2/promise';
-import type { AllowedInsertKeys, CommentInsertDTO, CommentRow, FoundComment, ICommentsRepository } from './types.js';
+import type {ResultSetHeader, Pool} from 'mysql2/promise';
+import type {AllowedInsertKeys, CommentInsertDTO, CommentRow, FoundComment, ICommentsRepository} from './types.js';
+import type {TExecutor} from '../../database/helper/transactionRunner.js';
 
 export class CommentsRepository implements ICommentsRepository {
-  constructor(private pool: Pool) {}
+  constructor(private pool: Pool) { }
   async findByPost(postId: number): Promise<CommentRow[] | null> {
     const query: string = 'SELECT * FROM comments WHERE post_id=:postId';
-    const [result] = await this.pool.query<CommentRow[]>(query, { postId });
+    const [result] = await this.pool.query<CommentRow[]>(query, {postId});
     return result.length > 0 ? result : null;
   }
   async findByUserId(userId: number, postId: number): Promise<CommentRow[] | null> {
     const query: string = 'SELECT * FROM comments WHERE user_id=:userId AND post_id=:postId';
-    const [result] = await this.pool.query<CommentRow[]>(query, { userId, postId });
+    const [result] = await this.pool.query<CommentRow[]>(query, {userId, postId});
     return result.length > 0 ? result : null;
   }
   async findById(userId: number, commentId: number): Promise<FoundComment | undefined> {
@@ -88,15 +89,15 @@ LEFT JOIN accounts as a ON a.id = c.user_id
 LEFT JOIN current_reactions_agg as curra ON curra.comment_id=c.id
 WHERE c.id = :commentId
 LIMIT 1`;
-    const [[result]] = await this.pool.query<FoundComment[]>(query, { userId, commentId });
+    const [[result]] = await this.pool.query<FoundComment[]>(query, {userId, commentId});
     return result;
   }
   async findByParentId(parentId: number): Promise<CommentRow[] | null> {
     const query: string = 'SELECT * FROM comments WHERE parent_id=:parentId';
-    const [result] = await this.pool.query<CommentRow[]>(query, { parentId });
+    const [result] = await this.pool.query<CommentRow[]>(query, {parentId});
     return result.length > 0 ? result : null;
   }
-  async insertDocument(dto: CommentInsertDTO): Promise<boolean> {
+  async insertDocument(dto: CommentInsertDTO, executor: TExecutor = this.pool): Promise<boolean> {
     const allowedKeys: AllowedInsertKeys[] = ['post_id', 'user_id', 'parent_id', 'content'];
     const queryKeys: string[] = [];
     const queryParams: Record<string, any> = {};
@@ -110,17 +111,17 @@ LIMIT 1`;
       }
     }
     const query = `INSERT INTO comments (${queryKeys.join(',')}) VALUES(${queryKeys.map((v) => `:${v}`).join(',')})`;
-    const [result] = await this.pool.execute<ResultSetHeader>(query, { ...queryParams });
+    const [result] = await executor.execute<ResultSetHeader>(query, {...queryParams});
     return result.affectedRows > 0;
   }
-  async updateContent(commentId: number, newContent: string): Promise<boolean> {
+  async updateContent(commentId: number, newContent: string, executor: TExecutor = this.pool): Promise<boolean> {
     const query: string = 'UPDATE comments SET content=:newContent WHERE id=:commentId';
-    const [result] = await this.pool.execute<ResultSetHeader>(query, { commentId, newContent });
+    const [result] = await executor.execute<ResultSetHeader>(query, {commentId, newContent});
     return result.affectedRows > 0;
   }
-  async deleteDocument(commentId: number): Promise<boolean> {
+  async deleteDocument(commentId: number, executor: TExecutor = this.pool): Promise<boolean> {
     const query: string = 'DELETE FROM comments WHERE id=:commentId';
-    const [result] = await this.pool.execute<ResultSetHeader>(query, { commentId });
+    const [result] = await executor.execute<ResultSetHeader>(query, {commentId});
     return result.affectedRows > 0;
   }
 }

@@ -1,4 +1,5 @@
 import type {RowDataPacket} from "mysql2";
+import type {TExecutor} from "../../database/helper/transactionRunner.js";
 
 export interface IPostReactionRepository {
     findById(id: number): Promise<PostReactionRow | undefined>;
@@ -7,9 +8,9 @@ export interface IPostReactionRepository {
     findByType(type: string, postId: number): Promise<PostReactionRow[]>;
     findByAuthorInPost(authorId: number, postId: number): Promise<PostReactionRow | undefined>;
 
-    insert(dto: PostReactionInsertDTO): Promise<boolean>;
-    updateType(reactionId: number, newType: string): Promise<boolean>;
-    delete(authorId: number, postId: number): Promise<boolean>;
+    insert(dto: PostReactionInsertDTO, executor?: TExecutor): Promise<boolean>;
+    updateType(reactionId: number, newType: string, executor?: TExecutor): Promise<boolean>;
+    delete(authorId: number, postId: number, executor?: TExecutor): Promise<boolean>;
 }
 
 export interface IPostReactionsService {
@@ -17,9 +18,9 @@ export interface IPostReactionsService {
     findPostReactionsByType(postId: number, type: string): Promise<PostReactionRow[] | undefined>;
     findAllUserReactions(userId: number): Promise<PostReactionRow[] | undefined>;
     findUserReactionInPost(userId: number, postId: number): Promise<PostReactionRow | undefined>;
-    insertPostReaction(dto: PostReactionInsertDTO): Promise<boolean>;
-    updateReactionType(reactionId: number, newType: string): Promise<boolean>;
-    deleteUserReactionInPost(userId: number, postId: number): Promise<boolean>;
+    insertPostReaction(dto: PostReactionInsertDTO, executor?: TExecutor): Promise<boolean>;
+    updateReactionType(reactionId: number, newType: string, executor?: TExecutor): Promise<boolean>;
+    deleteUserReactionInPost(userId: number, postId: number, executor?: TExecutor): Promise<boolean>;
 }
 
 export interface PostReactionRow extends RowDataPacket {

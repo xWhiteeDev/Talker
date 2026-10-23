@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 import {configDotenv} from 'dotenv';
 import type {IAccountService} from '../Account/types.js';
 import {ErrorHandler} from '../../handlers/errorHandler.js';
-import type {IAuthService, ILogin, IServerAccountRegisterData, ISignInPayload} from './types.js';
+import type {IAuthService, ILogin, IServerAccountRegisterData, ISessionPayload, ISignInPayload} from './types.js';
 import type {IPersonalService} from '../Personal/types.js';
 import type {ICodeInsertDTO, ICodeService} from '../Code/types.js';
 import {generateRandomCode} from '../../helpers/char.js';
@@ -11,10 +11,12 @@ import {ACCOUNT_CONFIG} from '../../configurations/account.config.js';
 import type {IResend} from '../../services/Resend/type.js';
 import {confirmationEmail} from '../../services/Resend/templates/email.template.js';
 import {ACCESS_TOKEN, REFRESH_TOKEN} from './cfg/cookie.js';
+import type {ITransactionRunner} from '../../database/helper/types.js';
+
 
 configDotenv();
 export class AuthService implements IAuthService {
-  constructor(private accountService: IAccountService, private personalService: IPersonalService, private codeService: ICodeService, private Emailer: IResend) {
+  constructor(private accountService: IAccountService, private personalService: IPersonalService, private codeService: ICodeService, private Emailer: IResend, private transactionRunner: ITransactionRunner) {
   }
   async signIn(document: ILogin): Promise<ISignInPayload | null> {
     const existingUser = await this.accountService.findUserWithCredentials(document.email);
@@ -27,6 +29,7 @@ export class AuthService implements IAuthService {
     }
     if (existingUser.status === 'unverified') {
       throw new ErrorHandler('Unverified', 403);
+
     }
     const existingPersonalRow = await this.personalService.getPersonal(existingUser.id);
     if (!existingPersonalRow) return null;
@@ -65,33 +68,40 @@ export class AuthService implements IAuthService {
     if (existingEmail) {
       throw new ErrorHandler('Failed to create an account!', 400);
     };
-    const insertId = await this.accountService.insertUser({email: document.account.email, password: document.account.password, status: 'unverified'});
-    if (insertId == null) {
-      throw new ErrorHandler('Failed to create an account!', 400);
-    }
-    const insertingPersonalities = await this.personalService.insertPersonal({
-      user_id: insertId,
-      first_name: document.personal.firstName,
-      last_name: document.personal.lastName,
-      birth_date: document.personal.birthdayDate,
-      living_place: document.personal.livingPlace,
-      gender: document.personal.gender
+    await this.transactionRunner.run(async (connection) => {
+      const insertId = await this.accountService.insertUser({email: document.account.email, password: document.account.password, status: 'unverified'}, connection);
+      if (insertId == null) {
+        throw new ErrorHandler('Failed to create an account!', 400);
+      }
+
+      const insertingPersonalities = await this.personalService.insertPersonal({
+        user_id: insertId,
+        first_name: document.personal.firstName,
+        last_name: document.personal.lastName,
+        birth_date: document.personal.birthdayDate,
+        living_place: document.personal.livingPlace,
+        gender: document.personal.gender
+      }, connection);
+
+      if (!insertingPersonalities) {
+        throw new ErrorHandler('Failed to save personal data', 500, false);
+      }
+      const generatedCode = generateRandomCode(ACCOUNT_CONFIG.CODE.MAX);
+      if (!generatedCode) {
+        throw new ErrorHandler('Failed to create code!', 400);
+      }
+      const codeInsertPayload: ICodeInsertDTO = {
+        email: document.account.email,
+        type: 'verification',
+        code: generatedCode,
+        expires_at: Date.now() + 5 * 60_000,
+        attempts: 0
+      };
+      await this.codeService.insertCode(codeInsertPayload, connection);
+      const confirmation = confirmationEmail(generatedCode, 5);
+      await this.Emailer.send(confirmation.subject, confirmation.html, confirmation.text, document.account.email.trim().toLowerCase());
     });
 
-    if (!insertingPersonalities) {
-      throw new ErrorHandler('Failed to save personal data', 500, false);
-    }
-    const generatedCode = generateRandomCode(ACCOUNT_CONFIG.CODE.MAX);
-    const codeInsertPayload: ICodeInsertDTO = {
-      email: document.account.email,
-      type: 'verification',
-      code: generatedCode,
-      expires_at: Date.now() + 5 * 60_000,
-      attempts: 0
-    };
-    await this.codeService.insertCode(codeInsertPayload);
-    const confirmation = confirmationEmail(generatedCode, 5);
-    await this.Emailer.send(confirmation.subject, confirmation.html, confirmation.text, document.account.email.trim().toLowerCase());
     return true;
   }
   signNewToken(userId: number, tokenType: 'access' | 'refresh'): string {
@@ -105,8 +115,15 @@ export class AuthService implements IAuthService {
   async isEmailTaken(email: string) {
     return (await this.accountService.isUserExist(email));
   }
-  async isAuthorized(id: number): Promise<number | null> {
+  async isAuthorized(id: number): Promise<ISessionPayload | null> {
     const existingUser = await this.accountService.findUserById(id);
-    return existingUser ? existingUser.id : null;
+    const personalData = await this.personalService.getPersonal(id);
+    if (!existingUser || !personalData) return null;
+    const payload: ISessionPayload = {
+      firstName: personalData.firstName,
+      lastName: personalData.lastName,
+      id: existingUser.id
+    };
+    return payload;
   }
 }

@@ -13,12 +13,12 @@ export class CodeRepository implements ICodeRepository {
         const [result] = await this.dbPool.query<ICodeRow[]>(query, {email});
         return result.length === 0 ? undefined : result;
     }
-    async insert(document: ICodeInsertDTO) {
+    async insert(document: ICodeInsertDTO, executor: Pool = this.dbPool) {
         const query: string = 'INSERT INTO code (email,type,code,expires_at) VALUES(:email,:type,:code,:expires_at)';
-        const [result] = await this.dbPool.execute<ResultSetHeader>(query, {...document});
+        const [result] = await executor.execute<ResultSetHeader>(query, {...document});
         return result.affectedRows > 0;
     }
-    async update(email: string, type: TCodeType, updateDocument: ICodeUpdateDTO): Promise<boolean> {
+    async update(email: string, type: TCodeType, updateDocument: ICodeUpdateDTO, executor: Pool = this.dbPool): Promise<boolean> {
         const allowedKeys: (keyof ICodeUpdateDTO)[] = ['attempts', 'code', 'expires_at'];
         const queryKeys: string[] = [];
         const queryParams: Partial<Record<keyof ICodeUpdateDTO, unknown>> = {};
@@ -33,7 +33,7 @@ export class CodeRepository implements ICodeRepository {
         if (queryKeys.length === 0 || Object.keys(queryParams).length === 0) return false;
         const fullQuery: string = queryKeys.join(',');
         const query: string = `UPDATE code SET ${fullQuery} WHERE email=:email AND type=:type`;
-        const [result] = await this.dbPool.execute<ResultSetHeader>(query, {email, type, ...queryParams as any});
+        const [result] = await executor.execute<ResultSetHeader>(query, {email, type, ...queryParams as any});
         return result.affectedRows > 0;
     }
     async isAnyExist(email: string, type: TCodeType): Promise<boolean> {
@@ -41,19 +41,19 @@ export class CodeRepository implements ICodeRepository {
         const [[result]] = await this.dbPool.query<ICodeRow[]>(query, {email, type});
         return !!result;
     }
-    async reserveAttempt(email: string, type: TCodeType): Promise<boolean> {
+    async reserveAttempt(email: string, type: TCodeType, executor: Pool = this.dbPool): Promise<boolean> {
         const query: string = 'UPDATE code SET attempts=attempts+1 WHERE email=:email AND type=:type AND attempts < 5 LIMIT 1';
-        const [updateResult] = await this.dbPool.execute<ResultSetHeader>(query, {email, type});
+        const [updateResult] = await executor.execute<ResultSetHeader>(query, {email, type});
         return updateResult.affectedRows > 0;
     }
-    async deleteWhenExhausted(email: string, type: TCodeType): Promise<boolean> {
+    async deleteWhenExhausted(email: string, type: TCodeType, executor: Pool = this.dbPool): Promise<boolean> {
         const query: string = 'DELETE FROM code WHERE email=:email AND type=:type AND attempts=5';
-        const [result] = await this.dbPool.execute<ResultSetHeader>(query, {email, type});
+        const [result] = await executor.execute<ResultSetHeader>(query, {email, type});
         return result.affectedRows > 0;
     }
-    async delete(email: string, type: TCodeType): Promise<boolean> {
+    async delete(email: string, type: TCodeType, executor: Pool = this.dbPool): Promise<boolean> {
         const query = 'DELETE FROM code WHERE email=:email AND type=:type LIMIT 1';
-        const [result] = await this.dbPool.execute<ResultSetHeader>(query, {email, type});
+        const [result] = await executor.execute<ResultSetHeader>(query, {email, type});
         return result.affectedRows > 0;
     }
 }

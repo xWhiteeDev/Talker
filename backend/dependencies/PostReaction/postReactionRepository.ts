@@ -31,20 +31,20 @@ export class PostReactionRepository implements IPostReactionRepository {
         const [[result]] = await this.pool.query<PostReactionRow[]>(query, {authorId, postId});
         return result;
     }
-    async insert(dto: PostReactionInsertDTO): Promise<boolean> {
+    async insert(dto: PostReactionInsertDTO, executor:Pool = this.pool): Promise<boolean> {
         const query: string = 'INSERT INTO reactions_post (author_id,type,post_id) VALUES(:authorId,:type,:postId)';
-        const [result] = await this.pool.execute<ResultSetHeader>(query, {...dto});
+        const [result] = await executor.execute<ResultSetHeader>(query, {...dto});
         return result.affectedRows > 0;
     }
-    async updateType(reactionId: number, newType: string): Promise<boolean> {
+    async updateType(reactionId: number, newType: string, executor:Pool = this.pool): Promise<boolean> {
         const query: string = 'UPDATE reactions_post SET type=:newType WHERE id=:id';
-        const [result] = await this.pool.execute<ResultSetHeader>(query, {id: reactionId, newType});
+        const [result] = await executor.execute<ResultSetHeader>(query, {id: reactionId, newType});
         return result.affectedRows > 0;
 
     }
-    async delete(authorId: number, postId: number): Promise<boolean> {
+    async delete(authorId: number, postId: number, executor:Pool = this.pool): Promise<boolean> {
         const query: string = 'DELETE FROM reactions_post WHERE author_id=:authorId AND post_id=:postId';
-        const [result] = await this.pool.execute<ResultSetHeader>(query, {authorId, postId});
+        const [result] = await executor.execute<ResultSetHeader>(query, {authorId, postId});
         return result.affectedRows > 0;
     }
 

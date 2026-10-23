@@ -1,5 +1,6 @@
 import type {ResultSetHeader, Pool} from "mysql2/promise";
 import type {CommentReactionInsertDTO, CommentReactionRow, ICommentReactionRepository} from "./types.js";
+import type {TExecutor} from "../../database/helper/transactionRunner.js";
 
 
 export class CommentReactionRepository implements ICommentReactionRepository {
@@ -31,20 +32,20 @@ export class CommentReactionRepository implements ICommentReactionRepository {
         const [[result]] = await this.pool.query<CommentReactionRow[]>(query, {authorId, commentId});
         return result;
     }
-    async insert(dto: CommentReactionInsertDTO): Promise<boolean> {
+    async insert(dto: CommentReactionInsertDTO, executor: TExecutor = this.pool): Promise<boolean> {
         const query: string = 'INSERT INTO reactions_comment (author_id,type,comment_Id) VALUES(:author_id,:type,:comment_id)';
-        const [result] = await this.pool.execute<ResultSetHeader>(query, {...dto});
+        const [result] = await executor.execute<ResultSetHeader>(query, {...dto});
         return result.affectedRows > 0;
     }
-    async updateType(reactionId: number, newType: string): Promise<boolean> {
+    async updateType(reactionId: number, newType: string, executor: TExecutor = this.pool): Promise<boolean> {
         const query: string = 'UPDATE reactions_comment SET type=:newType WHERE id=:id';
-        const [result] = await this.pool.execute<ResultSetHeader>(query, {id: reactionId, newType});
+        const [result] = await executor.execute<ResultSetHeader>(query, {id: reactionId, newType});
         return result.affectedRows > 0;
 
     }
-    async delete(authorId: number, commentId: number): Promise<boolean> {
+    async delete(authorId: number, commentId: number, executor: TExecutor = this.pool): Promise<boolean> {
         const query: string = 'DELETE FROM reactions_comment WHERE author_id=:authorId AND comment_id=:commentId';
-        const [result] = await this.pool.execute<ResultSetHeader>(query, {authorId, commentId});
+        const [result] = await executor.execute<ResultSetHeader>(query, {authorId, commentId});
         return result.affectedRows > 0;
     }
 
